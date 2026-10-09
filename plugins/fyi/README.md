@@ -43,12 +43,14 @@ that took effort to find.
 A local web page over the store: what needs you today, which pull
 requests are waiting, and what projects are in flight.
 
-Run `/fyi:dashboard` in a session to start it and get the link, or run
-it in a terminal:
+Run `/fyi:dashboard` in a session to start it and get the link, or use
+its script in a terminal:
 
 ```bash
-~/.jay/plugins/fyi/dashboard/start.sh          # http://localhost:3456
-~/.jay/plugins/fyi/dashboard/start.sh --open   # and open a browser
+~/.jay/plugins/fyi/dashboard/run.sh                # run it here, on http://localhost:3456
+~/.jay/plugins/fyi/dashboard/run.sh start --open   # in the background, and open a browser
+~/.jay/plugins/fyi/dashboard/run.sh stop           # stop it, however it was started
+~/.jay/plugins/fyi/dashboard/run.sh status         # the URL, if it is running
 ```
 
 | View | Lists |

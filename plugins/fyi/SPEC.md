@@ -253,7 +253,7 @@ same store, so validation and archiving apply.
 | `actions.ts` | Done and snooze, the only changes the page makes |
 | `public/views.js` | What the shell's page shows: rows, details, actions |
 | `public/rows.js`, `details.js`, `format.js` | The list rows, the details panel, PR chips |
-| `shell/`, `start.sh` | The shared dashboard shell, copied from `tools/plugin/dashboard/` |
+| `shell/`, `run.sh` | The shared dashboard shell, copied from `tools/plugin/dashboard/` |
 | `paths.ts`, `types.ts`, `validation.ts`, `errors.ts`, `time.ts` | Small shared pieces |
 
 ## 11. Changing the format

@@ -21,9 +21,6 @@ export interface NavEntry {
   views: (View & { badge?: Badge })[];
 }
 
-const START_WAIT_MS = 8_000;
-const START_POLL_MS = 200;
-
 const urlOf = (port: number) => `http://localhost:${port}`;
 
 /**
@@ -46,17 +43,24 @@ export async function nav(self: string, ownBadges: () => Promise<Record<string, 
   }));
 }
 
-/** Starts an installed plugin's dashboard, unless it is running, and returns its URL. */
+/**
+ * Starts an installed plugin's dashboard with its `run.sh start`, unless it is running,
+ * and returns its URL. The script runs in a session of its own, so the dashboard it
+ * starts outlives this one.
+ */
 export async function start(plugin: string): Promise<{ url: string }> {
   const dashboard = (await installed()).find((d) => d.plugin === plugin);
   if (!dashboard) throw new HttpError(404, `no dashboard installed for ${plugin}`);
   const url = urlOf(dashboard.port);
   if (await running(plugin, dashboard.port)) return { url };
 
-  spawn(join(dashboard.dir, "start.sh"), [], { detached: true, stdio: "ignore" }).unref();
-  for (let waited = 0; waited < START_WAIT_MS; waited += START_POLL_MS) {
-    await new Promise((resolve) => setTimeout(resolve, START_POLL_MS));
-    if (await running(plugin, dashboard.port)) return { url };
-  }
-  throw new HttpError(502, `${plugin}'s dashboard did not start; run ${join(dashboard.dir, "start.sh")} to see why`);
+  const script = spawn(join(dashboard.dir, "run.sh"), ["start"], { detached: true, stdio: ["ignore", "ignore", "pipe"] });
+  let stderr = "";
+  script.stderr.on("data", (chunk) => (stderr += chunk));
+  const code = await new Promise<number | null>((resolve) => {
+    script.on("error", () => resolve(null));
+    script.on("close", resolve);
+  });
+  if (code !== 0) throw new HttpError(502, stderr.trim() || `${plugin}'s dashboard did not start`);
+  return { url };
 }

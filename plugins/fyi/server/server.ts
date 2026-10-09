@@ -12,12 +12,16 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { readFileSync } from "node:fs";
 
 import { root } from "./store.js";
 import { tools, toolsByName } from "./tools/index.js";
 
+/** The plugin's version, so the server reports the release it ships in. */
+const { version } = JSON.parse(readFileSync(new URL("../.claude-plugin/plugin.json", import.meta.url), "utf8"));
+
 const mcp = new Server(
-  { name: "fyi", version: "0.1.0" },
+  { name: "fyi", version },
   {
     capabilities: { tools: {} },
     instructions: [

@@ -24,7 +24,7 @@ link, since the installed root changes with every version.
 ## dashboard
 
 The frame every dashboard runs on: the server, the page, the shared menu,
-and `start.sh`. A plugin adds four things to its `dashboard/`:
+and `run.sh`. A plugin adds four things to its `dashboard/`:
 
 | File | Holds |
 |---|---|
@@ -43,5 +43,8 @@ The server listens on 127.0.0.1 only. It refuses requests whose `Host`
 is not this machine, and changes sent as anything other than JSON, so a
 page on another site cannot read or change anything through it.
 
-Run a dashboard in a terminal with `dashboard/start.sh`, or
-`start.sh --open` to open a browser too.
+`dashboard/run.sh` runs a dashboard in the terminal. `run.sh start`
+starts it in the background and prints its URL, and `run.sh stop` stops it
+by asking the server to exit (`POST /shutdown`), however it was started.
+`--open` opens a browser too. The menu starts other dashboards with
+`run.sh start`.
