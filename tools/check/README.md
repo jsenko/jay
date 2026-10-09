@@ -14,7 +14,7 @@ tools/check/check.sh --quiet    # findings only
 | Check | Catches | Severity |
 |---|---|---|
 | **Manifests** | A plugin missing from the marketplace or listed without its directory; a `plugin.json` that misnames itself, has no version, or depends on a plugin not in this marketplace | error |
-| **Budgets** | An instruction file past the line limit for its kind (`docs/authoring.md`) | warning |
+| **Budgets** | An instruction file past the line limit for its kind (crew's `rules/authoring.md`) | warning |
 | **File references** | A `~/.jay/plugins/<p>/…` path to a file that does not exist, or into a plugin this one does not depend on | error |
 | | A reference into the old `~/.fyi/work/` layout | warning |
 | **Command references** | `/<plugin>:<name>` with no command or skill behind it, or in a plugin this one does not depend on | error |

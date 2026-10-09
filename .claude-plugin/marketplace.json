@@ -9,6 +9,11 @@
       "name": "fyi",
       "source": "./plugins/fyi",
       "description": "Durable store for tasks, notes, projects and tracked pull requests, kept as Markdown under ~/.fyi"
+    },
+    {
+      "name": "crew",
+      "source": "./plugins/crew",
+      "description": "Start sessions as roles, and coordinate them: who is working on what, jobs routed by capability, messages, and a dashboard"
     }
   ]
 }

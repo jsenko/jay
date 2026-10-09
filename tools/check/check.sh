@@ -57,7 +57,7 @@ plugin_of() { cut -d/ -f2 <<< "$1"; }
 
 # ---------------------------------------------------------------- budgets
 
-# Line budget by file kind. See docs/authoring.md.
+# Line budget by file kind. See plugins/crew/rules/authoring.md.
 budget_for() {
     case "$1" in
         plugins/crew/rules/always.md)     echo 25  ;;

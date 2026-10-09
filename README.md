@@ -14,10 +14,10 @@ being moved here from an earlier setup, one at a time.
 | Plugin | What it does | Dashboard | Needs | State |
 |---|---|---|---|---|
 | [fyi](plugins/fyi/README.md) | Store for tasks, notes, projects and tracked PRs, as Markdown under `~/.fyi` | Today, pull requests, projects | — | available |
-| crew | Coordination between concurrent sessions: who is running, messages, and jobs | Sessions, jobs | — | planned |
+| [crew](plugins/crew/README.md) | Roles to start sessions as, and coordination between them: who is running, messages, and jobs | Sessions, jobs | fyi | in progress |
 | status | A short status for teammates and a weekly report, built from GitHub and fyi | — | fyi | planned |
 | code | The coding role and workflow, with feature tracking and code-quality rules | — | fyi, crew | planned |
-| pr-workflow | Watching GitHub, PR reviews, and the PR queue | — | fyi, crew | planned |
+| pr | Watching GitHub, PR reviews, and the PR queue | — | fyi, crew | planned |
 
 Installing a plugin also installs what it needs. The dashboards of all
 installed plugins share one menu, so each one can open the others.
@@ -56,6 +56,10 @@ Talk to a session as usual; the plugins give it tools and habits.
   stopped, what was decided and why, and what is still open, from any
   directory.
 - **`/fyi:dashboard`** opens the same information as a web page.
+- **`/crew:start coder`** starts a session as the coder role: it joins
+  the crew, reads what the role lists, and says what it found. Other
+  sessions see what it is doing, and work it can take is routed to it.
+  `/crew:stop` saves where it stopped before it leaves.
 
 Each plugin's README lists what it adds.
 
@@ -89,6 +93,8 @@ then `/plugin update fyi@jay`. Restart Claude Code either way.
 | `~/.claude/plugins/cache/jay/<plugin>/<version>/` | The installed plugins, managed by Claude Code |
 | `~/.jay/plugins/<plugin>` | A link to each plugin's current version, made when a session starts; instruction files refer to each other through it |
 | `~/.jay/config.json` | Settings shared by several plugins, once a plugin needs one |
+| `~/.jay/roles/` | Your own roles, which crew finds next to the plugins' |
+| `~/.jay/crew/` | crew's state: sessions, messages and jobs |
 | `~/.fyi/` | fyi's items, and its own settings in `~/.fyi/config.json` |
 | `~/.claude/settings.json` | Changed by the installer, which keeps the previous version as `settings.json.before-jay` |
 
@@ -112,5 +118,5 @@ through an adapter, installed by the same `./install.sh`.
 edits load on the next restart, and installs the plugins' npm
 dependencies in place. See [CLAUDE.md](CLAUDE.md) for the
 repository layout and conventions, and
-[docs/authoring.md](docs/authoring.md) for the rules on writing
+[crew's authoring rules](plugins/crew/rules/authoring.md) for writing
 instruction files.

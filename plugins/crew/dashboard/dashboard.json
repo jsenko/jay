@@ -1,0 +1,8 @@
+{
+  "title": "crew",
+  "port": 3457,
+  "views": [
+    { "id": "sessions", "label": "Sessions", "icon": "◉" },
+    { "id": "jobs", "label": "Jobs", "icon": "☰" }
+  ]
+}

@@ -15,10 +15,9 @@ folders through an adapter.
   - `rules/`, `processes/`, `roles/` — instruction files, read through `~/.jay/plugins/<name>/`
   - `hooks/` — the link hook, copied from `tools/plugin/hooks/`
   - `.mcp.json`, `package.json`, `server/` — an MCP server, if the plugin has one
-  - `dashboard/` — a dashboard, if it has one, built on `tools/plugin/dashboard-shell/`
+  - `dashboard/` — a dashboard, if it has one, built on the shell copied from `tools/plugin/dashboard/`
 - `install.sh` — installs plugins into the clients found, sets permissions, and runs each plugin's `setup.sh`
 - `tools/` — repo tooling: `check/`, and `plugin/` for the pieces every plugin copies
-- `docs/` — repo-wide documentation, including `authoring.md`
 - `.github/workflows/` — CI: `tools/check`, shellcheck and plugin tests on each push to main
 
 A marketplace install copies only the plugin's folder. Everything a
@@ -57,7 +56,8 @@ invocation like a command.
 A profile for a kind of session: what it is for, what it advertises to
 the crew, which rules and processes it loads at start versus on demand,
 and how autonomously it acts. Each role ships in the plugin that owns
-it, and sessions find roles under `~/.jay/plugins/*/roles/`.
+it, and sessions find roles under `~/.jay/plugins/*/roles/`, and the
+user's own under `~/.jay/roles/`.
 
 ## References
 
@@ -65,7 +65,7 @@ Instruction files name each other by stable path, never relative to the
 plugin: `~/.jay/plugins/<plugin>/<dir>/<file>.md`. `${CLAUDE_PLUGIN_ROOT}`
 appears only in `.mcp.json` and hooks, where both clients substitute it.
 A reference into another plugin needs that plugin in `dependencies`.
-`docs/authoring.md` has the full table, and `tools/check` enforces it.
+crew's `rules/authoring.md` has the full table, and `tools/check` enforces it.
 
 ## Design principles
 
@@ -100,9 +100,13 @@ Always name the source explicitly, so every event has a clear emitter
 and processor.
 
 ### Conciseness and chunking
-Follow `docs/authoring.md` for any instruction file. It sets per-type
-line budgets. The right chunk is a **load boundary, not a topic**: when
-half a file applies only under a condition, that is two files.
+Follow `plugins/crew/rules/authoring.md` for any instruction file. It
+sets per-type line budgets, which `tools/check` enforces. The right
+chunk is a **load boundary, not a topic**: when half a file applies only
+under a condition, that is two files.
+
+Users follow the same guide for their own roles and rules, so keep it
+free of anything only this repository needs.
 
 ### Independent plugins
 A plugin never imports another plugin's code or reads its data files.
