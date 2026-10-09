@@ -18,7 +18,14 @@ From a clone of jay:
 ```
 
 This installs the plugin and asks for its settings (see
-[Configuration](#configuration)). The [main README](../../README.md)
+[Configuration](#configuration)). Without a clone, in Claude Code:
+
+```
+/plugin marketplace add jsenko/jay
+/plugin install fyi@jay
+```
+
+then follow the main README's steps for permissions and settings. The [main README](../../README.md)
 covers other ways to install, updating and uninstalling.
 
 ## What sessions can do
