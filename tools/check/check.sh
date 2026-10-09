@@ -65,7 +65,7 @@ budget_for() {
         plugins/*/roles/*.md)             echo 60  ;;
         plugins/*/processes/*.md)         echo 120 ;;
         plugins/*/skills/*/SKILL.md)      echo 120 ;;
-        plugins/*/commands/*.md|plugins/*/commands/*/*.md) echo 80 ;;
+        plugins/*/commands/*.md)          echo 80  ;;  # a case * also matches nested directories
         *)                                echo 0   ;;
     esac
 }
@@ -100,11 +100,11 @@ check_file_refs() {
             elif [[ "$owner" != "$self" ]] && ! dependencies_of "$self" | grep -qx "$owner"; then
                 err "$file → ~/.jay/plugins/$target ($self does not depend on $owner)"
             fi
-        done < <(grep -oE '~/\.jay/plugins/[a-z0-9-]+/[A-Za-z0-9_./-]+\.(md|sh|json|ts|js)' "$REPO/$file" \
+        done < <(grep -oE '[~]/\.jay/plugins/[a-z0-9-]+/[A-Za-z0-9_./-]+\.(md|sh|json|ts|js)' "$REPO/$file" \
                    | sed 's|^~/\.jay/plugins/||' | sort -u)
         while IFS= read -r target; do
             [[ -n "$target" ]] && warn "$file → $target (old layout; switch to ~/.jay/plugins/ once it moves)"
-        done < <(grep -oE '~/\.fyi/work/(rules|processes|roles)/[A-Za-z0-9_./-]+\.md' "$REPO/$file" | sort -u)
+        done < <(grep -oE '[~]/\.fyi/work/(rules|processes|roles)/[A-Za-z0-9_./-]+\.md' "$REPO/$file" | sort -u)
     done < <(instruction_files)
 }
 
