@@ -2,8 +2,7 @@
  * Finds the dashboards of every installed plugin, through the ~/.jay/plugins
  * links, and whether each is running.
  *
- * Copied into every plugin with a dashboard from tools/plugin/dashboard/;
- * edit it there.
+ * Shared by every plugin's dashboard through a link.
  */
 
 import { readdir, readFile } from "node:fs/promises";

@@ -3,8 +3,7 @@
  * counts and its actions; the shell supplies the page frame, the shared menu, and
  * the routes other dashboards and run.sh rely on (/health, /badges, /nav, /shutdown).
  *
- * Copied into every plugin with a dashboard from tools/plugin/dashboard/;
- * edit it there.
+ * Shared by every plugin's dashboard through a link.
  */
 
 import { type IncomingMessage, type ServerResponse, createServer } from "node:http";

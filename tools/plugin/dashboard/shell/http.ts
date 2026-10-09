@@ -1,8 +1,7 @@
 /**
  * Request and response helpers shared by every dashboard route.
  *
- * Copied into every plugin with a dashboard from tools/plugin/dashboard/;
- * edit it there.
+ * Shared by every plugin's dashboard through a link.
  */
 
 import type { IncomingMessage, ServerResponse } from "node:http";

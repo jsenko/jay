@@ -22,7 +22,7 @@ tools/check/check.sh --quiet    # findings only
 | **Role frontmatter** | A missing key, a `name` that disagrees with the filename, an `unattended` that is not a boolean, or a capability crew does not define | error |
 | **Command and skill frontmatter** | A missing `description`, without which Claude Code cannot list it | error |
 | **Orphans** | A rule or process nothing points at: dead, or loaded by an unwritten convention | warning |
-| **Shared copies** | A file from `tools/plugin/` missing from a plugin, or changed there instead of in the master | error |
+| **Shared links** | A plugin's `hooks`, `dashboard/shell` or `dashboard/run.sh` that is not a symlink to its master in `tools/plugin/` | error |
 | **Dashboards** | A plugin with a dashboard whose root `package.json` is not an ES module or lacks tsx | error |
 | **MCP servers** | A server command in `.mcp.json` that does not exist once dependencies are installed | error |
 | **claude plugin validate** | Anything Claude Code itself rejects in the marketplace or a plugin | error |

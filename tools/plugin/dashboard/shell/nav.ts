@@ -2,8 +2,7 @@
  * The menu across dashboards: what every installed dashboard shows, and
  * starting one that is not running.
  *
- * Copied into every plugin with a dashboard from tools/plugin/dashboard/;
- * edit it there.
+ * Shared by every plugin's dashboard through a link.
  */
 
 import { spawn } from "node:child_process";

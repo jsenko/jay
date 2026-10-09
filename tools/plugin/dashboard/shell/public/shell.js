@@ -10,7 +10,7 @@
  *   footer        optional (state) => text under the menu
  *
  * Refreshes every 30 seconds, keeping the view, the selection and an open panel.
- * Copied into every plugin with a dashboard from tools/plugin/dashboard/; edit it there.
+ * Shared by every plugin's dashboard through a link.
  */
 
 import * as views from "/views.js";

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Structural checks over the marketplace and its plugins: budgets, references,
-# frontmatter, the shared copies, and the manifests. Catches the class of
+# frontmatter, the shared links, and the manifests. Catches the class of
 # mistake a rename or a move leaves behind.
 #
 # Needs bash and node; runs `claude plugin validate` too when claude is installed.
@@ -222,24 +222,30 @@ check_manifests() {
     done <<< "$listed"
 }
 
-# ------------------------------------------------------------ shared copies
+# ------------------------------------------------------------- shared links
 
-# Each file under tools/plugin/<dir> must be copied unchanged to plugins/<p>/<dir>:
-# hooks into every plugin, dashboard into each plugin that declares one.
-check_copies() {
-    note "${GREEN}shared copies${NC}"
-    local p src rel
+# What every plugin shares, as each plugin's path and the master it must link to.
+# hooks/ goes into every plugin; the dashboard pieces into each that declares one.
+SHARED_LINKS=(
+    "hooks:tools/plugin/hooks"
+    "dashboard/shell:tools/plugin/dashboard/shell"
+    "dashboard/run.sh:tools/plugin/dashboard/run.sh"
+)
+
+# Each shared path must be a symlink resolving to its master in tools/plugin/, so
+# there is one copy to edit; the marketplace install copies the files in.
+check_links() {
+    note "${GREEN}shared links${NC}"
+    local p entry path master
     for p in $(plugins); do
-        for dir in hooks dashboard; do
-            [[ "$dir" == dashboard && ! -f "$REPO/plugins/$p/dashboard/dashboard.json" ]] && continue
-            while IFS= read -r src; do
-                rel="${src#"$REPO/tools/plugin/"}"
-                if [[ ! -f "$REPO/plugins/$p/$rel" ]]; then
-                    err "plugins/$p/$rel is missing (copy it from tools/plugin/$rel)"
-                elif ! cmp -s "$src" "$REPO/plugins/$p/$rel"; then
-                    err "plugins/$p/$rel differs from tools/plugin/$rel (edit the master, then copy)"
-                fi
-            done < <(find "$REPO/tools/plugin/$dir" -type f)
+        for entry in "${SHARED_LINKS[@]}"; do
+            path="${entry%%:*}" master="${entry#*:}"
+            [[ "$path" == dashboard/* && ! -f "$REPO/plugins/$p/dashboard/dashboard.json" ]] && continue
+            if [[ ! -L "$REPO/plugins/$p/$path" ]]; then
+                err "plugins/$p/$path must be a symlink to $master (ln -s with a relative path)"
+            elif [[ "$(realpath "$REPO/plugins/$p/$path")" != "$(realpath "$REPO/$master")" ]]; then
+                err "plugins/$p/$path links to $(readlink "$REPO/plugins/$p/$path"), not $master"
+            fi
         done
     done
 }
@@ -298,7 +304,7 @@ check_command_refs
 check_roles
 check_descriptions
 check_orphans
-check_copies
+check_links
 check_dashboards
 check_servers
 check_validate

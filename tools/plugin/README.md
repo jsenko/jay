@@ -1,19 +1,25 @@
 # plugin
 
-Pieces every plugin carries a copy of. A plugin can only rely on files
-inside its own folder, because a marketplace install copies nothing
-else, so shared code is copied rather than referenced.
+Pieces every plugin shares. Each plugin links to them with a relative
+symlink, so there is one copy to edit. A plugin can only rely on files
+inside its own folder, and that still holds: Claude Code follows the
+links when it copies a plugin into its cache, so an installed plugin
+holds the files themselves. `tools/check` fails when a link is missing
+or points elsewhere.
 
-This directory mirrors a plugin's layout. Each file here is copied to the
-same path in every plugin it applies to, and `tools/check` fails when a
-copy differs:
-
-| Here | Copied to | Applies to |
+| Here | Linked from | Applies to |
 |---|---|---|
-| `hooks/` | `plugins/<name>/hooks/` | every plugin |
-| `dashboard/` | `plugins/<name>/dashboard/` | plugins with `dashboard/dashboard.json` |
+| `hooks/` | `plugins/<name>/hooks` | every plugin |
+| `dashboard/shell/` | `plugins/<name>/dashboard/shell` | plugins with `dashboard/dashboard.json` |
+| `dashboard/run.sh` | `plugins/<name>/dashboard/run.sh` | the same |
 
-Edit the files here, then copy them into the plugins.
+For a new plugin, from its folder:
+
+```bash
+ln -s ../../tools/plugin/hooks hooks
+ln -s ../../../tools/plugin/dashboard/shell dashboard/shell      # with a dashboard
+ln -s ../../../tools/plugin/dashboard/run.sh dashboard/run.sh
+```
 
 ## hooks
 

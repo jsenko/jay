@@ -6,8 +6,8 @@
 #   run.sh stop             stop it, however it was started
 #   run.sh status           print the URL if it is running; exit 1 if not
 #
-# Needs curl. Copied into every plugin with a dashboard from
-# tools/plugin/dashboard/; edit it there.
+# Needs curl. Every plugin's dashboard/run.sh links here, and works out its
+# own folder from the path it was started by, so it reads that plugin's files.
 set -euo pipefail
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -1,5 +1,5 @@
 /* Dashboard frame shared by every plugin: menu, list, details. Follows the viewer's
-   light or dark preference. Copied from tools/plugin/dashboard/; edit it there. */
+   light or dark preference. Shared by every plugin's dashboard through a link. */
 
 :root {
   --bg: #f4f4f2;

@@ -13,11 +13,11 @@ folders through an adapter.
   - `.claude-plugin/plugin.json` — name, version, `dependencies`
   - `commands/`, `skills/` — what Claude Code loads, namespaced as `<plugin>:<name>`
   - `rules/`, `processes/`, `roles/` — instruction files, read through `~/.jay/plugins/<name>/`
-  - `hooks/` — the link hook, copied from `tools/plugin/hooks/`
+  - `hooks/` — the link hook: a symlink to `tools/plugin/hooks/`
   - `.mcp.json`, `package.json`, `server/` — an MCP server, if the plugin has one
-  - `dashboard/` — a dashboard, if it has one, built on the shell copied from `tools/plugin/dashboard/`
+  - `dashboard/` — a dashboard, if it has one, built on the shell, with `shell` and `run.sh` symlinked from `tools/plugin/dashboard/`
 - `install.sh` — installs plugins into the clients found, sets permissions, and runs each plugin's `setup.sh`
-- `tools/` — repo tooling: `check/`, and `plugin/` for the pieces every plugin copies
+- `tools/` — repo tooling: `check/`, and `plugin/` for the pieces every plugin links to
 - `.github/workflows/` — CI: `tools/check`, shellcheck and plugin tests on each push to main
 
 A marketplace install copies only the plugin's folder. Everything a
@@ -110,8 +110,9 @@ free of anything only this repository needs.
 
 ### Independent plugins
 A plugin never imports another plugin's code or reads its data files.
-What two plugins share is copied from `tools/plugin/`, and `tools/check`
-fails when a copy drifts. Shared state goes through the owning plugin's
+What two plugins share lives once in `tools/plugin/`, and each plugin
+links to it with a relative symlink; a marketplace install copies the
+files in. `tools/check` fails when a link is missing. Shared state goes through the owning plugin's
 MCP tools.
 
 ### Code style

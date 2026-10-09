@@ -1,8 +1,7 @@
 /**
  * Small pieces any dashboard's rows and details can use.
  *
- * Copied into every plugin with a dashboard from tools/plugin/dashboard/;
- * edit it there.
+ * Shared by every plugin's dashboard through a link.
  */
 
 /** Escapes text before it goes anywhere near innerHTML. */
