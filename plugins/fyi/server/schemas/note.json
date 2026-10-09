@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fyi/note",
+  "title": "Something worth remembering that needs no action",
+  "description": "Also carries decisions: a note with a project is what used to be a line in that project's LOG.md. A note belonging to a project is archived with it; others stay until archived by hand.",
+  "type": "object",
+  "properties": {
+    "content": {
+      "type": "string"
+    },
+    "project": {
+      "type": "string",
+      "x-fyi-ref": "project",
+      "description": "Scopes the note to a project. Project-scoped notes in date order are that project's decision log."
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Files or directories this concerns, absolute. Replaces the former resource type."
+    },
+    "urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "content"
+  ],
+  "x-fyi-archive": {
+    "follows": "project"
+  }
+}

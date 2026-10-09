@@ -1,6 +1,14 @@
 {
   "name": "jay",
-  "owner": { "name": "Jakub Senko" },
+  "owner": {
+    "name": "Jakub Senko"
+  },
   "description": "Plugins for working with Claude Code and opencode across sessions: a task and note store, session coordination, status reports, coding and PR workflows",
-  "plugins": []
+  "plugins": [
+    {
+      "name": "fyi",
+      "source": "./plugins/fyi",
+      "description": "Durable store for tasks, notes, projects and tracked pull requests, kept as Markdown under ~/.fyi"
+    }
+  ]
 }

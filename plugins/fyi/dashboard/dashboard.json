@@ -1,0 +1,9 @@
+{
+  "title": "fyi",
+  "port": 3456,
+  "views": [
+    { "id": "today", "label": "Today", "icon": "◷" },
+    { "id": "prs", "label": "Pull requests", "icon": "⇄" },
+    { "id": "projects", "label": "Projects", "icon": "▦" }
+  ]
+}

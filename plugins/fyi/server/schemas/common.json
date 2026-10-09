@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fyi/common",
+  "title": "Fields shared by every item type",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Stable identifier, and the file name. Generated: from the key for a mirrored type, otherwise from the title or a chosen slug."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "task",
+        "note",
+        "project",
+        "pr"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "description": "One line. What this is, readable on its own in a list."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "description": "Lowercase, hyphenated. For grouping that no field already captures."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "archived": {
+      "type": "boolean",
+      "description": "Moved out of the active set. The file moves to the archive directory; nothing is deleted."
+    },
+    "links": {
+      "type": "array",
+      "description": "Structured relationships to other items.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "x-fyi-ref": "any"
+          },
+          "rel": {
+            "type": "string",
+            "enum": [
+              "parent",
+              "child",
+              "blocks",
+              "blocked-by",
+              "relates-to",
+              "from"
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rel"
+        ]
+      }
+    },
+    "archived_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this was archived."
+    },
+    "archive_after_days": {
+      "type": "integer",
+      "description": "Override how long this lingers after reaching a terminal state. 0 archives it on the next pass."
+    },
+    "pinned": {
+      "type": "boolean",
+      "description": "Never archive automatically. For things that stay in the active set regardless of status."
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "title"
+  ]
+}

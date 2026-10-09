@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fyi/project",
+  "title": "A piece of work spanning more than one session",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "done",
+        "abandoned"
+      ],
+      "default": "active"
+    },
+    "work_directories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Absolute paths this project is worked on in. Many-to-many: a directory may host several projects."
+    },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Owner/Repo for each work directory that is a git checkout."
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^https?://[^/\\s]+/[^/\\s]+/[^/\\s]+/issues/\\d+/?$"
+      },
+      "description": "Links to the GitHub issues this project's status lives in \u2014 usually its area epic and current milestone epic. When set, they are the source of truth for progress: check them before trusting current_state."
+    },
+    "current_state": {
+      "type": "string",
+      "description": "Where the last session stopped, in a few sentences. Overwritten, never appended \u2014 the history is in the notes and in git."
+    },
+    "current_state_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When current_state was last written, so a handoff can say how stale it is."
+    },
+    "weight": {
+      "type": "string",
+      "enum": [
+        "none",
+        "single-doc",
+        "phased"
+      ],
+      "default": "none",
+      "description": "How much tracking structure this project carries, lightest first: none, single-doc, phased. 'none' is metadata only."
+    }
+  },
+  "required": [
+    "description"
+  ],
+  "x-fyi-archive": {
+    "field": "status",
+    "terminal": [
+      "done",
+      "abandoned"
+    ],
+    "after_days": 30
+  }
+}

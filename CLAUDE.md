@@ -141,5 +141,5 @@ author and has not seen it before.
 
 - `tools/check/check.sh` — structure, references, budgets; CI runs it on every push to main.
 - `npm test` in each plugin that has a `package.json`.
-- To try plugins in Claude Code, add the checkout as the `jay` marketplace (`claude plugin marketplace add <checkout>`). Plugins load in place, so a restart picks up edits. Run `npm install` in each plugin with a server first.
+- To try plugins in Claude Code, run `./install.sh --dev <plugins>`: it adds the checkout as the `jay` marketplace and runs `npm install` in each plugin. Plugins load in place, so a restart picks up edits.
 - Keep one `jay` marketplace. Marketplace names are global, so adding a second source under the same name repoints it everywhere.

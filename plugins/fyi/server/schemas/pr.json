@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fyi/pr",
+  "title": "A tracked pull request",
+  "description": "Replaces the hand-parsed tracking files under ~/.fyi/work/prs. The watcher owns lifecycle and attention; reviewers own the review sections.",
+  "type": "object",
+  "properties": {
+    "number": {
+      "type": "integer",
+      "description": "Derived from url; leave it out."
+    },
+    "repo": {
+      "type": "string",
+      "description": "Owner/Repo. Derived from url; leave it out."
+    },
+    "url": {
+      "type": "string",
+      "description": "Link to the pull request, e.g. https://github.com/Owner/Repo/pull/123. Identifies it: the id, repo and number are derived from it, and a PR already tracked cannot be captured twice."
+    },
+    "author": {
+      "type": "string"
+    },
+    "assignee": {
+      "type": "string"
+    },
+    "opened_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "importance": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "triage_reason": {
+      "type": "string",
+      "description": "Why this matters, naming the interest rules that matched."
+    },
+    "lifecycle": {
+      "type": "string",
+      "enum": [
+        "ready-for-review",
+        "ready-to-merge",
+        "merged",
+        "closed"
+      ]
+    },
+    "auto_review": {
+      "type": "string",
+      "enum": [
+        "needs-review",
+        "in-progress",
+        "reviewed",
+        "needs-re-review"
+      ]
+    },
+    "auto_reviewed_commit": {
+      "type": "string",
+      "description": "Short SHA last reviewed automatically. A different HEAD means a re-review is due."
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "findings": {
+      "type": "string",
+      "pattern": "^[0-9]+/[0-9]+$",
+      "description": "required/optional counts, e.g. 2/1. Required means it blocks merge."
+    },
+    "followups": {
+      "type": "array",
+      "description": "The author's choice for each optional finding, by id.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Finding id, e.g. O2."
+          },
+          "choice": {
+            "type": "string",
+            "enum": [
+              "here",
+              "issue",
+              "skip"
+            ]
+          },
+          "issue": {
+            "type": "string",
+            "description": "URL of the follow-up issue, once filed."
+          }
+        },
+        "required": [
+          "id",
+          "choice"
+        ]
+      }
+    },
+    "complexity": {
+      "type": "string",
+      "enum": [
+        "trivial",
+        "simple",
+        "moderate",
+        "complex",
+        "major"
+      ],
+      "description": "How much reading a review takes. Estimated at triage from the diff size; the reviewer corrects it."
+    },
+    "draft_review": {
+      "type": "string",
+      "description": "A review written but not posted: the full markdown comment. The user posts it with their verdict via /j:pr-checkout; cleared once posted."
+    },
+    "author_response": {
+      "type": "string",
+      "enum": [
+        "none",
+        "addressed",
+        "partially-addressed",
+        "not-addressed"
+      ]
+    },
+    "manual_review": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "changes-requested",
+        "commented"
+      ]
+    },
+    "manual_reviewed_commit": {
+      "type": "string"
+    },
+    "check_status": {
+      "type": "string",
+      "enum": [
+        "passing",
+        "failing",
+        "pending",
+        "needs-approval"
+      ]
+    },
+    "attention": {
+      "type": "boolean",
+      "description": "Whether the user needs to look at this now. Derived from the attention items."
+    },
+    "attention_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "assign",
+              "review",
+              "re-review",
+              "respond",
+              "decide",
+              "merge",
+              "ci-failing",
+              "ci-investigate",
+              "ci-approve",
+              "manual-review",
+              "stale"
+            ],
+            "description": "What the user must do. 'assign' now means the automatic assignment failed, not that a triage decision is pending. 'decide' is a design question only a maintainer can settle."
+          },
+          "who": {
+            "type": "string",
+            "enum": [
+              "user",
+              "author",
+              "maintainer",
+              "automation"
+            ],
+            "description": "Whose move it is: the user; the PR's author; another maintainer; or a session (a review or CI investigation not done yet). Only 'user' entries are why the user is needed."
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "description"
+        ]
+      },
+      "description": "What has to happen on this PR, one entry each, naming whose move it is. Several sessions write here: change entries with add/remove on fyi_update rather than setting the whole list, or entries others wrote are lost."
+    },
+    "summary": {
+      "type": "string",
+      "description": "What the PR does and what the user needs to decide. Written even when no review comment is posted."
+    },
+    "ci_failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "workflow": {
+            "type": "string"
+          },
+          "failed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "run_url": {
+            "type": "string"
+          },
+          "cause": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "workflow"
+        ]
+      }
+    },
+    "synced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this was last confirmed against GitHub, as opposed to last changed. Set by passing synced:true to fyi_update."
+    }
+  },
+  "required": [
+    "url",
+    "number",
+    "repo"
+  ],
+  "x-fyi-key": "url",
+  "x-fyi-archive": {
+    "field": "lifecycle",
+    "terminal": [
+      "merged",
+      "closed"
+    ],
+    "after_days": 7
+  },
+  "x-fyi-freshness": {
+    "source": "GitHub",
+    "max_age_hours": 24
+  }
+}

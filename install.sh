@@ -97,7 +97,19 @@ claude_installed() {
     claude plugin list --json | json "j.filter((p) => p.id?.endsWith('@$MARKETPLACE') && (p.scope ?? 'user') === 'user').map((p) => p.id.split('@')[0])"
 }
 
+# Plugins installed from a checkout run in place, where Claude Code installs no
+# npm dependencies, so --dev installs them.
+dev_dependencies() {
+    local p
+    for p in "${PLUGINS[@]}"; do
+        [[ -f "$REPO/plugins/$p/package.json" ]] || continue
+        say "installing $p's npm dependencies"
+        (cd "$REPO/plugins/$p" && npm install --ignore-scripts --no-audit --no-fund --silent)
+    done
+}
+
 claude_install() {
+    [[ "$DEV" == true ]] && dev_dependencies
     claude_marketplace
     local installed p
     installed="$(claude_installed)"
