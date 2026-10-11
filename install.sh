@@ -181,11 +181,30 @@ opencode_uninstall() {
 
 # ---------------------------------------------------------------- settings
 
-# Runs each plugin's setup.sh, which asks for its settings and writes its section
-# of ~/.jay/config.json.
+# The named plugins and everything they depend on, dependencies first, each once.
+# Claude Code installs dependencies on its own, but their settings still need asking.
+with_dependencies() {
+    local -A seen=()
+    local order=()
+    visit() {
+        local d
+        [[ -n "${seen[$1]:-}" ]] && return
+        seen[$1]=1
+        for d in $(json '(j.dependencies ?? []).map((d) => typeof d === "string" ? d : d.name)' < "$REPO/plugins/$1/.claude-plugin/plugin.json"); do
+            visit "$d"
+        done
+        order+=("$1")
+    }
+    local p
+    for p in "$@"; do visit "$p"; done
+    printf '%s\n' "${order[@]}"
+}
+
+# Runs the setup.sh of each plugin installed, dependencies included, which asks
+# for that plugin's settings and writes them where it reads them.
 configure() {
     local p
-    for p in "${PLUGINS[@]}"; do
+    for p in $(with_dependencies "${PLUGINS[@]}"); do
         [[ -x "$REPO/plugins/$p/setup.sh" ]] || continue
         say "configuring $p"
         if [[ "$YES" == true ]]; then
