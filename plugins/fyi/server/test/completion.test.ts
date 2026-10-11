@@ -60,6 +60,11 @@ export async function run(): Promise<void> {
   check("search finds what was finished in a period, and only that",
     thisWeek.items.map((i: any) => i.id).join() === task.id, thisWeek.items);
 
+  const today = await call(c, "fyi_search", {
+    type: ["task"], where: { completed_at: { after: dayOffset(0), before: dayOffset(0) } },
+  });
+  check("a date bound takes in the whole day", today.items.some((i: any) => i.id === task.id), today.items);
+
   // --- notes expire only when asked to ---------------------------------
   const brief = await call(c, "fyi_capture", { type: "note", title: "A brief", content: "x", archive_after_days: 0 });
   const kept = await call(c, "fyi_capture", { type: "note", title: "Kept a while", content: "x", archive_after_days: 14 });

@@ -34,12 +34,20 @@ function same(a: unknown, b: unknown): boolean {
   return String(a) === String(b);
 }
 
-/** Orders two values numerically when both are numbers, else as text. */
-function compare(a: unknown, b: unknown): number {
-  const x = Number(a);
-  const y = Number(b);
-  if (!Number.isNaN(x) && !Number.isNaN(y) && typeof a !== "boolean") return x - y;
-  return String(a).localeCompare(String(b));
+/** A plain date, as a range bound is usually written. */
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Orders a value against a bound: numerically when both are numbers, else
+ * as text. Against a plain date a timestamp compares on its day, so a date
+ * bound takes in the whole day, as an inclusive range promises.
+ */
+function compare(value: unknown, bound: unknown): number {
+  const x = Number(value);
+  const y = Number(bound);
+  if (!Number.isNaN(x) && !Number.isNaN(y) && typeof value !== "boolean") return x - y;
+  const day = typeof bound === "string" && DATE.test(bound) && typeof value === "string" ? value.slice(0, 10) : value;
+  return String(day).localeCompare(String(bound));
 }
 
 /** Whether the values found at a path satisfy one condition. */
