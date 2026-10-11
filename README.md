@@ -6,8 +6,8 @@ sessions running at the same time, status reports, and coding and pull
 request workflows. Each part is a separate plugin, so you install only
 what you need.
 
-**Status:** work in progress. fyi, crew and status are available; the
-other plugins are being moved here from an earlier setup, one at a time.
+**Status:** work in progress. fyi, crew, status and code are available;
+pr is being moved here from an earlier setup.
 
 ## Plugins
 
@@ -16,8 +16,8 @@ other plugins are being moved here from an earlier setup, one at a time.
 | [fyi](plugins/fyi/README.md) | Store for tasks, notes, projects and tracked PRs, as Markdown under `~/.fyi` | Today, pull requests, projects | — | available |
 | [crew](plugins/crew/README.md) | Roles to start sessions as, and coordination between them: who is running, messages, and jobs | Sessions, jobs | fyi | available |
 | [status](plugins/status/README.md) | A brief status for teammates and a weekly report, built from your GitHub activity and fyi | — | fyi | available |
-| code | The coding role and workflow, with feature tracking and code-quality rules | — | fyi, crew | planned |
-| pr | Watching GitHub, PR reviews, and the PR queue | — | fyi, crew | planned |
+| [code](plugins/code/README.md) | The coder role, one command for work of any size with as much tracking as it needs, and code-quality rules with stable IDs | — | fyi, crew | available |
+| pr | Watching GitHub, PR reviews, and the PR queue | — | fyi, crew, code | planned |
 
 Installing a plugin also installs what it needs. The dashboards of all
 installed plugins share one menu, so each one can open the others.
@@ -64,6 +64,11 @@ Talk to a session as usual; the plugins give it tools and habits.
   last brief, ready to paste into your team's channel, and asks first
   about anything personal or not yet public. **`/status:weekly`** writes
   the week as prose for a wider audience, and saves it to fyi.
+- **`/code:implement make the retry back off exponentially`** works on
+  the change in a loop of building and checking its own diff against
+  the code-quality rules, with a design note or phases when the work is
+  big enough to need them. It asks before committing and never pushes
+  without asking.
 
 Each plugin's README lists what it adds.
 
