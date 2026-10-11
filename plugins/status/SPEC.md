@@ -51,6 +51,12 @@ Security work that isn't public is always asked about before it is
 reported. A report travels further than the repository it came from, and
 an embargoed fix described in a channel is a disclosure.
 
+Both commands check in before writing, with what the status will say
+and a question about what is missing. Meetings, chat, email and time off
+leave no trace in GitHub or fyi, and they are often what a reader most
+needs. The user's answer is taken at the level they give it: a status
+that costs an interview stops being written.
+
 Standing answers are kept as fyi notes tagged `decision` and `status`
 rather than in configuration: they are decisions the user made, they are
 read the same way as everything else, and they need no settings file.

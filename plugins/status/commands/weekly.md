@@ -32,15 +32,9 @@ how their weeks run, offer to keep it as a note tagged `decision` and
 
 # Gather
 
-Follow `~/.jay/plugins/status/processes/gather.md` for the period, and
-read the previous report.
-
-# Ask before writing
-
-Summarise what was found in a few lines: where the activity was, what
-finished, notable conversations and decisions. In the same message, ask
-what `~/.jay/plugins/status/rules/sharing.md` says to ask, and what is
-missing: meetings, offline work, conversations that left no trace.
+Read the previous report, then follow
+`~/.jay/plugins/status/processes/gather.md` for the period, through its
+check-in.
 
 # Write
 

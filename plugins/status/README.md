@@ -73,8 +73,11 @@ about:
 Tell it a standing preference ("always include my parser project") and it
 offers to remember it, as an fyi note tagged `decision` and `status`.
 
-The weekly report also asks what's missing, such as meetings or work
-that left no trace in a tool, before it writes.
+**Both check in before writing:** a couple of sentences on what the
+status will say, and a question about anything that left no trace in a
+tool, such as news from chat or email, meetings, or time off. A short
+answer is enough; they ask a follow-up only when they can't write it
+without one.
 
 ## Where reports go
 

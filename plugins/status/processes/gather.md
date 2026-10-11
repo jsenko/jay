@@ -1,7 +1,8 @@
 # Gather a period
 
 One gathering of the user's activity over a period, which both status
-commands read. The result is a digest kept in the session, not saved.
+commands read, ending with a check-in with the user. The result is a
+digest kept in the session, not saved.
 
 ## Start
 
@@ -71,3 +72,18 @@ Mark each item `private` when it came from a private repository, and
 `personal` when its repository is outside the organisations most of the
 period's work is in. `~/.jay/plugins/status/rules/sharing.md` decides
 what those marks mean.
+
+## Check in
+
+Before writing, one message to the user:
+
+1. **What the status will say:** the main points in a couple of
+   sentences, not the digest.
+2. **What to share:** the questions `sharing.md` says to ask.
+3. **What is missing:** anything that left no trace in GitHub or fyi,
+   such as news from chat or email, meetings, offline work, or time off.
+
+Take what the user adds at the level they give it. "I was off on Friday"
+or "mostly calls with the Data Models team" goes in as said. Ask a
+follow-up only when the status can't say it without one, such as what
+came of a conversation the user names, and at most one round of them.

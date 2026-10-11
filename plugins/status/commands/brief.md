@@ -7,7 +7,7 @@ argument-hint: [period, default: since the last brief]
 
 A few bullets for teammates on what the user has been doing, posted
 every couple of days to cover what meetings miss. Not
-`/status:weekly`: no interview, no prose.
+`/status:weekly`: a quick check-in, then bullets, no prose.
 
 # Period
 
@@ -22,12 +22,8 @@ unless it is longer than a week, which is a question for the user.
 
 # Gather
 
-Follow `~/.jay/plugins/status/processes/gather.md` for the period.
-
-# Choose
-
-Apply `~/.jay/plugins/status/rules/sharing.md`. Ask only what it says to
-ask; otherwise go straight to writing.
+Follow `~/.jay/plugins/status/processes/gather.md` for the period,
+through its check-in.
 
 # Write
 
