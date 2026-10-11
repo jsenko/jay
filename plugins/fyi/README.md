@@ -202,9 +202,17 @@ One file per item, `~/.fyi/<scope>/<type>/<id>.md`:
     task/task-fix-the-retry-on-startup.md
     note/note-chose-varnish-over-a-cache.md
     project/project-storage.md
+    projects/storage/                   # the project's folder, for its files
     archive/
       task/task-ship-the-release-notes.md   # archived, still searchable
 ```
+
+**Each project has a folder** for files that belong to it rather than to
+any one item: plans, design notes, phase files. `fyi_capture`, `fyi_get`
+and `fyi_handoff` give its path as `folder`, so other plugins and roles
+never build it themselves. It is named after the project id without
+`project-`, and is created when first asked for; an archived project
+keeps the folder it had.
 
 Fields are YAML frontmatter, and the one long text field of each type is
 the Markdown body. You can create, edit and delete files by hand: the

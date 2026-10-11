@@ -11,11 +11,11 @@ fields and the validation — read its tool descriptions for those.
 | A decision and why it was made | `note`, with `project` set |
 | Worth remembering, no action | `note` |
 | Work spanning more than one session | `project` |
+| A project's files: plans, designs, phase files | its `folder`, from `fyi_get` or `fyi_handoff` |
 | A pull request being tracked | `pr` |
 
 **No next action date means it is not a task.** If there is nothing to
-do on a date, it is a note. Do not invent a deadline to satisfy the
-field.
+do on a date, it is a note; do not invent a deadline.
 
 **Well-known tags** mean the same to every tool and plugin that reads
 them; the `tags` field description lists them. Use one rather than a

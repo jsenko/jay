@@ -3,6 +3,7 @@
 import { stampCompletion } from "../completion.js";
 import { DEFAULT_SCOPE } from "../config.js";
 import { ToolError } from "../errors.js";
+import { projectFolder } from "../folders.js";
 import { isMirrored } from "../freshness.js";
 import { authoredId, keyedId } from "../identity.js";
 import { deriveFromKey, findByKey, keyField } from "../keys.js";
@@ -71,7 +72,8 @@ function handler(args: Record<string, any>) {
   stampCompletion(item, undefined, fields, now);
 
   const stored = write(item, scope as Scope);
-  return { id: item.id, type: item.type, path: stored.path };
+  const folder = projectFolder(stored);
+  return { id: item.id, type: item.type, path: stored.path, ...(folder ? { folder } : {}) };
 }
 
 export const captureTool: Tool = {

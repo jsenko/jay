@@ -38,6 +38,14 @@ writes are atomic, invalidation is per-item, and it leaves git-tracking
 `~/.fyi` as a later yes/no rather than a rewrite. Multi-object files
 would make merge conflicts inside a single file a routine event.
 
+**Project folders** (`<scope>/projects/<name>/`) hold a project's files
+that are not items: plans, design notes, phase files. fyi owns the
+location and hands it out as `folder` (`folders.ts`), so no other plugin
+reads the store's layout, and a later change to that layout moves the
+folders with everything else. The path is derived from the project id,
+never stored, so it cannot go stale; the naming matches the folders
+sessions were already keeping there by hand.
+
 **Format:** YAML frontmatter for schema fields, markdown body for the one
 long prose field per type (`description`, `content`, `summary`). The body
 is the part a human edits; the frontmatter is the part tools query.
@@ -243,6 +251,8 @@ Under `server/`:
 | `fieldpath.ts` | Dotted paths through lists, shared by search and references |
 | `listops.ts` | Adding and removing list entries without rewriting the list |
 | `archiving.ts` | When items leave the active set, from `x-fyi-archive` |
+| `completion.ts` | `completed_at`: stamped on finishing, cleared on reopening |
+| `folders.ts` | Project folders: where a project's files go |
 | `config.ts` | Settings from the store's `config.json` |
 | `check.ts` | The store checker, `npm run check` |
 | `migrations/` | One-off store migrations, each runnable with `--dry-run` |

@@ -1,6 +1,7 @@
 /** `fyi_handoff` — assemble enough context to continue a project. */
 
 import { ToolError } from "../errors.js";
+import { projectFolder } from "../folders.js";
 import { search, summarise } from "../query.js";
 import { all, get } from "../store.js";
 import { daysFrom } from "../time.js";
@@ -58,6 +59,8 @@ function handler(args: Record<string, any>) {
       status: project.status,
       description: project.description,
       work_directories: project.work_directories,
+      // Where the project's files go: plans, designs, phase files.
+      folder: projectFolder(stored) ?? null,
     },
     // Where progress is really recorded, when the project has issues.
     // fyi does not fetch them; the caller checks them before trusting
@@ -82,7 +85,7 @@ export const handoffTool: Tool = {
   definition: {
     name: "fyi_handoff",
     description:
-      "Pick up a project where the last session left off: what it is, where work stopped, what decisions were made and why, what is still open. Works from any directory — use this instead of trying to resume a previous session.",
+      "Pick up a project where the last session left off: what it is, where work stopped, what decisions were made and why, what is still open. Works from any directory — use this instead of trying to resume a previous session. Also gives the project's folder, for files that belong to it such as plans and design notes.",
     inputSchema: {
       type: "object",
       properties: {

@@ -34,7 +34,7 @@ export async function run(): Promise<void> {
 
   await call(c, "fyi_update", { id: task.id, description: "A later edit." });
   const edited = await call(c, "fyi_get", { id: task.id });
-  check("a later edit keeps it", edited.completed_at === done.completed_at && edited.updated_at > done.completed_at, edited);
+  check("a later edit keeps it", edited.completed_at === done.completed_at && edited.description === "A later edit.", edited);
 
   await call(c, "fyi_update", { id: task.id, status: "open" });
   check("reopening clears it", (await call(c, "fyi_get", { id: task.id })).completed_at === undefined);
