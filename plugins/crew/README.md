@@ -54,8 +54,8 @@ A role is a Markdown file:
 | Work, Behaviour | How it works for the rest of the session |
 
 [`roles/general.md`](roles/general.md) is a complete example. crew ships
-only `general`; the code and pr plugins will bring coder, reviewer and
-watcher.
+only `general`; the [code](../code/README.md) plugin brings `coder`, and
+the pr plugin will bring reviewer and watcher.
 
 Roles are found in two places, and yours win on a name clash:
 
@@ -139,6 +139,19 @@ session finds out by receiving one. Right after `crew_join`, crew pushes
 `{"crew":"hello"}`. A session starts polling on a timer as usual, and
 stops when the hello, or any other crew push, arrives. Without the
 argument the hello is dropped, and the session keeps polling.
+
+## When a response is too large
+
+```
+/crew:retry-smaller
+```
+
+When a response is refused for being too large (in opencode, "the
+response was blocked by the provider's content filter"), the session
+can't tell: from its side nothing went wrong. Run `/crew:retry-smaller`
+and it finds what was too big, then does the same work in smaller
+pieces. If that keeps failing, it saves where it stopped so a fresh
+session can pick up with `fyi_handoff`.
 
 ## Dashboard
 
