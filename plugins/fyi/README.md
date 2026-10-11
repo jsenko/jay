@@ -99,8 +99,10 @@ reads back in date order.
 
 **Items archive themselves.** A task 14 days after it is done, a PR 7
 days after it merges or closes, a project 30 days after it finishes, and
-a project's notes with it. A note with no project stays until archived
-by hand (`archived: true`). Archived items move to
+a project's notes with it, each counted from `completed_at`, when it
+finished. A note with no project stays until archived by hand
+(`archived: true`), or until `archive_after_days` after its last change
+when that is set. Archived items move to
 `<scope>/archive/<type>/`, where `fyi_get` still finds them and
 `fyi_search` does with `include_archived`. Nothing is deleted. Set
 `pinned: true` to keep something active regardless, or

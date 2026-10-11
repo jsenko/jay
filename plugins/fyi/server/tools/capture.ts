@@ -1,5 +1,6 @@
 /** `fyi_capture` — create an item. */
 
+import { stampCompletion } from "../completion.js";
 import { DEFAULT_SCOPE } from "../config.js";
 import { ToolError } from "../errors.js";
 import { isMirrored } from "../freshness.js";
@@ -66,6 +67,8 @@ function handler(args: Record<string, any>) {
     created_at: now,
     updated_at: now,
   };
+
+  stampCompletion(item, undefined, fields, now);
 
   const stored = write(item, scope as Scope);
   return { id: item.id, type: item.type, path: stored.path };

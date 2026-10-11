@@ -78,9 +78,14 @@
       "format": "date-time",
       "description": "When this was archived."
     },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "(task, project, pr) When this reached a finished state: stamped by the server on the change, and cleared if it is reopened. Search on it for what was finished in a period. Set it only to record work finished earlier."
+    },
     "archive_after_days": {
       "type": "integer",
-      "description": "Override how long this lingers after reaching a terminal state. 0 archives it on the next pass."
+      "description": "How long this lingers before it is archived. On a task, project or pr it overrides the default, counted from completed_at. On a note it is the only expiry, counted from the last change, so setting it means that many days from now. 0 archives it on the next pass."
     },
     "pinned": {
       "type": "boolean",

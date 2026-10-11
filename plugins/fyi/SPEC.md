@@ -146,10 +146,20 @@ with `include_archived`.
 fields it reads (`x-fyi-archive`) — a task 14 days after it is done or
 cancelled, a PR 7 days after it merges or closes, a project 30 days
 after it is done or abandoned. A note follows its project: archived when
-the project is. A note with no project is archived by hand.
+the project is. A note with no project is archived by hand, or expires
+when given `archive_after_days`.
+
+**Finishing is recorded once.** Types with a finished state get
+`completed_at`, stamped when an item enters that state and cleared if it
+is reopened. Archiving counts from it rather than from `updated_at`,
+which every later edit moves, and "what was finished this week" is a
+search on it. Items finished before it existed were backfilled from
+their last edit (`migrations/completed-at.ts`).
 
 Per item, `archive_after_days` overrides the window and `pinned` opts out
-entirely. There is no reconciliation pass, because a periodic cleanup is
+entirely. On a note, which has no finished state, `archive_after_days`
+counts from the last change, so setting it means "that many days from
+now", and a note still being edited stays. There is no reconciliation pass, because a periodic cleanup is
 exactly the chore that does not get run. On-demand tidying stays possible
 but should be rare.
 

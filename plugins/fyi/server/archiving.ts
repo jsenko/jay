@@ -59,7 +59,10 @@ export type Lookup = (id: string) => Item | undefined;
  * Whether an item's time in the active set is up.
  *
  * `pinned` opts out entirely; `archive_after_days` overrides the type's
- * default, so a single item can linger longer or go immediately.
+ * default, so a single item can linger longer or go immediately. On a
+ * type with no finished state, it is the only way to expire: counted from
+ * the last change, so setting it means "this many days from now", and a
+ * note still being edited stays.
  */
 export function shouldArchive(item: Item, lookup: Lookup, now = Date.now()): boolean {
   if (item.archived || item.pinned) return false;
@@ -69,15 +72,20 @@ export function shouldArchive(item: Item, lookup: Lookup, now = Date.now()): boo
 
   if ("follows" in policy) {
     const target = item[policy.follows];
-    return typeof target === "string" && lookup(target)?.archived === true;
+    if (typeof target === "string" && lookup(target)?.archived === true) return true;
+    return typeof item.archive_after_days === "number" && elapsed(item.updated_at ?? item.created_at, item.archive_after_days, now);
   }
 
   const state = item[policy.field];
   if (typeof state !== "string" || !policy.terminal.includes(state)) return false;
 
   const after = typeof item.archive_after_days === "number" ? item.archive_after_days : policy.after_days;
-  const since = Date.parse(String(item.updated_at ?? item.created_at ?? ""));
-  if (Number.isNaN(since)) return false;
+  // Items finished before completed_at existed fall back to their last edit.
+  return elapsed(item.completed_at ?? item.updated_at ?? item.created_at, after, now);
+}
 
-  return now - since >= after * DAY_MS;
+/** Whether `days` have passed since an ISO timestamp; never for a missing or bad one. */
+function elapsed(since: unknown, days: number, now: number): boolean {
+  const start = Date.parse(String(since ?? ""));
+  return !Number.isNaN(start) && now - start >= days * DAY_MS;
 }

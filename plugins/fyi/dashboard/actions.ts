@@ -6,6 +6,7 @@
  * second way to write items, just a second caller.
  */
 
+import { stampCompletion } from "../server/completion.js";
 import { get, write } from "../server/store.js";
 import { nowIso } from "../server/time.js";
 
@@ -14,9 +15,10 @@ export function complete(id: string): { ok: boolean; error?: string } {
   const stored = get(id);
   if (!stored) return { ok: false, error: `no item "${id}"` };
 
-  stored.item.status = "done";
-  stored.item.updated_at = nowIso();
-  write(stored.item, stored.scope);
+  const now = nowIso();
+  const done = { ...stored.item, status: "done", updated_at: now };
+  stampCompletion(done, stored.item, {}, now);
+  write(done, stored.scope);
   return { ok: true };
 }
 

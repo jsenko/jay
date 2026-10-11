@@ -3,6 +3,7 @@
 import { ToolError } from "../errors.js";
 import { authoredId, keyedId } from "../identity.js";
 import { deriveFromKey, findByKey, keyField } from "../keys.js";
+import { stampCompletion } from "../completion.js";
 import { checkRefs } from "../refs.js";
 import { addLink } from "../links.js";
 import { unionProperties, validate } from "../schema.js";
@@ -94,6 +95,8 @@ function handler(args: Record<string, any>) {
     updated_at: now,
     links: addLink(undefined, { id, rel: "from", note: `converted from ${source.type}` }),
   } as Item;
+  // A carried completed_at is the source's finish time, which still holds.
+  stampCompletion(item, undefined, fields, now);
 
   write(item, stored.scope);
 

@@ -13,10 +13,11 @@ import { run as refs } from "./refs.test.js";
 import { run as listops } from "./listops.test.js";
 import { run as checker } from "./check.test.js";
 import { run as config } from "./config.test.js";
+import { run as completion } from "./completion.test.js";
 
 console.log("fyi tests");
 
-for (const suite of [items, views, archiving, freshness, handedit, identity, where, refs, listops, checker, config]) {
+for (const suite of [items, views, archiving, freshness, handedit, identity, where, refs, listops, checker, config, completion]) {
   await suite();
 }
 

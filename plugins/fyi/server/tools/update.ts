@@ -3,6 +3,7 @@
 import { ToolError } from "../errors.js";
 import { DERIVED_FIELDS, deriveFromKey, keyField, parseKey } from "../keys.js";
 import { applyListOps } from "../listops.js";
+import { stampCompletion } from "../completion.js";
 import { checkRefs } from "../refs.js";
 import { unionProperties, validate } from "../schema.js";
 import { get, write } from "../store.js";
@@ -67,6 +68,7 @@ function handler(args: Record<string, any>) {
 
   const now = nowIso();
   const updated = { ...stored.item, ...fields, updated_at: now };
+  stampCompletion(updated, stored.item, fields, now);
 
   // Only an explicit claim counts. A local edit must not make a stale
   // record look freshly confirmed.
