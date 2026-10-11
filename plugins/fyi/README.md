@@ -97,6 +97,20 @@ never be looked at again.
 tag is an entry in that project's decision log, which `fyi_handoff`
 reads back in date order.
 
+**Some tags are well-known**, and other tools and plugins rely on what
+they mean:
+
+| Tag | Means |
+|---|---|
+| `decision` | A decision and its reasoning, on a note with a project |
+| `finding` | A fact established by investigating |
+| `learned` | Something learned that is worth sharing with the team |
+| `report` | A generated report, such as a status |
+| `meta` | Friction with the instructions themselves |
+
+They are listed in the `tags` field description, so every session sees
+them. Any other tag is free-form.
+
 **Items archive themselves.** A task 14 days after it is done, a PR 7
 days after it merges or closes, a project 30 days after it finishes, and
 a project's notes with it, each counted from `completed_at`, when it

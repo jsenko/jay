@@ -28,7 +28,7 @@
         "type": "string",
         "pattern": "^[a-z0-9][a-z0-9-]*$"
       },
-      "description": "Lowercase, hyphenated. For grouping that no field already captures."
+      "description": "Lowercase, hyphenated. For grouping that no field already captures. Well-known tags, which other tools and plugins read: decision (a decision and its reasoning, on a note with a project), finding (a fact established by investigating), learned (something learned that is worth sharing with the team), report (a generated report, such as a status), meta (friction with the instructions themselves). Any other tag is free-form."
     },
     "created_at": {
       "type": "string",

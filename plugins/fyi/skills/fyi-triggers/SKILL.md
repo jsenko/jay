@@ -24,7 +24,14 @@ fixing", "remind me to…". Capture a `task` with the date it should
 resurface.
 
 **Something took effort to establish.** A build incantation, why a test
-is flaky, which service owns a config. Capture a `note`.
+is flaky, which service owns a config. Capture a `note` tagged `finding`.
+
+**Something was learned that the team would want to hear.** A surprise,
+a better way of doing something, how an unfamiliar system really works.
+Offer a `note` tagged `learned`; status reports share these.
+
+Tag with the well-known tags from the `tags` field description where
+one fits, so the tools that read them find the item.
 
 **Ad-hoc work has turned into a project.** It has spanned sessions, or
 a design decision got made, or several related tasks appeared. Offer a

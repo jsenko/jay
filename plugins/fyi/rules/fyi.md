@@ -17,10 +17,10 @@ fields and the validation — read its tool descriptions for those.
 do on a date, it is a note. Do not invent a deadline to satisfy the
 field.
 
-**A decision is a note with a project**, tagged `decision` rather than
-titled "Decision: …". Those notes in date order are
-the project's decision log, and are what `fyi_handoff` reads to explain
-what was decided and why.
+**Well-known tags** mean the same to every tool and plugin that reads
+them; the `tags` field description lists them. Use one rather than a
+synonym. A decision is a note with a project, tagged `decision` rather
+than titled "Decision: …": in date order, the project's decision log.
 
 ## When to capture
 
