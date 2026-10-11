@@ -24,9 +24,10 @@ never a list of repositories. `<range>` is `<start>..<end>`.
 | PRs authored | `gh search prs --author=@me --updated=<range>`; those opened, merged or closed in the period, or with the user's commits in it |
 | PRs reviewed | `gh search prs --reviewed-by=@me --updated=<range>`; those with a review by the user in the period (`gh api …/pulls/<n>/reviews`) |
 | Issues authored | `gh search issues --author=@me --updated=<range>`; those opened or closed in the period |
+| Commits pushed without a PR | `gh api users/<login>/events`, push events in the period, for the repositories; then `gh api "repos/<repo>/commits?author=<login>&since=<start>&until=<end + 1 day>"`, minus commits in a PR above |
 | Comments | `gh search issues --commenter=@me --include-prs --updated=<range>`, minus what is above; read the user's comments in the period on each |
 | GitHub Discussions | `gh api graphql`, `search(type: DISCUSSION)` with `involves:<login> updated:<range>` |
-| Private | the authored and comment searches again with `--visibility=private`, to mark which items are private |
+| Private | the authored and comment searches again with `--visibility=private`, and push events with `public: false`, to mark which items are private |
 
 Use `--limit 100`, and say so when a search fills it.
 
@@ -62,7 +63,7 @@ One line per item, with its link, under these headings:
 | With others | Reviews, discussions and comments, with what came of each |
 | Decided and learned | `decision`, `finding` and `learned` notes |
 | Blocked | Blocked tasks, with what they wait on |
-| Next | Due tasks, and each active project's next step |
+| Next | Issues the user opened, as the work they plan; due tasks; each active project's next step |
 
 Mark each item `private` when it came from a private repository, and
 `personal` when its repository is outside the organisations most of the

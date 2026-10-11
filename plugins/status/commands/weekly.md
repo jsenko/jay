@@ -50,6 +50,8 @@ Prose, four to eight paragraphs, grouped by theme or project.
 - Reviews, naming the contributor and what their work enables.
 - Conversations with others and what came of them.
 - Decisions, with their reasoning.
+- Issues filed and investigations started, as the next steps of the
+  work they continue.
 - Mid-term plans: each active project's direction, from its
   `current_state`.
 - Continue the previous report's threads rather than repeating them.
