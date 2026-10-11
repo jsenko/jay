@@ -19,6 +19,11 @@
       "name": "status",
       "source": "./plugins/status",
       "description": "A brief status for teammates and a weekly report, built from your GitHub activity and fyi"
+    },
+    {
+      "name": "code",
+      "source": "./plugins/code",
+      "description": "Write code with Claude: a coder role, one command for work of any size with as much tracking as it needs, and code-quality rules with stable IDs"
     }
   ]
 }
