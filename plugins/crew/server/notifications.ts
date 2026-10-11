@@ -1,7 +1,8 @@
 /**
- * Wake signals.
+ * Push signals: `wake` when something is waiting, and `hello` once after a
+ * join, so the session learns that pushes reach it.
  *
- * The signal carries no message content on purpose (SPEC.md §1): making
+ * A signal carries no message content on purpose (SPEC.md §1): making
  * `crew_poll` the only delivery path keeps delivery cursor-mediated, so
  * a session that both receives a push and polls cannot double-process.
  */
@@ -17,6 +18,15 @@ import { ensureDir, paths, read } from "./store.js";
 /** Collapses the burst of writes a single mutation can produce. */
 const DEBOUNCE_MS = 150;
 
+/** Lets the join's answer reach the session before the hello does. */
+const GREET_DELAY_MS = 200;
+
+/** What a push says. */
+export type Push = "wake" | "hello";
+
+/** Sends a push to this session; set by `startNotifier`. */
+let push: (kind: Push) => void = () => {};
+
 /** Highest sequence already signalled, so one arrival wakes the session once. */
 let signalledUpto = 0;
 
@@ -24,13 +34,14 @@ let signalledUpto = 0;
 let signalledJob: string | null = null;
 
 /**
- * Watches for state changes and invokes `signal` when this session has
+ * Watches for state changes and pushes `wake` when this session has
  * something new.
  *
  * Watches the directory rather than the file: writes land through a
  * temp-file rename, which would break a watch held on the file itself.
  */
-export function startNotifier(signal: () => void): void {
+export function startNotifier(send: (kind: Push) => void): void {
+  push = send;
   const stateFile = basename(paths.STATE_FILE);
   let timer: NodeJS.Timeout | undefined;
 
@@ -38,12 +49,21 @@ export function startNotifier(signal: () => void): void {
   watch(dirname(paths.STATE_FILE), (_event, filename) => {
     if (filename !== stateFile) return;
     clearTimeout(timer);
-    timer = setTimeout(() => check(signal), DEBOUNCE_MS);
+    timer = setTimeout(check, DEBOUNCE_MS);
   }).unref();
 }
 
-/** Signals only when unread work has appeared since the last signal. */
-function check(signal: () => void): void {
+/**
+ * Tells a session that has just joined that pushes reach it. The client does
+ * not say whether it delivers them, so the session learns it by receiving one,
+ * after the join's answer (SPEC.md §1).
+ */
+export function greet(): void {
+  setTimeout(() => push("hello"), GREET_DELAY_MS).unref();
+}
+
+/** Wakes the session only when unread work has appeared since the last wake. */
+function check(): void {
   const id = getSessionId();
   if (!id) return;
 
@@ -59,7 +79,7 @@ function check(signal: () => void): void {
     if (highest > signalledUpto || (claimable !== null && claimable !== signalledJob)) {
       signalledUpto = Math.max(signalledUpto, highest);
       signalledJob = claimable;
-      signal();
+      push("wake");
     }
   } catch {
     // A torn read during someone else's write; the next event re-checks.

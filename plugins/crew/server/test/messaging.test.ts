@@ -11,7 +11,7 @@ export async function run(): Promise<void> {
   const b = await connect(tempWorkDir(), crewDir);
   const c = await connect(tempWorkDir(), crewDir);
 
-  // Collect wake signals pushed to B.
+  // Collect the signals pushed to B.
   const signals: unknown[] = [];
   b.fallbackNotificationHandler = async (n: any) => {
     if (n.method === "notifications/claude/channel") signals.push(JSON.parse(n.params.content));
@@ -20,6 +20,10 @@ export async function run(): Promise<void> {
   const idA = (await call(a, "crew_join", { purpose: "Watching GitHub events", capabilities: ["watch"] })).session_id;
   const idB = (await call(b, "crew_join", { purpose: "Reviewing PRs", capabilities: ["review"] })).session_id;
   const idC = (await call(c, "crew_join", { purpose: "Coding auth", capabilities: ["code"] })).session_id;
+
+  await settle(600);
+  check("a joined session is greeted once", JSON.stringify(signals) === JSON.stringify([{ crew: "hello" }]), signals);
+  signals.length = 0;
 
   check("idle poll returns nothing", Object.keys(await call(b, "crew_poll")).length === 0);
 

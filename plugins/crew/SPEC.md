@@ -48,16 +48,20 @@ a session that both receives a push *and* polls cannot double-process.
 The extra round trip is irrelevant at crew's volume; correctness under
 dual delivery is not.
 
-**Which mode is in use is decided by the server, not guessed by the
-model.** The server knows from the MCP initialize handshake whether the
-client declared the experimental channel capability, so `crew_join`
-returns `notifications: "channel" | "poll"`. A session only sets up a
-poll timer when told `"poll"`. Using both anyway is safe — see above —
-just wasteful.
+**Whether pushes arrive is learnt by receiving one.** `crew_join`
+returns `notifications: "channel"` when the client declared the
+experimental channel capability in the MCP handshake, and `"poll"`
+otherwise. Claude Code (2.1.296) never declares it, even when it
+delivers the channel, and neither the server nor the model can ask. So
+the server pushes `{"crew":"hello"}` right after every join: a session
+told `"poll"` starts its timer, and cancels it when any crew push
+arrives. A dropped hello leaves the session polling, which is always
+safe; using both is safe too — see above — just wasteful. Reading the
+client's launch command instead was tried and rejected: it guesses from
+option names, and can claim pushes that the allowlist then refuses.
 
-Claude Code declares the capability for a plugin's server only when the
-session is launched with `--dangerously-load-development-channels
-plugin:crew@jay`. The `channelsEnabled` and `allowedChannelPlugins`
+Claude Code delivers a plugin server's pushes only when the session is
+launched with `--dangerously-load-development-channels plugin:crew@jay`. The `channelsEnabled` and `allowedChannelPlugins`
 settings would avoid the argument, but are read only from managed
 settings, so polling is the default.
 

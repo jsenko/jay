@@ -78,9 +78,9 @@ process.stdin.on("end", shutdown);
 
 await mcp.connect(new StdioServerTransport());
 
-startNotifier(() => {
+startNotifier((kind) => {
   mcp.notification({
     method: "notifications/claude/channel",
-    params: { content: JSON.stringify({ crew: "wake" }) },
+    params: { content: JSON.stringify({ crew: kind }) },
   });
 });

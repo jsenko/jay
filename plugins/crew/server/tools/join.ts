@@ -3,6 +3,7 @@
 import { getNotificationMode, HOME_DIR, setSessionId } from "../context.js";
 import { detectRepo, detectRepos, isValidId, knownKey, proposeId, uniqueId } from "../identity.js";
 import { ToolError } from "../errors.js";
+import { greet } from "../notifications.js";
 import { reapSessions, rosterEntry } from "../sessions.js";
 import { mutate } from "../store.js";
 import { nowIso } from "../time.js";
@@ -74,6 +75,8 @@ async function handler(args: Record<string, any>) {
   const others = Object.values(result.state.sessions)
     .filter((s) => s.id !== result.session.id && isLive(s))
     .map(rosterEntry);
+
+  greet();
 
   return {
     session_id: result.session.id,

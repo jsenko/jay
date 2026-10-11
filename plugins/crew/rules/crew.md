@@ -1,8 +1,7 @@
 # Crew Rules
 
-Cross-session coordination through the `crew` MCP server. Tool semantics
-live in the tool descriptions; this covers only the conventions around
-them.
+Conventions around the `crew` tools; their semantics are in the tool
+descriptions.
 
 ## Joining
 
@@ -45,14 +44,15 @@ from routing, so leaving it set strands work.
 
 ## Receiving
 
-A wake notification means only that something is waiting; call
-`crew_poll` to read it.
+| Event | Action |
+|---|---|
+| `crew_join` reports `notifications: "poll"` | Check with `crew_poll` every ~10 minutes, on a timer |
+| A crew push `{"crew":"hello"}` arrives | Pushes reach this session: cancel the timer. Nothing to read |
+| A crew push `{"crew":"wake"}` arrives | Something is waiting: `crew_poll`. Cancel the timer if one runs |
 
-When `crew_join` reports `notifications: "poll"`, check every ~10
-minutes. Shorter intervals cost tokens for no gain at this volume.
-
-No capabilities, no timer — nothing is routed there. Start one when the
-session takes capabilities with `crew_state`.
+Shorter intervals cost tokens for no gain. No capabilities, no timer —
+nothing is routed there; start one on taking capabilities with
+`crew_state`, unless a push has arrived.
 
 ## Leaving
 

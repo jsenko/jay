@@ -129,10 +129,17 @@ which a plugin cannot switch on by itself:
 claude --dangerously-load-development-channels plugin:crew@jay
 ```
 
-Claude Code asks you to confirm at each start. Settings cannot replace
-the argument: the allowlist that would is read only from managed
-settings, which need root. `crew_join` tells each session which mode it
-is in.
+Claude Code asks you to confirm at each start. Several channels go in
+one argument, as in `--dangerously-load-development-channels
+plugin:crew@jay server:other`. Settings cannot replace the argument: the
+allowlist that would is read only from managed settings, which need
+root.
+
+Claude Code does not tell crew whether it delivers the pushes, so a
+session finds out by receiving one. Right after `crew_join`, crew pushes
+`{"crew":"hello"}`. A session starts polling on a timer as usual, and
+stops when the hello, or any other crew push, arrives. Without the
+argument the hello is dropped, and the session keeps polling.
 
 ## Dashboard
 
