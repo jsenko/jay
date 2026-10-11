@@ -134,16 +134,33 @@ claude_uninstall() {
     done
 }
 
+# The fyi store's project folders, as a permission path: under the home directory
+# with ~/, anywhere else with // (a single / would be relative to the settings file).
+fyi_projects_path() {
+    local store="${FYI_DIR:-$HOME/.fyi}"
+    if [[ "$store" == "$HOME"/* || "$store" == "$HOME" ]]; then
+        echo "~${store#"$HOME"}/*/projects/**"
+    else
+        echo "/$store/*/projects/**"
+    fi
+}
+
 # Plugins cannot grant themselves permissions, so the installer does: ~/.jay as a
-# readable directory, and, if wanted, the plugins' MCP tools without prompts.
+# readable directory; with fyi, reading and writing its project folders, where
+# sessions keep a project's files; and, if wanted, the plugins' MCP tools without
+# prompts. Items themselves stay behind fyi's tools, which validate them.
 claude_permissions() {
-    local p server rules=()
+    local p server rules=() files=()
     for p in $(claude_installed); do
         [[ -f "$REPO/plugins/$p/.mcp.json" ]] || continue
         for server in $(json 'Object.keys(j.mcpServers ?? {})' < "$REPO/plugins/$p/.mcp.json"); do
             rules+=("mcp__plugin_${p}_${server}")
         done
     done
+
+    if claude_installed | grep -qx fyi; then
+        files=("Read($(fyi_projects_path))" "Edit($(fyi_projects_path))")
+    fi
 
     local allow=false
     if (( ${#rules[@]} )) && confirm "Allow the plugins' tools without asking (${rules[*]})?"; then
@@ -153,14 +170,16 @@ claude_permissions() {
     mkdir -p "$(dirname "$CLAUDE_SETTINGS")"
     [[ -f "$CLAUDE_SETTINGS" ]] || echo '{}' > "$CLAUDE_SETTINGS"
     cp "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.before-jay"
-    node - "$CLAUDE_SETTINGS" "$allow" "${rules[@]}" <<'EOF'
+    JAY_FILE_RULES="$(printf '%s\n' "${files[@]}")" node - "$CLAUDE_SETTINGS" "$allow" "${rules[@]}" <<'EOF'
 const fs = require("fs");
 const [file, allow, ...rules] = process.argv.slice(2);
+const files = (process.env.JAY_FILE_RULES ?? "").split("\n").filter(Boolean);
 const settings = JSON.parse(fs.readFileSync(file, "utf8"));
 const add = (list, item) => (list.includes(item) ? list : [...list, item]);
 
 settings.permissions ??= {};
 settings.permissions.additionalDirectories = add(settings.permissions.additionalDirectories ?? [], "~/.jay");
+settings.permissions.allow = files.reduce(add, settings.permissions.allow ?? []);
 if (allow === "true") {
   settings.permissions.allow = rules.reduce(add, settings.permissions.allow ?? []);
 }

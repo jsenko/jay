@@ -34,8 +34,9 @@ cd jay
 ```
 
 The installer adds the jay marketplace to Claude Code, installs the
-plugin, lets sessions read `~/.jay` and, if you agree, use the plugin's
-tools without asking each time. It then asks for the plugin's settings.
+plugin, lets sessions read `~/.jay` and read and write fyi's project
+folders, and, if you agree, use the plugin's tools without asking each
+time. It then asks for the plugin's settings.
 Restart Claude Code afterwards.
 
 `./install.sh all` installs every plugin, and `./install.sh --help`
@@ -85,8 +86,10 @@ Claude Code:
 ```
 
 Then add `~/.jay` to `permissions.additionalDirectories` in
-`~/.claude/settings.json`, so sessions can read the plugins' files, and
-restart. After the first session has started, run a plugin's settings
+`~/.claude/settings.json`, so sessions can read the plugins' files. With
+fyi, also add `Read(~/.fyi/*/projects/**)` and `Edit(~/.fyi/*/projects/**)`
+to `permissions.allow`, so sessions can keep a project's files in its
+folder. Then restart. After the first session has started, run a plugin's settings
 script, such as `~/.jay/plugins/fyi/setup.sh`.
 
 ### Updating
