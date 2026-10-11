@@ -1,0 +1,14 @@
+{
+  "name": "status",
+  "version": "1.0.0",
+  "description": "A brief status for teammates and a weekly report, built from your GitHub activity and fyi",
+  "author": {
+    "name": "Jakub Senko"
+  },
+  "dependencies": [
+    {
+      "name": "fyi",
+      "version": "^1.1"
+    }
+  ]
+}

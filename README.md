@@ -6,16 +6,16 @@ sessions running at the same time, status reports, and coding and pull
 request workflows. Each part is a separate plugin, so you install only
 what you need.
 
-**Status:** work in progress. fyi is available; the other plugins are
-being moved here from an earlier setup, one at a time.
+**Status:** work in progress. fyi, crew and status are available; the
+other plugins are being moved here from an earlier setup, one at a time.
 
 ## Plugins
 
 | Plugin | What it does | Dashboard | Needs | State |
 |---|---|---|---|---|
 | [fyi](plugins/fyi/README.md) | Store for tasks, notes, projects and tracked PRs, as Markdown under `~/.fyi` | Today, pull requests, projects | — | available |
-| [crew](plugins/crew/README.md) | Roles to start sessions as, and coordination between them: who is running, messages, and jobs | Sessions, jobs | fyi | in progress |
-| status | A short status for teammates and a weekly report, built from GitHub and fyi | — | fyi | planned |
+| [crew](plugins/crew/README.md) | Roles to start sessions as, and coordination between them: who is running, messages, and jobs | Sessions, jobs | fyi | available |
+| [status](plugins/status/README.md) | A brief status for teammates and a weekly report, built from your GitHub activity and fyi | — | fyi | available |
 | code | The coding role and workflow, with feature tracking and code-quality rules | — | fyi, crew | planned |
 | pr | Watching GitHub, PR reviews, and the PR queue | — | fyi, crew | planned |
 
@@ -60,6 +60,10 @@ Talk to a session as usual; the plugins give it tools and habits.
   the crew, reads what the role lists, and says what it found. Other
   sessions see what it is doing, and work it can take is routed to it.
   `/crew:stop` saves where it stopped before it leaves.
+- **`/status:brief`** writes a few bullets on what you did since your
+  last brief, ready to paste into your team's channel, and asks first
+  about anything personal or not yet public. **`/status:weekly`** writes
+  the week as prose for a wider audience, and saves it to fyi.
 
 Each plugin's README lists what it adds.
 

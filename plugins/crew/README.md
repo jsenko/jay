@@ -10,8 +10,7 @@ Two things for running several Claude Code sessions at once:
   can take it.
 
 It needs [fyi](../fyi/README.md), where sessions save where they
-stopped. The crew plugin is in progress: it works from a clone, and
-replaces an earlier setup one step at a time.
+stopped.
 
 ## Installing
 

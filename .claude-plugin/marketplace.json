@@ -14,6 +14,11 @@
       "name": "crew",
       "source": "./plugins/crew",
       "description": "Start sessions as roles, and coordinate them: who is working on what, jobs routed by capability, messages, and a dashboard"
+    },
+    {
+      "name": "status",
+      "source": "./plugins/status",
+      "description": "A brief status for teammates and a weekly report, built from your GitHub activity and fyi"
     }
   ]
 }
