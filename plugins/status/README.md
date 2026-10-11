@@ -29,7 +29,11 @@ This installs status and fyi. Without a clone, in Claude Code:
 
 The [main README](../../README.md) covers the permissions to add then,
 updating and uninstalling. The commands use the GitHub CLI, `gh`, logged
-in as you.
+in as you, and only read: `gh search`, and `gh api` for reviews, commits,
+events and Discussions. To skip a prompt for each one, allow
+`Bash(gh search *)` and `Bash(gh api *)` in your Claude Code settings;
+`gh api` can also write, so allow it only if you're comfortable with
+that.
 
 ## Using it
 

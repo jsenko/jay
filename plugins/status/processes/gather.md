@@ -16,8 +16,10 @@ what to always include or leave out, and how the user's periods run.
 
 ## GitHub
 
-Export `GH_HOST=github.com`. Search all of GitHub as the user (`@me`),
-never a list of repositories. `<range>` is `<start>..<end>`.
+Search all of GitHub as the user (`@me`), never a list of repositories.
+`<range>` is `<start>..<end>`. Prefix calls with `GH_HOST=github.com`
+only when `gh auth status` lists another host; without the prefix, the
+user's allow rules for `gh` still match.
 
 | What | Search, then keep |
 |---|---|
