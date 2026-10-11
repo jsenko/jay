@@ -6,7 +6,6 @@ Committing, branching and opening pull requests in a coder session.
 
 - Conventional prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`.
 - Concise, about why rather than what.
-- No AI attribution or co-author lines.
 
 ## Branches
 
