@@ -13,6 +13,7 @@ import { Cache } from "./cache.js";
 import { loadConfig, validateConfig } from "./config.js";
 import { truncateEvent } from "./format.js";
 import { API, fetchGitHubApi } from "./github.js";
+import { greetOnce } from "./hello.js";
 import { Poller } from "./poller.js";
 
 /** The plugin's version, so the server reports the release it ships in. */
@@ -42,6 +43,7 @@ const mcp = new Server(
       "It also monitors GitHub notifications for @mentions and replies across all repositories.",
       "Workflow run failures are tracked for watched repositories.",
       "Events are pushed as channel notifications with truncated bodies.",
+      "After the first tool call it pushes {\"github\":\"hello\"} once: a session that receives it gets pushes and need not poll get_new_events.",
       "Use the get_event tool with the event_id from the notification meta to retrieve the full event (non-truncated body).",
       "Use the github_api tool to fetch any GitHub API URL — it uses a cache to avoid redundant requests.",
     ].join("\n"),
@@ -97,8 +99,14 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
   ],
 }));
 
+/** Sends a channel notification to the session. */
+function push(content: string): void {
+  mcp.notification({ method: "notifications/claude/channel", params: { content } });
+}
+
 mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
   const args = (req.params.arguments ?? {}) as Record<string, unknown>;
+  greetOnce(push);
 
   switch (req.params.name) {
     case "get_event": {
@@ -162,13 +170,7 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
 });
 
 const poller = new Poller(config, cache, (eventId, event) => {
-  const payload = { event_id: eventId, event: truncateEvent(event) };
-  mcp.notification({
-    method: "notifications/claude/channel",
-    params: {
-      content: JSON.stringify(payload),
-    },
-  });
+  push(JSON.stringify({ event_id: eventId, event: truncateEvent(event) }));
 });
 
 async function main(): Promise<void> {

@@ -42,10 +42,11 @@ export function tempDir(label: string): string {
   return mkdtempSync(join(tmpdir(), `pr-${label}-`));
 }
 
-/** A connected server, and every channel notification it has pushed. */
+/** A connected server, the events it has pushed, and its hellos. */
 export interface Connection {
   client: Client;
   pushes: any[];
+  hellos: number;
 }
 
 /**
@@ -53,11 +54,14 @@ export interface Connection {
  * the channel pushes it sends. Polls every second so tests don't wait.
  */
 export async function connect(apiUrl: string, stateFile: string, repos = "acme/widgets"): Promise<Connection> {
-  const pushes: any[] = [];
-  const client = new Client({ name: "pr-test", version: "0" }, { capabilities: {} });
-  client.fallbackNotificationHandler = async (n: any) => {
-    if (n.method === "notifications/claude/channel") pushes.push(JSON.parse(n.params.content));
+  const conn: Connection = { client: new Client({ name: "pr-test", version: "0" }, { capabilities: {} }), pushes: [], hellos: 0 };
+  conn.client.fallbackNotificationHandler = async (n: any) => {
+    if (n.method !== "notifications/claude/channel") return;
+    const content = JSON.parse(n.params.content);
+    if (content.github === "hello") conn.hellos++;
+    else conn.pushes.push(content);
   };
+  const client = conn.client;
   await client.connect(
     new StdioClientTransport({
       command: TSX,
@@ -74,7 +78,7 @@ export async function connect(apiUrl: string, stateFile: string, repos = "acme/w
       stderr: "ignore",
     })
   );
-  return { client, pushes };
+  return conn;
 }
 
 /** Calls a tool, returning parsed JSON, or `{ error }` for a tool error. */

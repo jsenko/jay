@@ -17,7 +17,9 @@ export async function run(): Promise<void> {
   github.add(comment("alice", "before the watcher started"));
 
   const first = await connect(github.url, state);
-  await until(() => false, 2500);
+  await settle(1500);
+  check("nothing says hello before the session calls a tool", first.hellos === 0, first.hellos);
+  await until(() => false, 1000);
   check("events already there when watching starts are not delivered",
     first.pushes.length === 0 && (await call(first.client, "get_new_events")).length === 0, first.pushes);
 
@@ -44,6 +46,9 @@ export async function run(): Promise<void> {
   const polled = (await call(first.client, "get_new_events")).map((e: any) => e.event_id);
   check("get_new_events returns what arrived", polled.includes(long.id) && polled.includes(mention.id), polled);
   check("and returns it only once", (await call(first.client, "get_new_events")).length === 0);
+
+  await settle(500);
+  check("the first tool call brings one hello, and later calls none", first.hellos === 1, first.hellos);
 
   await first.client.close();
 
