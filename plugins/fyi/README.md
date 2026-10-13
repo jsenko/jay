@@ -28,6 +28,9 @@ This installs the plugin and asks for its settings (see
 then follow the main README's steps for permissions and settings. The [main README](../../README.md)
 covers other ways to install, updating and uninstalling.
 
+In opencode, `./install.sh --opencode fyi` installs it from the clone,
+and `/fyi:dashboard` is `/fyi-dashboard` there.
+
 ## What sessions can do
 
 | Tool | Purpose |

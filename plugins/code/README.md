@@ -32,6 +32,9 @@ This installs code, crew and fyi. Without a clone, in Claude Code:
 The [main README](../../README.md) covers the permissions to add then,
 updating and uninstalling.
 
+In opencode, `./install.sh --opencode code` installs it from the clone;
+the command is `/code-implement` and the skill `code-style` there.
+
 ## Using it
 
 ```

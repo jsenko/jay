@@ -44,6 +44,10 @@ and then run `~/.jay/plugins/pr/setup.sh` once a session has started.
 The [main README](../../README.md) covers the permissions to add,
 updating and uninstalling.
 
+In opencode, `./install.sh --opencode pr` installs it from the clone;
+the commands are `/pr-queue` and `/pr-checkout`, and the watcher polls,
+since opencode has no channels.
+
 ## Using it
 
 Run the watcher and a reviewer in sessions of their own, and keep using

@@ -30,6 +30,10 @@ This installs crew and fyi. Without a clone, in Claude Code:
 The [main README](../../README.md) covers the permissions to add then,
 updating and uninstalling.
 
+In opencode, `./install.sh --opencode crew` installs it from the clone;
+its commands are `/crew-start`, `/crew-stop` and `/crew-retry-smaller`
+there, and sessions poll instead of receiving pushes.
+
 ## Roles
 
 ```

@@ -35,6 +35,9 @@ events and Discussions. To skip a prompt for each one, allow
 `gh api` can also write, so allow it only if you're comfortable with
 that.
 
+In opencode, `./install.sh --opencode status` installs it from the
+clone, and the commands are `/status-brief` and `/status-weekly` there.
+
 ## Using it
 
 ```

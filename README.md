@@ -6,8 +6,8 @@ sessions running at the same time, status reports, and coding and pull
 request workflows. Each part is a separate plugin, so you install only
 what you need.
 
-**Status:** work in progress. All five plugins are available in Claude
-Code; opencode support is planned.
+**Status:** work in progress, not yet published. All five plugins work
+in Claude Code and in opencode.
 
 ## Plugins
 
@@ -24,8 +24,8 @@ installed plugins share one menu, so each one can open the others.
 
 ## Quickstart
 
-You need [Claude Code](https://claude.com/claude-code), Node.js 18 or
-later, and git. opencode support is planned.
+You need [Claude Code](https://claude.com/claude-code) or
+[opencode](https://opencode.ai), Node.js 18 or later, and git.
 
 ```bash
 git clone https://github.com/jsenko/jay.git
@@ -36,8 +36,8 @@ cd jay
 The installer adds the jay marketplace to Claude Code, installs the
 plugin, lets sessions read `~/.jay` and read and write fyi's project
 folders, and, if you agree, use the plugin's tools without asking each
-time. It then asks for the plugin's settings.
-Restart Claude Code afterwards.
+time. It sets up opencode as well, if it is installed. It then asks for
+the plugin's settings. Restart your client afterwards.
 
 `./install.sh all` installs every plugin, and `./install.sh --help`
 lists the options.
@@ -125,8 +125,25 @@ stay. Delete `~/.jay/plugins/fyi` to remove the link too.
 
 ### opencode
 
-Not supported yet. The plan is for the same plugins to load in opencode
-through an adapter, installed by the same `./install.sh`.
+The same plugins load in opencode, from your clone: `./install.sh`
+configures opencode when it finds it, or only opencode with
+`--opencode`. It writes one small file per plugin into
+`~/.config/opencode/plugins/`, pointing at the plugin in the clone, so
+keep the clone where it is, and `git pull` there to update.
+
+What differs from Claude Code:
+
+| | Claude Code | opencode |
+|---|---|---|
+| Commands | `/crew:start` | `/crew-start`: opencode doesn't group commands by plugin, so each is prefixed with its plugin's name |
+| Skills | `code:style` | `code-style`, for the same reason |
+| Tool names | `mcp__plugin_fyi_fyi__fyi_capture` | `fyi_fyi_capture`, as before jay |
+| Notifications | Pushed, with the channels flag | Polled every ten minutes: opencode has no channels |
+| Instructions for every session | `~/.claude/CLAUDE.md` | `AGENTS.md` |
+
+Instruction files use Claude Code's names; opencode is given its names
+when the plugins load. Skills are kept as renamed copies under
+`~/.local/share/jay/<plugin>/opencode-skills/`.
 
 ## Developing
 
