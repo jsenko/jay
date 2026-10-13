@@ -100,14 +100,22 @@ claude_installed() {
 }
 
 # Plugins installed from a checkout run in place, where Claude Code installs no
-# npm dependencies, so --dev installs them.
+# npm dependencies, so --dev installs them, for what they depend on too.
 dev_dependencies() {
     local p
-    for p in "${PLUGINS[@]}"; do
-        [[ -f "$REPO/plugins/$p/package.json" ]] || continue
-        say "installing $p's npm dependencies"
-        (cd "$REPO/plugins/$p" && npm install --ignore-scripts --no-audit --no-fund --silent)
+    for p in $(with_dependencies "${PLUGINS[@]}"); do
+        npm_dependencies "$p"
     done
+}
+
+# Installs one plugin's npm dependencies in the clone, once per run: --dev and
+# opencode both run plugins from it.
+NPM_DONE=" "
+npm_dependencies() {
+    [[ -f "$REPO/plugins/$1/package.json" && "$NPM_DONE" != *" $1 "* ]] || return 0
+    say "installing $1's npm dependencies"
+    (cd "$REPO/plugins/$1" && npm install --ignore-scripts --no-audit --no-fund --silent)
+    NPM_DONE+="$1 "
 }
 
 claude_install() {
@@ -129,11 +137,41 @@ claude_install() {
 }
 
 claude_uninstall() {
-    local p
+    local p rules=()
     for p in "${PLUGINS[@]}"; do
         say "removing $p from Claude Code"
         claude plugin uninstall "$p@$MARKETPLACE" --scope user --keep-data >/dev/null || true
+        mapfile -t -O "${#rules[@]}" rules < <(plugin_tool_rules "$p"; plugin_file_rules "$p")
     done
+    (( ${#rules[@]} )) && [[ -f "$CLAUDE_SETTINGS" ]] || return 0
+    cp "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.before-jay"
+    node - "$CLAUDE_SETTINGS" "${rules[@]}" <<'EOF'
+const fs = require("fs");
+const [file, ...rules] = process.argv.slice(2);
+const settings = JSON.parse(fs.readFileSync(file, "utf8"));
+if (settings.permissions?.allow) {
+  settings.permissions.allow = settings.permissions.allow.filter((r) => !rules.includes(r));
+}
+fs.writeFileSync(file, JSON.stringify(settings, null, 2) + "\n");
+EOF
+    say "removed their permissions from $CLAUDE_SETTINGS (previous copy: settings.json.before-jay)"
+}
+
+# The allow rules for one plugin's tools: its MCP servers, and with pr the one
+# GitHub write its unattended roles make, setting a milestone.
+plugin_tool_rules() {
+    local server
+    if [[ -f "$REPO/plugins/$1/.mcp.json" ]]; then
+        for server in $(json 'Object.keys(j.mcpServers ?? {})' < "$REPO/plugins/$1/.mcp.json"); do
+            echo "mcp__plugin_${1}_${server}"
+        done
+    fi
+    [[ "$1" != pr ]] || echo "Bash(gh api -X PATCH repos/*/issues/* -F milestone=*)"
+}
+
+# The file rules one plugin needs: with fyi, reading and writing its project folders.
+plugin_file_rules() {
+    [[ "$1" != fyi ]] || printf '%s\n' "Read($(fyi_projects_path))" "Edit($(fyi_projects_path))"
 }
 
 # The fyi store's project folders, as a permission path: under the home directory
@@ -148,25 +186,15 @@ fyi_projects_path() {
 }
 
 # Plugins cannot grant themselves permissions, so the installer does: ~/.jay as a
-# readable directory; with fyi, reading and writing its project folders, where
-# sessions keep a project's files; and, if wanted, the plugins' MCP tools without
-# prompts, and with pr the one GitHub write its unattended roles make: setting a
-# milestone. Items themselves stay behind fyi's tools, which validate them.
+# readable directory; each plugin's file rules, where sessions keep a project's
+# files; and, if wanted, the plugins' tool rules, so they run without prompts.
+# Items themselves stay behind fyi's tools, which validate them.
 claude_permissions() {
-    local p server rules=() files=()
+    local p rules=() files=()
     for p in $(claude_installed); do
-        [[ -f "$REPO/plugins/$p/.mcp.json" ]] || continue
-        for server in $(json 'Object.keys(j.mcpServers ?? {})' < "$REPO/plugins/$p/.mcp.json"); do
-            rules+=("mcp__plugin_${p}_${server}")
-        done
+        mapfile -t -O "${#rules[@]}" rules < <(plugin_tool_rules "$p")
+        mapfile -t -O "${#files[@]}" files < <(plugin_file_rules "$p")
     done
-    if claude_installed | grep -qx pr; then
-        rules+=("Bash(gh api -X PATCH repos/*/issues/* -F milestone=*)")
-    fi
-
-    if claude_installed | grep -qx fyi; then
-        files=("Read($(fyi_projects_path))" "Edit($(fyi_projects_path))")
-    fi
 
     local allow=false
     if (( ${#rules[@]} )) && confirm "Allow the plugins' tools without asking (${rules[*]})?"; then
@@ -209,10 +237,7 @@ opencode_install() {
     local p cmd
     mkdir -p "$OPENCODE_DIR/plugins"
     for p in $(with_dependencies "${PLUGINS[@]}"); do
-        if [[ -f "$REPO/plugins/$p/package.json" ]]; then
-            say "installing $p's npm dependencies"
-            (cd "$REPO/plugins/$p" && npm install --ignore-scripts --no-audit --no-fund --silent)
-        fi
+        npm_dependencies "$p"
         if [[ -f "$REPO/plugins/$p/.mcp.json" ]]; then
             while IFS= read -r cmd; do
                 [[ -x "$cmd" ]] || die "$p's server command $cmd doesn't exist; opencode would hang on it"

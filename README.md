@@ -121,8 +121,9 @@ then `/plugin update fyi@jay`. Restart Claude Code either way.
 ./install.sh --uninstall fyi
 ```
 
-or `/plugin uninstall fyi@jay`. Your items in `~/.fyi` and your settings
-stay. Delete `~/.jay/plugins/fyi` to remove the link too.
+or `/plugin uninstall fyi@jay`. The installer also removes the
+permissions it added for the plugin. Your items in `~/.fyi` and your
+settings stay. Delete `~/.jay/plugins/fyi` to remove the link too.
 
 ### opencode
 
