@@ -150,7 +150,8 @@ fyi_projects_path() {
 # Plugins cannot grant themselves permissions, so the installer does: ~/.jay as a
 # readable directory; with fyi, reading and writing its project folders, where
 # sessions keep a project's files; and, if wanted, the plugins' MCP tools without
-# prompts. Items themselves stay behind fyi's tools, which validate them.
+# prompts, and with pr the one GitHub write its unattended roles make: setting a
+# milestone. Items themselves stay behind fyi's tools, which validate them.
 claude_permissions() {
     local p server rules=() files=()
     for p in $(claude_installed); do
@@ -159,6 +160,9 @@ claude_permissions() {
             rules+=("mcp__plugin_${p}_${server}")
         done
     done
+    if claude_installed | grep -qx pr; then
+        rules+=("Bash(gh api -X PATCH repos/*/issues/* -F milestone=*)")
+    fi
 
     if claude_installed | grep -qx fyi; then
         files=("Read($(fyi_projects_path))" "Edit($(fyi_projects_path))")

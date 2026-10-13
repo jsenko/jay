@@ -37,6 +37,11 @@ Do not assign a milestone if:
    ```bash
    gh api -X PATCH repos/{owner}/{repo}/issues/{number} -F milestone={milestone_number}
    ```
+   One plain call per PR or issue, exactly in this form: no loop, pipe or
+   `--jq`. The allow rule for it matches only this shape, and anything
+   else is refused as an external write in an unattended session. If it
+   is refused anyway, don't try another way: add an `assign` attention
+   item, `who: user`, naming the milestone, and carry on.
 4. Do the same for every open issue the PR closes that has no open
    milestone — PR validation fails until they have one. List them with
    GraphQL `closingIssuesReferences`; `gh pr view` lacks the field.

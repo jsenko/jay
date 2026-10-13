@@ -35,8 +35,9 @@ Read when something looks wrong and the code does not explain it.
   /issues/{n}/assignees` works and is correct.
 - **Claim commands fire only on comment creation**, and must be first on
   the first line. Editing a comment to add one does nothing.
-- **Closing keywords match inside prose and code spans.** Writing
-  `Fixes #NNNN` in a note re-creates the link.
+- **`gh pr edit` fails to label or set a milestone**, on the Projects
+  (classic) deprecation. Use the issues API: `gh api -X POST
+  repos/{o}/{r}/issues/{n}/labels -f 'labels[]=X'`.
 
 ## Milestones
 

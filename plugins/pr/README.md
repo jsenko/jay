@@ -75,6 +75,11 @@ What they may do without asking, and what always waits for you:
 | Posting a review with only optional findings, asking the author to choose for each | |
 | Filing a follow-up issue the author asked for | |
 
+Setting a milestone is a GitHub write, which Claude Code's auto mode
+refuses unless it is allowed. `install.sh` offers to allow exactly that
+call, `Bash(gh api -X PATCH repos/*/issues/* -F milestone=*)`; without it,
+the watcher and reviewer ask you to set the milestone instead.
+
 Approval is never automatic. Talking to a reviewer session yourself
 puts it in `focus`, so no other work is routed to it while you do.
 
