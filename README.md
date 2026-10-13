@@ -6,8 +6,8 @@ sessions running at the same time, status reports, and coding and pull
 request workflows. Each part is a separate plugin, so you install only
 what you need.
 
-**Status:** work in progress. fyi, crew, status and code are available;
-pr is being moved here from an earlier setup.
+**Status:** work in progress. All five plugins are available in Claude
+Code; opencode support is planned.
 
 ## Plugins
 
@@ -17,7 +17,7 @@ pr is being moved here from an earlier setup.
 | [crew](plugins/crew/README.md) | Roles to start sessions as, and coordination between them: who is running, messages, and jobs | Sessions, jobs | fyi | available |
 | [status](plugins/status/README.md) | A brief status for teammates and a weekly report, built from your GitHub activity and fyi | — | fyi | available |
 | [code](plugins/code/README.md) | The coder role, one command for work of any size with as much tracking as it needs, and code-quality rules with stable IDs | — | fyi, crew | available |
-| pr | Watching GitHub, PR reviews, and the PR queue | — | fyi, crew, code | planned |
+| [pr](plugins/pr/README.md) | A watcher that follows GitHub for you, a reviewer, and a queue of PRs waiting on you | — | fyi, crew, code | available |
 
 Installing a plugin also installs what it needs. The dashboards of all
 installed plugins share one menu, so each one can open the others.
@@ -70,6 +70,9 @@ Talk to a session as usual; the plugins give it tools and habits.
   the code-quality rules, with a design note or phases when the work is
   big enough to need them. It asks before committing and never pushes
   without asking.
+- **`/crew:start watcher`** and **`/crew:start reviewer`**, each in a
+  session of its own, follow GitHub and review the PRs that concern you
+  without you; **`/pr:queue`** then gives you the few that need a person.
 
 Each plugin's README lists what it adds.
 
@@ -104,9 +107,10 @@ then `/plugin update fyi@jay`. Restart Claude Code either way.
 |---|---|
 | `~/.claude/plugins/cache/jay/<plugin>/<version>/` | The installed plugins, managed by Claude Code |
 | `~/.jay/plugins/<plugin>` | A link to each plugin's current version, made when a session starts; instruction files refer to each other through it |
-| `~/.jay/config.json` | Settings shared by several plugins, once a plugin needs one |
+| `~/.jay/config.json` | Settings shared by several plugins: `github.user` and `github.repos`, written by pr's setup |
 | `~/.jay/roles/` | Your own roles, which crew finds next to the plugins' |
 | `~/.jay/crew/` | crew's state: sessions, messages and jobs |
+| `~/.jay/pr/` | github-events' state: where each repository's event stream was last read |
 | `~/.fyi/` | fyi's items, and its own settings in `~/.fyi/config.json` |
 | `~/.claude/settings.json` | Changed by the installer, which keeps the previous version as `settings.json.before-jay` |
 
