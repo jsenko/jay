@@ -1,0 +1,189 @@
+/** The github-events MCP server: GitHub activity for watched repositories, pushed to sessions. */
+
+import { readFileSync } from "node:fs";
+
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  ListToolsRequestSchema,
+  CallToolRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+
+import { Cache } from "./cache.js";
+import { Poller, loadConfig, validateConfig, truncateEvent, fetchGitHubApi, type PollerStatus } from "./poller.js";
+
+/** The plugin's version, so the server reports the release it ships in. */
+const { version } = JSON.parse(readFileSync(new URL("../.claude-plugin/plugin.json", import.meta.url), "utf8"));
+
+const cache = new Cache();
+const config = loadConfig();
+
+try {
+  validateConfig(config);
+} catch (err: any) {
+  console.error(`[github-events] ${err.message}`);
+  process.exit(1);
+}
+
+const mcp = new Server(
+  { name: "github-events", version },
+  {
+    capabilities: {
+      tools: {},
+      experimental: {
+        "claude/channel": {},
+      },
+    },
+    instructions: [
+      "This server monitors GitHub repositories for PR and issue activity.",
+      "It also monitors GitHub notifications for @mentions and replies across all repositories.",
+      "Workflow run failures are tracked for watched repositories.",
+      "Events are pushed as channel notifications with truncated bodies.",
+      "Use the get_event tool with the event_id from the notification meta to retrieve the full event (non-truncated body).",
+      "Use the github_api tool to fetch any GitHub API URL — it uses a cache to avoid redundant requests.",
+    ].join("\n"),
+  }
+);
+
+mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools: [
+    {
+      name: "get_event",
+      description: "Retrieve a cached GitHub event by its event ID. Returns the full event with non-truncated body and diff_hunk fields.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          event_id: {
+            type: "string",
+            description: "The GitHub event ID (from the notification meta)",
+          },
+        },
+        required: ["event_id"],
+      },
+    },
+    {
+      name: "get_new_events",
+      description: "Returns GitHub events that have not been returned by a previous call to this tool. Events are truncated (use get_event for full content). Each event includes an event_id and meta fields. Returns an empty array if no new events are available.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {},
+      },
+    },
+    {
+      name: "github_api",
+      description: "Fetch a GitHub API URL. Uses cached responses when available to reduce API calls. Returns the raw JSON response.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          url: {
+            type: "string",
+            description: "The GitHub API URL to fetch (e.g. https://api.github.com/repos/owner/repo/pulls/42)",
+          },
+        },
+        required: ["url"],
+      },
+    },
+    {
+      name: "get_status",
+      description: "Returns the health status of the GitHub events server: authenticated user, monitored repos, last successful poll times per source (repo_events, workflow_runs, notifications), and any recent errors. Use this to diagnose whether empty results mean 'no events' or 'polling is broken'.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {},
+      },
+    },
+  ],
+}));
+
+mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
+  const args = (req.params.arguments ?? {}) as Record<string, unknown>;
+
+  switch (req.params.name) {
+    case "get_event": {
+      const eventId = args.event_id as string;
+      const event = cache.getEvent(eventId);
+      if (!event) {
+        return {
+          content: [{ type: "text", text: `No cached event found for ID: ${eventId}` }],
+          isError: true,
+        };
+      }
+      return {
+        content: [{ type: "text", text: JSON.stringify(event, null, 2) }],
+      };
+    }
+
+    case "get_new_events": {
+      const newEvents = cache.consumeNewEvents();
+      const result = newEvents.map(({ id, event }) => ({
+        event_id: id,
+        event: truncateEvent(event),
+      }));
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+
+    case "github_api": {
+      const url = args.url as string;
+      if (!url.startsWith("https://api.github.com/")) {
+        return {
+          content: [{ type: "text", text: "URL must start with https://api.github.com/" }],
+          isError: true,
+        };
+      }
+      const data = await fetchGitHubApi(url, config.githubToken, cache);
+      if (data === null) {
+        return {
+          content: [{ type: "text", text: `Failed to fetch ${url}` }],
+          isError: true,
+        };
+      }
+      return {
+        content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+      };
+    }
+
+    case "get_status": {
+      const status = poller.getStatus();
+      return {
+        content: [{ type: "text", text: JSON.stringify(status, null, 2) }],
+      };
+    }
+
+    default:
+      return {
+        content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }],
+        isError: true,
+      };
+  }
+});
+
+const poller = new Poller(config, cache, (eventId, event) => {
+  const payload = { event_id: eventId, event: truncateEvent(event) };
+  mcp.notification({
+    method: "notifications/claude/channel",
+    params: {
+      content: JSON.stringify(payload),
+    },
+  });
+});
+
+async function main(): Promise<void> {
+  await mcp.connect(new StdioServerTransport());
+  poller.start();
+
+  process.on("SIGINT", () => {
+    poller.stop();
+    process.exit(0);
+  });
+  process.on("SIGTERM", () => {
+    poller.stop();
+    process.exit(0);
+  });
+  process.stdin.on("end", () => {
+    poller.stop();
+    process.exit(0);
+  });
+}
+
+main();
