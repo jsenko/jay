@@ -16,6 +16,7 @@ import { join } from "node:path";
 import { toFile, toItem } from "./frontmatter.js";
 import { archiveDir, FYI_DIR, itemPath, typeDir } from "./paths.js";
 import { shouldArchive } from "./archiving.js";
+import { assertWritable, writable } from "./store-version.js";
 import { nowIso } from "./time.js";
 import { ITEM_TYPES, SCOPES, type Item, type ItemType, type Scope, type StoredItem } from "./types.js";
 
@@ -113,6 +114,8 @@ function lookup(id: string): Item | undefined {
 
 /** Archives every active item whose policy says its time is up. */
 function sweep(now = Date.now()): void {
+  // Archiving writes, so it waits while the store is newer than this server.
+  if (!writable()) return;
   for (const entry of [...active.values()]) {
     if (shouldArchive(entry.item, lookup, now)) moveToArchive(entry);
   }
@@ -168,6 +171,7 @@ export function exists(id: string): boolean {
  * being archived by policy.
  */
 export function write(item: Item, scope: Scope): StoredItem {
+  assertWritable();
   const archived = item.archived === true;
   const dir = archived ? archiveDir(scope, item.type) : typeDir(scope, item.type);
   mkdirSync(dir, { recursive: true });

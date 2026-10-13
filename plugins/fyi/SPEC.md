@@ -253,6 +253,7 @@ Under `server/`:
 | `archiving.ts` | When items leave the active set, from `x-fyi-archive` |
 | `completion.ts` | `completed_at`: stamped on finishing, cleared on reopening |
 | `folders.ts` | Project folders: where a project's files go |
+| `store-version.ts` | The store's format version, and the migrations from older ones |
 | `config.ts` | Settings from the store's `config.json` |
 | `check.ts` | The store checker, `npm run check` |
 | `migrations/` | One-off store migrations, each runnable with `--dry-run` |
@@ -278,10 +279,35 @@ same store, so validation and archiving apply.
 
 ## 11. Changing the format
 
-Files outlive the schema they were written under. After changing a
-schema, run `npm run check` against the real store; whatever it reports
-needs a migration in `server/migrations/`, one file per change, run with
-`--dry-run` first, in the same change as the schema.
+Files outlive the schema they were written under, and once others use
+fyi, a store this repository never sees has to follow a schema change on
+its own.
+
+**The store records its format** in `<store>/store.json`, `{"version": 1}`
+(`store-version.ts`). Version 1 is the format fyi was first published
+in; a store without the file predates versioning and is taken as 1. At
+start the server runs every migration past the recorded version, in
+order, recording each as it completes. A store newer than the server is
+read-only to it: reads work, every write fails asking to update fyi, and
+archiving waits. An older fyi writing into a newer store would produce
+items the newer one misreads, which is worse than refusing.
+
+**To change the format incompatibly**, in the same change as the schema:
+1. Raise `STORE_VERSION`.
+2. Add a `Migration` to `MIGRATIONS` with that version. Its `run` rewrites
+   the store through `store.ts`, and must be safe to run again, since a
+   crash part-way reruns it.
+3. Test it on a copy of a real store, and add a test with a store in the
+   old format.
+
+A change old items still pass, such as a new optional field, needs no
+version. `npm run check` against a real store tells the two apart.
+
+**Not built yet**, because no store but the author's existed when the
+facility was added: a backup before migrating, and telling the session
+what changed. Both belong with the first real migration. The scripts in
+`server/migrations/` predate versioning: run by hand, once, on the
+author's store, they are the history of format 1.
 
 The tests cover the schema-generated tool definitions, validation,
 capture, both naming conventions and the rename migration, search

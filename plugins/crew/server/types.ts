@@ -82,8 +82,15 @@ export interface Job {
   expires_at: string;
 }
 
+/**
+ * The state file's format. Raise it when the format changes: an older
+ * state then starts fresh, since crew's state is short-lived, and an
+ * older crew refuses a newer state rather than overwrite it.
+ */
+export const STATE_VERSION = 1;
+
 export interface State {
-  version: 1;
+  version: typeof STATE_VERSION;
   seq: number;
   sessions: Record<string, Session>;
   messages: Message[];
@@ -98,7 +105,7 @@ export interface State {
 
 export function emptyState(): State {
   return {
-    version: 1,
+    version: STATE_VERSION,
     seq: 0,
     sessions: {},
     messages: [],

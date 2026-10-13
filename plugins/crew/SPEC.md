@@ -268,6 +268,8 @@ case it should not have been posted.
 | `crew_send`/`crew_post` to unknown session | Error, lists known session ids |
 | `crew_send` to offline or stale session | Succeeds, returns a warning with last-seen. The message waits. |
 | State file missing or corrupt | Rebuild empty, log once. Crew state is reconstructible; never block a session on it. |
+| State file in an older format (`version` below `STATE_VERSION`) | Rebuild empty, log once, as for a corrupt one: the state is short-lived, so it is not migrated. |
+| State file in a newer format | Refuse every call, saying to update crew. A newer crew wrote it, and overwriting it would destroy that crew's state. Raise `STATE_VERSION` with any incompatible change to the state's shape. |
 
 The distinction throughout: "nothing to do" is a result, not an error.
 Errors are reserved for genuine caller mistakes, so the model never has

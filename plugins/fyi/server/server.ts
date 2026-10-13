@@ -15,6 +15,7 @@ import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprot
 import { readFileSync } from "node:fs";
 
 import { root } from "./store.js";
+import { prepareStore } from "./store-version.js";
 import { tools, toolsByName } from "./tools/index.js";
 
 /** The plugin's version, so the server reports the release it ships in. */
@@ -51,4 +52,5 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
   }
 });
 
+prepareStore();
 await mcp.connect(new StdioServerTransport());

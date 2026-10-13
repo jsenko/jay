@@ -7,7 +7,8 @@ import { existsSync, mkdirSync, openSync, closeSync, readFileSync, writeFileSync
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { emptyState, type State } from "./types.js";
+import { ToolError } from "./errors.js";
+import { emptyState, STATE_VERSION, type State } from "./types.js";
 
 const CREW_DIR = process.env.CREW_DIR || join(homedir(), ".jay", "crew");
 const STATE_FILE = join(CREW_DIR, "state.json");
@@ -63,19 +64,29 @@ function releaseLock(): void {
 }
 
 /**
- * Crew state is operational and reconstructible, so a missing or corrupt
- * file starts over rather than blocking a session (SPEC.md §5).
+ * Crew state is operational and reconstructible, so a missing, corrupt or
+ * older file starts over rather than blocking a session (SPEC.md §5). A
+ * newer one is refused: this crew can't read it, and writing over it
+ * would destroy the state of the crew that wrote it.
  */
 function readState(): State {
   if (!existsSync(STATE_FILE)) return emptyState();
+  let parsed: State;
   try {
-    const parsed = JSON.parse(readFileSync(STATE_FILE, "utf8")) as State;
-    if (parsed.version !== 1) throw new Error(`unsupported version ${parsed.version}`);
-    return parsed;
+    parsed = JSON.parse(readFileSync(STATE_FILE, "utf8")) as State;
   } catch (err: any) {
     console.error(`[crew] discarding unreadable state (${err.message})`);
     return emptyState();
   }
+  const version = Number(parsed.version);
+  if (version > STATE_VERSION) {
+    throw new ToolError(`${STATE_FILE} is from a newer crew (format ${version}; this one reads ${STATE_VERSION}). Update the crew plugin.`);
+  }
+  if (version !== STATE_VERSION) {
+    console.error(`[crew] starting fresh: state format ${parsed.version} is older than ${STATE_VERSION}`);
+    return emptyState();
+  }
+  return parsed;
 }
 
 function writeState(state: State): void {

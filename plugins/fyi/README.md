@@ -201,6 +201,7 @@ One file per item, `~/.fyi/<scope>/<type>/<id>.md`:
 ```
 ~/.fyi/
   config.json                         # settings, see below
+  store.json                          # the store's format version, kept by fyi
   default/
     task/task-fix-the-retry-on-startup.md
     note/note-chose-varnish-over-a-cache.md
@@ -216,6 +217,13 @@ and `fyi_handoff` give its path as `folder`, so other plugins and roles
 never build it themselves. It is named after the project id without
 `project-`, and is created when first asked for; an archived project
 keeps the folder it had.
+
+**`store.json` records the store's format**, which fyi keeps up to date
+itself: a release that changes the format migrates the store when it
+starts. If a session says the store is in a newer format than fyi reads,
+a newer fyi, perhaps in your other client, has already migrated it.
+Update the fyi plugin where it is older; until then that client can read
+the store but not change it.
 
 Fields are YAML frontmatter, and the one long text field of each type is
 the Markdown body. You can create, edit and delete files by hand: the
