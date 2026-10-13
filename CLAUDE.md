@@ -18,6 +18,7 @@ folders through an adapter.
   - `dashboard/` — a dashboard, if it has one, built on the shell, with `shell` and `run.sh` symlinked from `tools/plugin/dashboard/`
 - `install.sh` — installs plugins into the clients found, sets permissions, and runs each plugin's `setup.sh`
 - `tools/` — repo tooling: `check/`, and `plugin/` for the pieces every plugin links to
+- `docs/test-pass.md` — the manual test pass before a release
 - `.github/workflows/` — CI: `tools/check`, shellcheck, the opencode adapter tests and plugin tests, on each push to main and each pull request
 
 A marketplace install copies only the plugin's folder. Everything a
@@ -146,5 +147,6 @@ author and has not seen it before.
 
 - `tools/check/check.sh` — structure, references, budgets; CI runs it on every push to main and every pull request.
 - `npm test` in each plugin that has a `package.json`.
+- [`docs/test-pass.md`](docs/test-pass.md) — the manual pass in a real client, before a release that changes behaviour.
 - To try plugins in Claude Code, run `./install.sh --dev <plugins>`: it adds the checkout as the `jay` marketplace and runs `npm install` in each plugin. Plugins load in place, so a restart picks up edits.
 - Keep one `jay` marketplace. Marketplace names are global, so adding a second source under the same name repoints it everywhere.
