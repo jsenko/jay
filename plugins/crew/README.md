@@ -59,7 +59,7 @@ A role is a Markdown file:
 
 [`roles/general.md`](roles/general.md) is a complete example. crew ships
 only `general`; the [code](../code/README.md) plugin brings `coder`, and
-the pr plugin will bring reviewer and watcher.
+the [pr](../pr/README.md) plugin brings `reviewer` and `watcher`.
 
 Roles are found in two places, and yours win on a name clash:
 
@@ -133,8 +133,8 @@ claude --dangerously-load-development-channels plugin:crew@jay
 ```
 
 Claude Code asks you to confirm at each start. Several channels go in
-one argument, as in `--dangerously-load-development-channels
-plugin:crew@jay server:other`. Settings cannot replace the argument: the
+one argument: with [pr](../pr/README.md) installed too, use
+`--dangerously-load-development-channels plugin:crew@jay plugin:pr@jay`. Settings cannot replace the argument: the
 allowlist that would is read only from managed settings, which need
 root.
 

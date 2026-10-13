@@ -74,7 +74,8 @@ Talk to a session as usual; the plugins give it tools and habits.
   session of its own, follow GitHub and review the PRs that concern you
   without you; **`/pr:queue`** then gives you the few that need a person.
 
-Each plugin's README lists what it adds.
+Each plugin's README lists what it adds, and [GUIDE.md](GUIDE.md) walks
+through a working day with all of them.
 
 ## Installing and managing plugins
 
