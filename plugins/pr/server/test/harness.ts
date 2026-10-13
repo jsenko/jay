@@ -98,6 +98,16 @@ export async function until(cond: () => boolean, ms = 8000): Promise<boolean> {
   return cond();
 }
 
+/** Waits until the server has finished a round of polling repository events. */
+export async function firstRound(client: Client, ms = 8000): Promise<void> {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    const status = await call(client, "get_status");
+    if (status.sources?.repo_events?.lastSuccessAt) return;
+    await new Promise((r) => setTimeout(r, 200));
+  }
+}
+
 /** Waits a fixed time, for asserting that something did not happen. */
 export function settle(ms = 2500): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));

@@ -76,8 +76,8 @@ puts it in `focus`, so no other work is routed to it while you do.
 
 ## Notifications
 
-GitHub activity reaches the watcher as pushes when Claude Code is
-launched with the channels flag for both plugins:
+Launch every session the same way, with the channels flag for both
+plugins:
 
 ```bash
 claude --dangerously-load-development-channels plugin:crew@jay plugin:pr@jay
@@ -87,10 +87,16 @@ Claude Code asks you to confirm at each start. The setting that would
 allow it permanently is read only from managed settings, so the
 installer can't turn it on.
 
-Without the flag the sessions poll every ten minutes, which always
-works. A session can't otherwise tell which it has, so after its first
-call the server pushes `{"github":"hello"}`: a session that receives it
-stops polling.
+Every session runs its own github-events server, but **only a session
+that asks for events polls GitHub**: the server starts on the first
+`get_status` or `get_new_events`, which the watcher calls at startup.
+Coder and reviewer sessions never do, so their servers make no GitHub
+calls and push nothing, flag or not. `github_api` works everywhere.
+
+In the watcher, GitHub activity arrives as pushes. Without the flag it
+polls every ten minutes instead, which always works. It can't otherwise
+tell which it has, so after its first call the server pushes
+`{"github":"hello"}`: a session that receives it stops polling.
 
 ## Settings
 

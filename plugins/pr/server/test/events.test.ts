@@ -3,7 +3,7 @@
 import { join } from "node:path";
 
 import { comment, startFake } from "./fake-github.js";
-import { call, check, connect, section, settle, tempDir, until } from "./harness.js";
+import { call, check, connect, firstRound, section, settle, tempDir, until } from "./harness.js";
 
 /**
  * A watcher acts on every event it is given, so an event delivered twice
@@ -16,12 +16,27 @@ export async function run(): Promise<void> {
   const state = join(tempDir("events"), "state.json");
   github.add(comment("alice", "before the watcher started"));
 
+  // --- a session that never asks for events costs nothing ---------------
+  const idle = await connect(github.url, join(tempDir("idle"), "state.json"));
+  await call(idle.client, "github_api", { url: `${github.url}/repos/acme/widgets/issues/7` });
+  await settle(2500);
+  const isPolling = (path: string) => path === "/user" || path.endsWith("/events") || path.endsWith("/runs") || path === "/notifications";
+  check("a server nobody asks for events makes no polling calls", !github.requests.some(isPolling), github.requests);
+
+  const asked = await call(idle.client, "get_status");
+  check("the first get_status starts polling, and knows the user and repositories when it answers",
+    asked.polling === true && asked.authenticatedUser === "tester" && asked.monitoredRepos.join() === "acme/widgets", asked);
+  await idle.client.close();
+  github.requests.length = 0;
+
   const first = await connect(github.url, state);
   await settle(1500);
   check("nothing says hello before the session calls a tool", first.hellos === 0, first.hellos);
   await until(() => false, 1000);
+  const nothing = await call(first.client, "get_new_events");
+  await firstRound(first.client);
   check("events already there when watching starts are not delivered",
-    first.pushes.length === 0 && (await call(first.client, "get_new_events")).length === 0, first.pushes);
+    first.pushes.length === 0 && nothing.length === 0 && (await call(first.client, "get_new_events")).length === 0, first.pushes);
 
   const long = comment("alice", "x".repeat(300));
   const ignored = comment("EricWittbot", "routine bot comment");
@@ -57,6 +72,7 @@ export async function run(): Promise<void> {
   github.add(whileDown);
 
   const second = await connect(github.url, state);
+  await call(second.client, "get_status");
   await until(() => second.pushes.length > 0, 4000);
   await settle(1500);
   const resent = second.pushes.map((p) => p.event_id);

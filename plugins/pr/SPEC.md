@@ -116,6 +116,15 @@ once, including events from while the server was down, up to
 `MAX_EVENT_AGE`. Conditional requests with ETags make an unchanged
 stream free against the rate limit.
 
+**Polling starts on demand.** Every session with the plugin runs its own
+server, and before this each one polled all the watched repositories on
+its own: rate limit spent several times over, and every event pushed
+into sessions with no use for it. Now nothing calls GitHub until a
+session calls `get_status` or `get_new_events`, which only a watching
+session does. The first such call waits until the user and repositories
+are known, so a status asked for then is complete. So one launch command
+serves every session.
+
 **Push and poll at once.** Events are pushed as channel notifications
 and also kept for `get_new_events`, which tracks what it handed out
 separately. A session can use either, or both, without double

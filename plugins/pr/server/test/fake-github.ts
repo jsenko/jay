@@ -20,6 +20,8 @@ export interface RawEvent {
 /** The running fake, and the events it serves. */
 export interface FakeGitHub {
   url: string;
+  /** The path of every request received, in order. */
+  requests: string[];
   /** Adds an event, as the newest. */
   add(event: RawEvent): void;
   close(): Promise<void>;
@@ -48,8 +50,10 @@ export function comment(actor: string, body: string, hoursAgo = 0): RawEvent {
 /** Starts the fake on a free local port. */
 export async function startFake(user = "tester"): Promise<FakeGitHub> {
   const events: RawEvent[] = [];
+  const requests: string[] = [];
   const server: Server = createServer((req, res) => {
     const path = (req.url ?? "").split("?")[0];
+    requests.push(path);
     const json = (status: number, body: unknown, headers: Record<string, string> = {}) => {
       res.writeHead(status, { "content-type": "application/json", ...headers });
       res.end(body === undefined ? "" : JSON.stringify(body));
@@ -69,6 +73,7 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
   const { port } = server.address() as AddressInfo;
   return {
     url: `http://127.0.0.1:${port}`,
+    requests,
     add: (event) => events.unshift(event),
     close: () => new Promise((r) => server.close(() => r())),
   };

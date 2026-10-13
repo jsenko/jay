@@ -42,6 +42,7 @@ const mcp = new Server(
       "This server monitors GitHub repositories for PR and issue activity.",
       "It also monitors GitHub notifications for @mentions and replies across all repositories.",
       "Workflow run failures are tracked for watched repositories.",
+      "It polls GitHub only once a session calls get_status or get_new_events; until then it makes no GitHub calls and pushes nothing, so only a session that watches pays for watching.",
       "Events are pushed as channel notifications with truncated bodies.",
       "After the first tool call it pushes {\"github\":\"hello\"} once: a session that receives it gets pushes and need not poll get_new_events.",
       "Use the get_event tool with the event_id from the notification meta to retrieve the full event (non-truncated body).",
@@ -124,6 +125,7 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
     }
 
     case "get_new_events": {
+      await poller.ensureStarted();
       const newEvents = cache.consumeNewEvents();
       const result = newEvents.map(({ id, event }) => ({
         event_id: id,
@@ -155,6 +157,7 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
     }
 
     case "get_status": {
+      await poller.ensureStarted();
       const status = poller.getStatus();
       return {
         content: [{ type: "text", text: JSON.stringify(status, null, 2) }],
@@ -175,7 +178,6 @@ const poller = new Poller(config, cache, (eventId, event) => {
 
 async function main(): Promise<void> {
   await mcp.connect(new StdioServerTransport());
-  poller.start();
 
   process.on("SIGINT", () => {
     poller.stop();

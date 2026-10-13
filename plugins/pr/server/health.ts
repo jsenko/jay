@@ -24,6 +24,8 @@ export interface PollerStatus {
   authenticatedUser: string;
   monitoredRepos: string[];
   pollIntervalSeconds: number;
+  /** Whether this server polls; it starts on the first `get_status` or `get_new_events`. */
+  polling: boolean;
   sources: Record<PollSource, SourceHealth>;
   recentErrors: HealthError[];
   coverage: {

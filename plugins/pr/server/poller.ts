@@ -29,6 +29,8 @@ export class Poller {
   private authenticatedUser = "";
   private health = new Health();
   private startedAt: string | null = null;
+  /** Set on the first `ensureStarted`, and resolved once the user and repositories are known. */
+  private started: Promise<void> | null = null;
 
   constructor(config: PollerConfig, cache: Cache, onEvent: EventCallback) {
     this.config = config;
@@ -43,6 +45,7 @@ export class Poller {
       authenticatedUser: this.authenticatedUser,
       monitoredRepos: [...this.resolvedRepos],
       pollIntervalSeconds: this.config.pollInterval || 60,
+      polling: this.started !== null,
       sources: structuredClone(this.health.sources),
       recentErrors: [...this.health.recentErrors],
       coverage: {
@@ -88,8 +91,24 @@ export class Poller {
     return data.login;
   }
 
-  /** Runs the loop until `stop`. */
-  async start(): Promise<void> {
+  /**
+   * Starts polling, unless it has started. Resolves once the user and the
+   * repositories are known, so a status asked for at that moment is
+   * complete; the loop carries on in the background.
+   *
+   * Nothing calls GitHub before this. Every session with the plugin runs
+   * its own server, and only one that asks for events should poll.
+   */
+  ensureStarted(): Promise<void> {
+    if (!this.started) {
+      this.started = this.setUp();
+      this.started.then(() => this.loop()).catch((err) => console.error("[github-events] Poller stopped:", err));
+    }
+    return this.started;
+  }
+
+  /** Who the user is and what to watch: everything the first round needs. */
+  private async setUp(): Promise<void> {
     this.running = true;
     this.startedAt = new Date().toISOString();
 
@@ -109,7 +128,10 @@ export class Poller {
     console.error(`[github-events] Monitoring ${this.resolvedRepos.length} repo(s): ${this.resolvedRepos.join(", ")}`);
     console.error(`[github-events] Max event age: ${this.config.maxEventAgeHours}h`);
     console.error(`[github-events] State file: ${this.config.stateFilePath}`);
+  }
 
+  /** Polls round after round until `stop`. */
+  private async loop(): Promise<void> {
     let interval = this.config.pollInterval || 60;
 
     while (this.running) {
