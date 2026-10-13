@@ -228,6 +228,7 @@ check_manifests() {
 # hooks/ goes into every plugin; the dashboard pieces into each that declares one.
 SHARED_LINKS=(
     "hooks:tools/plugin/hooks"
+    "opencode:tools/plugin/opencode"
     "dashboard/shell:tools/plugin/dashboard/shell"
     "dashboard/run.sh:tools/plugin/dashboard/run.sh"
 )
@@ -247,6 +248,9 @@ check_links() {
                 err "plugins/$p/$path links to $(readlink "$REPO/plugins/$p/$path"), not $master"
             fi
         done
+        # opencode loads a plugin through this file, which hands its folder to the adapter.
+        grep -q 'jayPlugin(import.meta.dirname)' "$REPO/plugins/$p/opencode.mjs" 2>/dev/null || \
+            err "plugins/$p/opencode.mjs is missing, or doesn't call jayPlugin(import.meta.dirname)"
     done
 }
 

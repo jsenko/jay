@@ -37,6 +37,9 @@ jobs:
       - name: Shell scripts
         run: shellcheck -S warning install.sh tools/check/check.sh $(find tools/plugin plugins -name '*.sh' -not -path '*/node_modules/*' 2>/dev/null)
 
+      - name: opencode adapter tests
+        run: node --test 'tools/plugin/opencode/test/*.test.mjs'
+
       - name: Plugin tests
         run: |
           for pkg in plugins/*/package.json; do

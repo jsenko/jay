@@ -10,6 +10,7 @@ or points elsewhere.
 | Here | Linked from | Applies to |
 |---|---|---|
 | `hooks/` | `plugins/<name>/hooks` | every plugin |
+| `opencode/` | `plugins/<name>/opencode` | every plugin, with `opencode.mjs` beside it |
 | `dashboard/shell/` | `plugins/<name>/dashboard/shell` | plugins with `dashboard/dashboard.json` |
 | `dashboard/run.sh` | `plugins/<name>/dashboard/run.sh` | the same |
 
@@ -17,6 +18,7 @@ For a new plugin, from its folder:
 
 ```bash
 ln -s ../../tools/plugin/hooks hooks
+ln -s ../../tools/plugin/opencode opencode
 ln -s ../../../tools/plugin/dashboard/shell dashboard/shell      # with a dashboard
 ln -s ../../../tools/plugin/dashboard/run.sh dashboard/run.sh
 ```
@@ -26,6 +28,25 @@ ln -s ../../../tools/plugin/dashboard/run.sh dashboard/run.sh
 A `SessionStart` hook that links `~/.jay/plugins/<name>` to the plugin's
 installed root. Instruction files reference each other through that
 link, since the installed root changes with every version.
+
+## opencode
+
+The adapter that loads a plugin into opencode. Each plugin's
+`opencode.mjs` calls `jayPlugin` with its own folder; `install.sh
+--opencode` points opencode at that file. Through opencode's `config`
+hook, the adapter adds the plugin's commands, MCP servers and skills,
+allows the directories its sessions use, and links `~/.jay/plugins/<name>`,
+which in Claude Code the `SessionStart` hook does.
+
+opencode namespaces neither commands nor skills, so there they are named
+`<plugin>-<name>`: `/crew-start`, and code's `style` skill is
+`code-style`. A skill is registered as a renamed copy under
+`~/.local/share/jay/<plugin>/opencode-skills/`, since opencode reads the
+name from the file. MCP servers keep their names, so opencode's tool names
+are the same as before.
+
+`node --test 'tools/plugin/opencode/test/*.test.mjs'` runs the adapter
+over every plugin in this repository.
 
 ## dashboard
 
