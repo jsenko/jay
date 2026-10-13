@@ -12,7 +12,8 @@
 #   --claude, --opencode   configure only that client (default: every one installed)
 #   --yes                  accept defaults instead of asking
 #
-# Needs node, and claude or opencode. Honours CLAUDE_CONFIG_DIR.
+# Needs node, and claude or opencode. Honours CLAUDE_CONFIG_DIR and
+# OPENCODE_CONFIG_DIR.
 
 set -euo pipefail
 
@@ -20,6 +21,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MARKETPLACE=jay
 GITHUB_SOURCE=jsenko/jay
 CLAUDE_SETTINGS="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"
+OPENCODE_DIR="${OPENCODE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/opencode}"
 
 DEV=false
 UNINSTALL=false
@@ -27,7 +29,7 @@ YES=false
 CLIENTS=()
 PLUGINS=()
 
-usage() { sed -n '3,15p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
+usage() { sed -n '3,16p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
 say() { echo "• $*"; }
 die() { echo "✗ $*" >&2; exit 1; }
 
@@ -190,12 +192,40 @@ EOF
 
 # ---------------------------------------------------------------- opencode
 
+# A plugin's MCP server commands, with its root substituted, one per line.
+server_commands() {
+    json "Object.values(j.mcpServers ?? {}).map((s) => s.command.replace('\${CLAUDE_PLUGIN_ROOT}', '$REPO/plugins/$1'))" < "$REPO/plugins/$1/.mcp.json"
+}
+
+# opencode loads each plugin from this clone, through a one-line file in its
+# plugins folder that re-exports the plugin's opencode.mjs. Plugins run in place,
+# so their npm dependencies are installed here. A server whose command doesn't
+# exist makes opencode hang at start, so that is checked first.
 opencode_install() {
-    say "opencode is not supported yet; skipping it"
+    local p cmd
+    mkdir -p "$OPENCODE_DIR/plugins"
+    for p in $(with_dependencies "${PLUGINS[@]}"); do
+        if [[ -f "$REPO/plugins/$p/package.json" ]]; then
+            say "installing $p's npm dependencies"
+            (cd "$REPO/plugins/$p" && npm install --ignore-scripts --no-audit --no-fund --silent)
+        fi
+        if [[ -f "$REPO/plugins/$p/.mcp.json" ]]; then
+            while IFS= read -r cmd; do
+                [[ -x "$cmd" ]] || die "$p's server command $cmd doesn't exist; opencode would hang on it"
+            done < <(server_commands "$p")
+        fi
+        say "installing $p in opencode"
+        echo "export * from \"$REPO/plugins/$p/opencode.mjs\";" > "$OPENCODE_DIR/plugins/jay-$p.js"
+    done
+    say "restart opencode to load the changes"
 }
 
 opencode_uninstall() {
-    opencode_install
+    local p
+    for p in "${PLUGINS[@]}"; do
+        say "removing $p from opencode"
+        rm -f "$OPENCODE_DIR/plugins/jay-$p.js"
+    done
 }
 
 # ---------------------------------------------------------------- settings
