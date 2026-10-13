@@ -2,7 +2,7 @@
 
 Structural checks over the marketplace and its plugins. Needs bash and
 node; it also runs `claude plugin validate` when `claude` is installed.
-CI runs it on every push to main.
+CI runs it on every push to main and every pull request.
 
 ```bash
 tools/check/check.sh            # full output, exit 1 on errors

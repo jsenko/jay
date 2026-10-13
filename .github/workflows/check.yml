@@ -1,10 +1,11 @@
-# Checks the marketplace and its plugins on every push to main. Pull requests are
-# added as a trigger once the repository is public.
+# Checks the marketplace and its plugins on every push to main, and on every pull
+# request, so a contribution is checked before it is reviewed.
 name: check
 
 on:
   push:
     branches: [main]
+  pull_request:
 
 permissions:
   contents: read
