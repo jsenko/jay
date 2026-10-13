@@ -1,0 +1,66 @@
+# Releases plugins when run by hand from the Actions tab: one input per plugin,
+# the version to release it at, or empty to leave it out. tools/release/release.sh
+# raises the versions, checks and tests the result, commits it to main, and tags
+# and releases each plugin.
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      fyi:
+        description: "fyi: version to release, such as 1.3.0 (empty: not released)"
+        required: false
+      crew:
+        description: "crew: version to release (empty: not released)"
+        required: false
+      status:
+        description: "status: version to release (empty: not released)"
+        required: false
+      code:
+        description: "code: version to release (empty: not released)"
+        required: false
+      pr:
+        description: "pr: version to release (empty: not released)"
+        required: false
+
+# One release at a time: each pushes to main.
+concurrency: release
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # For `claude plugin validate` in the checks, and `claude plugin tag`.
+      - name: Install Claude Code
+        run: npm install --global @anthropic-ai/claude-code@2.1.295
+
+      - name: Install plugin dependencies
+        run: |
+          for pkg in plugins/*/package.json; do
+            (cd "$(dirname "$pkg")" && npm ci --ignore-scripts)
+          done
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FYI: ${{ inputs.fyi }}
+          CREW: ${{ inputs.crew }}
+          STATUS: ${{ inputs.status }}
+          CODE: ${{ inputs.code }}
+          PR: ${{ inputs.pr }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          tools/release/release.sh "fyi=$FYI" "crew=$CREW" "status=$STATUS" "code=$CODE" "pr=$PR"

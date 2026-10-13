@@ -42,6 +42,36 @@ dependencies_of() {
     json "$REPO/plugins/$1/.claude-plugin/plugin.json" '(j.dependencies ?? []).map((d) => typeof d === "string" ? d : d.name)'
 }
 
+# A dependency's range must admit the version it has here, or installing the
+# dependent fails: a release that leaves a range behind raises the range too.
+# jay uses caret ranges (^1, ^1.2), alone or as alternatives (^1.2 || ^2): a
+# major release raises its dependents' ranges to admit both majors first.
+# Anything else is reported, not guessed.
+range_admits() {
+    local range version
+    range="$(json "$REPO/plugins/$1/.claude-plugin/plugin.json" "(j.dependencies ?? []).find((d) => d.name === '$2')?.version")"
+    [[ -n "$range" ]] || return 0
+    version="$(json "$REPO/plugins/$2/.claude-plugin/plugin.json" 'j.version')"
+    while read -r problem; do
+        case "$problem" in
+            unsupported) err "plugins/$1 needs $2 $range: only caret ranges like ^1.2, or ^1.2 || ^2, are supported" ;;
+            outside) err "plugins/$1 needs $2 $range, which doesn't admit $2's version $version" ;;
+        esac
+    done < <(node -e '
+const [range, version] = process.argv.slice(1);
+const have = version.split(".").map(Number);
+const admits = (caret) => {
+  const m = /^\^(\d+)(?:\.(\d+))?(?:\.(\d+))?$/.exec(caret.trim());
+  if (!m) return undefined;
+  const want = m.slice(1).map((n) => Number(n ?? 0));
+  return have[0] === want[0] && (have[1] > want[1] || (have[1] === want[1] && have[2] >= want[2]));
+};
+const results = range.split("||").map(admits);
+if (results.includes(undefined)) console.log("unsupported");
+else if (!results.includes(true)) console.log("outside");
+' "$range" "$version")
+}
+
 # Every instruction file, repo-relative.
 instruction_files() {
     local p d
@@ -203,7 +233,7 @@ check_orphans() {
 # directory, and every dependency is a plugin of this marketplace.
 check_manifests() {
     note "${GREEN}manifests${NC}"
-    local market="$REPO/.claude-plugin/marketplace.json" listed p dep
+    local market="$REPO/.claude-plugin/marketplace.json" listed p dep version
     [[ -f "$market" ]] || { err ".claude-plugin/marketplace.json is missing"; return; }
     listed="$(json "$market" 'j.plugins.map((p) => `${p.name} ${p.source}`)')"
 
@@ -211,10 +241,15 @@ check_manifests() {
         grep -qx "$p ./plugins/$p" <<< "$listed" || err "plugins/$p is not in the marketplace with source ./plugins/$p"
         [[ "$(json "$REPO/plugins/$p/.claude-plugin/plugin.json" 'j.name')" == "$p" ]] || \
             err "plugins/$p/.claude-plugin/plugin.json does not name itself $p"
-        [[ -n "$(json "$REPO/plugins/$p/.claude-plugin/plugin.json" 'j.version')" ]] || \
-            err "plugins/$p/.claude-plugin/plugin.json has no version"
+        version="$(json "$REPO/plugins/$p/.claude-plugin/plugin.json" 'j.version')"
+        [[ -n "$version" ]] || err "plugins/$p/.claude-plugin/plugin.json has no version"
+        # A release is a version bump, so the two manifests must move together.
+        if [[ -f "$REPO/plugins/$p/package.json" && "$(json "$REPO/plugins/$p/package.json" 'j.version')" != "$version" ]]; then
+            err "plugins/$p/package.json's version differs from plugin.json's $version"
+        fi
         for dep in $(dependencies_of "$p"); do
-            [[ -d "$REPO/plugins/$dep" ]] || err "plugins/$p depends on $dep, which is not in this marketplace"
+            [[ -d "$REPO/plugins/$dep" ]] || { err "plugins/$p depends on $dep, which is not in this marketplace"; continue; }
+            range_admits "$p" "$dep"
         done
     done
     while read -r p _; do

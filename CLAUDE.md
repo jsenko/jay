@@ -18,9 +18,9 @@ folders through an adapter.
   - `.mcp.json`, `package.json`, `server/` — an MCP server, if the plugin has one
   - `dashboard/` — a dashboard, if it has one, built on the shell, with `shell` and `run.sh` symlinked from `tools/plugin/dashboard/`
 - `install.sh` — installs plugins into the clients found, sets permissions, and runs each plugin's `setup.sh`
-- `tools/` — repo tooling: `check/`, and `plugin/` for the pieces every plugin links to
+- `tools/` — repo tooling: `check/`, `release/`, and `plugin/` for the pieces every plugin links to
 - `docs/test-pass.md` — the manual test pass before a release
-- `.github/workflows/` — CI: `tools/check`, shellcheck, the opencode adapter tests and plugin tests, on each push to main and each pull request
+- `.github/workflows/` — CI: `tools/check`, shellcheck and `tools/check/test.sh`, on each push to main and each pull request; and the release workflow, run by hand
 
 A marketplace install copies only the plugin's folder. Everything a
 plugin needs at runtime lives inside it.
@@ -147,7 +147,31 @@ author and has not seen it before.
 ## Testing changes
 
 - `tools/check/check.sh` — structure, references, budgets; CI runs it on every push to main and every pull request.
-- `npm test` in each plugin that has a `package.json`.
+- `tools/check/test.sh` — every automated test: the opencode adapter's, and each plugin's `npm test`.
 - [`docs/test-pass.md`](docs/test-pass.md) — the manual pass in a real client, before a release that changes behaviour.
 - To try plugins in Claude Code, run `./install.sh --dev <plugins>`: it adds the checkout as the `jay` marketplace and runs `npm install` in each plugin. Plugins load in place, so a restart picks up edits.
 - Keep one `jay` marketplace. Marketplace names are global, so adding a second source under the same name repoints it everywhere.
+
+## Releasing
+
+Run the **release** workflow from the Actions tab, with a version for each
+plugin to release and the rest left empty. It runs
+`tools/release/release.sh`, which:
+
+1. raises each version in the plugin's `plugin.json`, `package.json` and lockfile
+2. runs `tools/check` and the tests on the result
+3. commits the bump to main, as `release: fyi 1.3.0, pr 1.0.1`
+4. tags each plugin `<plugin>--v<version>`, the tags Claude Code resolves dependency ranges against
+5. creates a GitHub release listing the plugin's commits since its previous tag
+
+`tools/release/release.sh --dry-run fyi=1.3.0` shows the bump and the notes,
+then undoes the bump. A version must come after the current one; the
+current one is accepted while it has no tag, which is how a plugin is
+first released.
+
+Follow semver. A dependent's range, such as `^1.2`, admits every later
+minor and patch, so a change it can't rely on is a new major.
+`tools/check` fails when a range doesn't admit the version it depends on,
+so a major release goes in two steps: first raise the dependents' ranges
+to admit both majors (`^1.2 || ^2`), then release. `claude plugin validate`
+accepts such a range; no install has resolved one yet.

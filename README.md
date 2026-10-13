@@ -154,7 +154,8 @@ edits load on the next restart, and installs the plugins' npm
 dependencies in place. See [CLAUDE.md](CLAUDE.md) for the
 repository layout and conventions, and
 [crew's authoring rules](plugins/crew/rules/authoring.md) for writing
-instruction files.
+instruction files. Plugins are released by a workflow run by hand,
+with the new version of each ([CLAUDE.md](CLAUDE.md#releasing)).
 
 ## License
 

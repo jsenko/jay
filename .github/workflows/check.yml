@@ -36,16 +36,7 @@ jobs:
         run: tools/check/check.sh
 
       - name: Shell scripts
-        run: shellcheck -S warning install.sh tools/check/check.sh $(find tools/plugin plugins -name '*.sh' -not -path '*/node_modules/*' 2>/dev/null)
+        run: shellcheck -S warning install.sh $(find tools plugins -name '*.sh' -not -path '*/node_modules/*' 2>/dev/null)
 
-      - name: opencode adapter tests
-        run: node --test 'tools/plugin/opencode/test/*.test.mjs'
-
-      - name: Plugin tests
-        run: |
-          for pkg in plugins/*/package.json; do
-            [ -f "$pkg" ] || continue
-            if node -e "process.exit(require('./$pkg').scripts?.test ? 0 : 1)"; then
-              (cd "$(dirname "$pkg")" && npm test)
-            fi
-          done
+      - name: Tests
+        run: tools/check/test.sh
