@@ -1,3 +1,6 @@
+/** The events a session is told about, as the server formats them. */
+
+/** Fields every event has. `body` is what a push truncates. */
 interface EventBase {
   repo: string;
   // display_login preferred over login
@@ -10,16 +13,19 @@ interface EventBase {
   body: string;
 }
 
+/** Links to something on GitHub: the page, and the API URL for `github_api`. */
 export interface Ref {
   html_url: string;
   api_url: string;
 }
 
+/** A link to a PR or issue, with its number and title. */
 export interface NumberedRef extends Ref {
   number: number;
   title: string;
 }
 
+/** A PR opened, closed, merged, labelled… `labels-changed` collapses a run of label events. */
 export interface PullRequestEvent extends EventBase {
   type: "PullRequestEvent";
   // from follow-up API call; falls back to head branch name
@@ -45,6 +51,7 @@ export interface PullRequestEvent extends EventBase {
   };
 }
 
+/** A review submitted on a PR. */
 export interface PullRequestReviewEvent extends EventBase {
   type: "PullRequestReviewEvent";
   review_state: string;
@@ -55,6 +62,7 @@ export interface PullRequestReviewEvent extends EventBase {
   };
 }
 
+/** A comment on a PR's diff. */
 export interface PullRequestReviewCommentEvent extends EventBase {
   type: "PullRequestReviewCommentEvent";
   path: string;
@@ -68,6 +76,7 @@ export interface PullRequestReviewCommentEvent extends EventBase {
   };
 }
 
+/** An issue opened, closed, labelled… */
 export interface IssuesEvent extends EventBase {
   type: "IssuesEvent";
   title: string;
@@ -81,6 +90,7 @@ export interface IssuesEvent extends EventBase {
   };
 }
 
+/** A comment on an issue or on a PR's conversation. */
 export interface IssueCommentEvent extends EventBase {
   type: "IssueCommentEvent";
   // derived from presence of pull_request field on the issue
@@ -91,6 +101,7 @@ export interface IssueCommentEvent extends EventBase {
   };
 }
 
+/** A finished workflow run, or one waiting for a maintainer to approve it. */
 export interface WorkflowRunEvent extends EventBase {
   type: "WorkflowRunEvent";
   workflow_name: string;
@@ -106,6 +117,7 @@ export interface WorkflowRunEvent extends EventBase {
   };
 }
 
+/** A GitHub notification from outside the watched repositories. */
 export interface NotificationEvent extends EventBase {
   type: "NotificationEvent";
   // "mention", "comment", "review_requested", etc.
@@ -119,6 +131,7 @@ export interface NotificationEvent extends EventBase {
   };
 }
 
+/** Any event a session can be told about. */
 export type Event =
   | PullRequestEvent
   | PullRequestReviewEvent

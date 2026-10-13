@@ -10,7 +10,10 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { Cache } from "./cache.js";
-import { API, Poller, loadConfig, validateConfig, truncateEvent, fetchGitHubApi, type PollerStatus } from "./poller.js";
+import { loadConfig, validateConfig } from "./config.js";
+import { truncateEvent } from "./format.js";
+import { API, fetchGitHubApi } from "./github.js";
+import { Poller } from "./poller.js";
 
 /** The plugin's version, so the server reports the release it ships in. */
 const { version } = JSON.parse(readFileSync(new URL("../.claude-plugin/plugin.json", import.meta.url), "utf8"));
