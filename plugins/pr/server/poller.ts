@@ -19,6 +19,9 @@ import { Cache } from "./cache.js";
 import { applyFilters } from "./filters.js";
 import { gitHubSettings } from "./settings.js";
 
+/** The GitHub API, overridable so tests can run against a fake. */
+export const API = (process.env.GITHUB_API_URL || "https://api.github.com").replace(/\/$/, "");
+
 // --- Types ---
 
 interface RepoState {
@@ -125,11 +128,11 @@ async function resolveOrgRepos(owner: string, token: string): Promise<string[]> 
     }
 
     // Try orgs endpoint first, fall back to users
-    let url = `https://api.github.com/orgs/${owner}/repos?per_page=100&page=${page}`;
+    let url = `${API}/orgs/${owner}/repos?per_page=100&page=${page}`;
     let res = await fetch(url, { headers });
 
     if (res.status === 404) {
-      url = `https://api.github.com/users/${owner}/repos?per_page=100&page=${page}`;
+      url = `${API}/users/${owner}/repos?per_page=100&page=${page}`;
       res = await fetch(url, { headers });
     }
 
@@ -260,7 +263,7 @@ async function pollRepoEvents(
     headers["If-None-Match"] = etag;
   }
 
-  const url = `https://api.github.com/repos/${repo}/events?per_page=100`;
+  const url = `${API}/repos/${repo}/events?per_page=100`;
   const res = await fetch(url, { headers });
 
   const newEtag = res.headers.get("etag");
@@ -692,7 +695,7 @@ export class Poller {
   }
 
   private async fetchAuthenticatedUser(): Promise<string> {
-    const res = await fetch("https://api.github.com/user", {
+    const res = await fetch(`${API}/user`, {
       headers: githubHeaders(this.config.githubToken),
     });
     if (!res.ok) {
@@ -772,9 +775,9 @@ export class Poller {
     const sinceDate = since.slice(0, 10);
 
     // Fetch completed runs (success + failure)
-    const completedUrl = `https://api.github.com/repos/${repo}/actions/runs?status=completed&per_page=30&created=>${sinceDate}`;
+    const completedUrl = `${API}/repos/${repo}/actions/runs?status=completed&per_page=30&created=>${sinceDate}`;
     // Fetch runs awaiting approval (first-time contributor workflows)
-    const waitingUrl = `https://api.github.com/repos/${repo}/actions/runs?status=action_required&per_page=10`;
+    const waitingUrl = `${API}/repos/${repo}/actions/runs?status=action_required&per_page=10`;
 
     const [completedRes, waitingRes] = await Promise.all([
       fetch(completedUrl, { headers: githubHeaders(this.config.githubToken) }),
@@ -857,7 +860,7 @@ export class Poller {
       refs: {
         run: {
           html_url: run.html_url,
-          api_url: `https://api.github.com/repos/${repo}/actions/runs/${run.id}`,
+          api_url: `${API}/repos/${repo}/actions/runs/${run.id}`,
         },
         ...(prRef ? { pr: prRef } : {}),
       },
@@ -871,7 +874,7 @@ export class Poller {
 
     try {
       const since = this.state.lastNotificationAt;
-      let url = "https://api.github.com/notifications?participating=true&per_page=50";
+      let url = `${API}/notifications?participating=true&per_page=50`;
       if (since) {
         url += `&since=${since}`;
       }

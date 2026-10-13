@@ -10,7 +10,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { Cache } from "./cache.js";
-import { Poller, loadConfig, validateConfig, truncateEvent, fetchGitHubApi, type PollerStatus } from "./poller.js";
+import { API, Poller, loadConfig, validateConfig, truncateEvent, fetchGitHubApi, type PollerStatus } from "./poller.js";
 
 /** The plugin's version, so the server reports the release it ships in. */
 const { version } = JSON.parse(readFileSync(new URL("../.claude-plugin/plugin.json", import.meta.url), "utf8"));
@@ -125,9 +125,9 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
 
     case "github_api": {
       const url = args.url as string;
-      if (!url.startsWith("https://api.github.com/")) {
+      if (!url.startsWith(`${API}/`)) {
         return {
-          content: [{ type: "text", text: "URL must start with https://api.github.com/" }],
+          content: [{ type: "text", text: `URL must start with ${API}/` }],
           isError: true,
         };
       }
