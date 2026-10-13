@@ -14,6 +14,7 @@ folders through an adapter.
   - `commands/`, `skills/` — what Claude Code loads, namespaced as `<plugin>:<name>`
   - `rules/`, `processes/`, `roles/` — instruction files, read through `~/.jay/plugins/<name>/`
   - `hooks/` — the link hook: a symlink to `tools/plugin/hooks/`
+  - `LICENSE` — a symlink to the repository's, so the license travels with the plugin
   - `.mcp.json`, `package.json`, `server/` — an MCP server, if the plugin has one
   - `dashboard/` — a dashboard, if it has one, built on the shell, with `shell` and `run.sh` symlinked from `tools/plugin/dashboard/`
 - `install.sh` — installs plugins into the clients found, sets permissions, and runs each plugin's `setup.sh`

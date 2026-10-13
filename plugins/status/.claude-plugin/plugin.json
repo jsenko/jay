@@ -1,6 +1,7 @@
 {
   "name": "status",
   "version": "1.0.0",
+  "license": "Apache-2.0",
   "description": "A brief status for teammates and a weekly report, built from your GitHub activity and fyi",
   "author": {
     "name": "Jakub Senko"

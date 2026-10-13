@@ -1,6 +1,7 @@
 {
   "name": "code",
   "version": "1.0.0",
+  "license": "Apache-2.0",
   "description": "Write code with Claude: a coder role, one command for work of any size with as much tracking as it needs, and code-quality rules with stable IDs",
   "author": {
     "name": "Jakub Senko"

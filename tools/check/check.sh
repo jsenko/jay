@@ -225,8 +225,9 @@ check_manifests() {
 # ------------------------------------------------------------- shared links
 
 # What every plugin shares, as each plugin's path and the master it must link to.
-# hooks/ goes into every plugin; the dashboard pieces into each that declares one.
+# LICENSE and hooks/ go into every plugin; the dashboard pieces into each that declares one.
 SHARED_LINKS=(
+    "LICENSE:LICENSE"
     "hooks:tools/plugin/hooks"
     "opencode:tools/plugin/opencode"
     "dashboard/shell:tools/plugin/dashboard/shell"

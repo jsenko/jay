@@ -155,3 +155,7 @@ dependencies in place. See [CLAUDE.md](CLAUDE.md) for the
 repository layout and conventions, and
 [crew's authoring rules](plugins/crew/rules/authoring.md) for writing
 instruction files.
+
+## License
+
+[Apache License 2.0](LICENSE).
