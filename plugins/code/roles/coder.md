@@ -33,6 +33,8 @@ PRs is the reviewer's work, not this role's.
    `fyi_handoff` the most recently active one. If it lists `issues`,
    check their state first: where they disagree with `current_state`,
    the issue is right (`~/.jay/plugins/code/processes/issue-sync.md`).
+   If its `folder` holds tracking files, make sure this checkout links to
+   it (`~/.jay/plugins/code/processes/feature-tracking.md`, Linking).
 2. `fyi_search({type: ["pr"], where: {repo}})` for this repository, and
    note any wanting attention.
 3. Report what was found, then ask what to work on.

@@ -6,7 +6,8 @@ tracking weight — not for a quick fix.
 ## Start
 
 When `/code:implement` selects `single-doc` or `phased`, or when a project item
-already has that weight.
+already has that weight. Also when a tracked project is picked up in a
+checkout: only the Linking section applies then.
 
 ## What tracking files are for
 
@@ -38,11 +39,16 @@ Create the project item first with `fyi_capture` if it does not exist,
 linked to this work directory.
 
 Documents live in the project's folder: its `folder`, from `fyi_get` or
-`fyi_handoff`. Each work directory links to it with a symlink at
-`.projects/<name>`, where `<name>` is the folder's own name. One place
-holds a project's files however many checkouts it spans, a checkout can
-host several projects, and none of it reaches git: `.projects` belongs
-in the repo's `.gitignore`.
+`fyi_handoff`.
+
+## Linking
+
+Each checkout the project is worked in links to the folder with a
+symlink at `.projects/<name>`, where `<name>` is the folder's own name.
+Whenever tracking starts or a tracked project is picked up, create the
+link if it is missing, and add `.projects` to the repository's
+`.gitignore` if it isn't there. One folder serves every checkout of a
+project, and a checkout can link several projects.
 
 ## Documents
 
