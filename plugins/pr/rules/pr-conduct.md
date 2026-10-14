@@ -25,6 +25,15 @@ sign-off is missing, posting a review as `~/.jay/plugins/pr/processes/pr-comment
 allows, and filing a follow-up issue the author asked for. All
 reversible, none of them a decision the user has not already made.
 
+The installer allows these as single commands, so run each on its own,
+with any body written first by the Write tool and passed as
+`--body-file`. Any other form is left to the client, which may refuse.
+
+**A refused write is not retried**, and no other tool is tried in its
+place. A review becomes a draft, with a `manual-review` attention item
+naming the refusal; anything else is left for the user. Either way, tell
+the user once.
+
 ## Never say
 
 - That merging is warranted. "No further issues found" and "everything

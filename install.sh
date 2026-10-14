@@ -157,8 +157,9 @@ EOF
     say "removed their permissions from $CLAUDE_SETTINGS (previous copy: settings.json.before-jay)"
 }
 
-# The allow rules for one plugin's tools: its MCP servers, and with pr the one
-# GitHub write its unattended roles make, setting a milestone.
+# The allow rules for one plugin's tools: its MCP servers, and with pr the
+# GitHub writes its unattended roles make, each in the one form pr-conduct.md
+# has them run it. None of them matches an approval.
 plugin_tool_rules() {
     local server
     if [[ -f "$REPO/plugins/$1/.mcp.json" ]]; then
@@ -166,7 +167,13 @@ plugin_tool_rules() {
             echo "mcp__plugin_${1}_${server}"
         done
     fi
-    [[ "$1" != pr ]] || echo "Bash(gh api -X PATCH repos/*/issues/* -F milestone=*)"
+    [[ "$1" != pr ]] || printf '%s\n' \
+        "Bash(gh api -X PATCH repos/*/issues/* -F milestone=*)" \
+        "Bash(gh issue create *)" \
+        "Bash(gh pr comment * --body-file *)" \
+        "Bash(gh pr review * --comment --body-file *)" \
+        "Bash(gh pr review * --request-changes --body-file *)" \
+        "Bash(gh run rerun *)"
 }
 
 # The file rules one plugin needs: with fyi, reading and writing its project folders.

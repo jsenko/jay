@@ -41,8 +41,8 @@ cd jay
 The installer adds the jay marketplace to Claude Code, installs the
 plugin, lets sessions read `~/.jay` and read and write fyi's project
 folders, and, if you agree, use the plugin's tools without asking each
-time. It then asks for the plugin's settings. Restart your client
-afterwards.
+time ([Permissions](#permissions)). It then asks for the plugin's
+settings. Restart your client afterwards.
 
 If opencode is installed, the installer sets it up too. opencode has no
 plugin marketplace, so it loads the plugins straight from this clone:
@@ -89,6 +89,28 @@ through a working day with all of them.
 
 ## Installing and managing plugins
 
+### Permissions
+
+Plugins can't grant themselves permissions, so the installer adds them
+to `~/.claude/settings.json`, keeping the previous file as
+`settings.json.before-jay`. Uninstalling a plugin removes its rules
+again.
+
+| Permission | For | When |
+|---|---|---|
+| `~/.jay` in `additionalDirectories` | Reading the plugins' instruction files | Always |
+| `Read(~/.fyi/*/projects/**)`, `Edit(~/.fyi/*/projects/**)` | fyi: a project's plans and design notes, in its folder | Always |
+| `mcp__plugin_<plugin>_<server>` | The plugins' MCP tools, without asking each time | If you agree |
+| Six `Bash(gh …)` rules | pr: the GitHub writes its sessions make unattended, such as setting a milestone or posting a review, each in one exact form and none able to approve | If you agree |
+
+The [pr README](plugins/pr/README.md#using-it) lists the six `gh`
+rules. Without them, auto mode may refuse those writes: a review then
+waits as a draft, and anything else is left for you.
+
+In opencode, the plugins allow their own directories (`~/.jay`, and
+fyi's project folders) when they load. Tools and commands follow your
+opencode permission settings.
+
 ### Without the installer
 
 The installer runs these steps; you can run them yourself instead. In
@@ -99,11 +121,9 @@ Claude Code:
 /plugin install fyi@jay
 ```
 
-Then add `~/.jay` to `permissions.additionalDirectories` in
-`~/.claude/settings.json`, so sessions can read the plugins' files. With
-fyi, also add `Read(~/.fyi/*/projects/**)` and `Edit(~/.fyi/*/projects/**)`
-to `permissions.allow`, so sessions can keep a project's files in its
-folder. Then restart. After the first session has started, run a plugin's settings
+Then add the permissions marked "Always" in [Permissions](#permissions)
+to `~/.claude/settings.json`, and any of the others you want, and
+restart. After the first session has started, run a plugin's settings
 script, such as `~/.jay/plugins/fyi/setup.sh`.
 
 ### Updating

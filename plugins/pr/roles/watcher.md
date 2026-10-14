@@ -30,7 +30,8 @@ reviews happen without the user and only decisions reach them.
 
 1. `get_status`: polling works, and the repositories are the ones in
    `~/.jay/config.json`. Being the first github call, it brings
-   `{"github":"hello"}` if pushes reach this session.
+   `{"github":"hello"}` if pushes reach this session. Begin every
+   `activity` with them, as crew's `repos` is only this checkout.
 2. `~/.jay/plugins/pr/processes/pr-reconcile.md`, every time, before starting the loop
 3. Poll `get_new_events` every ~10 min on a timer, unless a github push
    (the hello, or an event) has arrived: then pushes reach this session,

@@ -23,8 +23,8 @@ Use a scratch configuration, so your own stays untouched:
       installs fyi, asks for the default scope, and offers to allow the
       tools; `settings.json.before-jay` holds the previous settings
 - [ ] `./install.sh code` installs fyi and crew too
-- [ ] `./install.sh all` installs all five; with pr, the milestone allow
-      rule is offered
+- [ ] `./install.sh all` installs all five; with pr, the allow rules for
+      its GitHub writes are offered, none matching `gh pr review --approve`
 - [ ] Re-running keeps every answer and changes nothing else
 - [ ] After a restart, `/mcp` lists the plugins' servers, all connected
 - [ ] `~/.jay/plugins/<plugin>` links to the installed version after the
@@ -84,6 +84,9 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] The watcher, with the channels flag, gets `{"github":"hello"}` and
       receives events without polling; without it, polls
       `get_new_events` as well as crew
+- [ ] In `crew_who`, the watcher's activity starts with the repositories
+      it watches, and a reviewer elsewhere doesn't conclude from `repos`
+      that its work won't arrive
 - [ ] A session that never calls a github-events tool doesn't poll
       GitHub (`get_status` from it starts polling)
 - [ ] Stop the watcher, get a PR assigned, restart it: the startup
@@ -101,6 +104,8 @@ Use a scratch configuration, so your own stays untouched:
       posted
 - [ ] An optional-only review is posted, ending with the here / issue /
       skip question, and no verdict
+- [ ] In auto mode, with the allow rules, each post is a `gh` command of
+      its own with `--body-file` and runs without a refusal
 - [ ] The author answers "O1 here, O2 issue": `followups` recorded, an
       issue filed for O2 and linked on the PR, O1 checked on the next
       re-review

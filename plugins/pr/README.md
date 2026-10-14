@@ -75,10 +75,23 @@ What they may do without asking, and what always waits for you:
 | Posting a review with only optional findings, asking the author to choose for each | |
 | Filing a follow-up issue the author asked for | |
 
-Setting a milestone is a GitHub write, which Claude Code's auto mode
-refuses unless it is allowed. `install.sh` offers to allow exactly that
-call, `Bash(gh api -X PATCH repos/*/issues/* -F milestone=*)`; without it,
-the watcher and reviewer ask you to set the milestone instead.
+Each of these is a GitHub write, and Claude Code's auto mode judges
+each one unless it is allowed, sometimes refusing. `install.sh` offers
+to allow exactly the commands the sessions run for them, and nothing
+broader. None of them can approve:
+
+| Write | Allow rule |
+|---|---|
+| Setting a milestone | `Bash(gh api -X PATCH repos/*/issues/* -F milestone=*)` |
+| Re-running a workflow | `Bash(gh run rerun *)` |
+| Commenting, as about DCO | `Bash(gh pr comment * --body-file *)` |
+| Requesting changes | `Bash(gh pr review * --request-changes --body-file *)` |
+| Posting a review with optional findings | `Bash(gh pr review * --comment --body-file *)` |
+| Filing a follow-up issue | `Bash(gh issue create *)` |
+
+Without them, a refused write isn't retried: a review waits as a draft
+for `/pr:checkout`, and anything else is left for you, with a note
+saying so.
 
 Approval is never automatic. Talking to a reviewer session yourself
 puts it in `focus`, so no other work is routed to it while you do.

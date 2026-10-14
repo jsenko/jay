@@ -123,4 +123,4 @@ that looks personal or isn't public yet ([status](plugins/status/README.md)).
 | "The fyi store is in format N, newer than this fyi reads" | A newer fyi, perhaps in your other client, migrated the store: update fyi there too |
 | A session can't find `~/.jay/plugins/…` | Hooks didn't run; check they aren't disabled, and restart |
 | The watcher reports nothing | Ask it for `get_status`: it says whether polling works and when each source last succeeded |
-| A milestone wasn't set, and you were asked to | Auto mode refused the write; allow it as the [pr README](plugins/pr/README.md#using-it) says |
+| A milestone wasn't set, or a review was drafted though it could have been posted, and the session says a write was refused | Auto mode refused it; allow the writes as the [pr README](plugins/pr/README.md#using-it) says |
