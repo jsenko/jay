@@ -24,6 +24,11 @@ export interface StateFile {
   repos: Record<string, RepoState>;
   workflowRuns?: Record<string, WorkflowRunState>;
   lastNotificationAt?: string;
+  /**
+   * The notifications updated at exactly `lastNotificationAt`. GitHub's
+   * `since` includes that instant, so they come back on the next poll.
+   */
+  notificationsAtCursor?: string[];
 }
 
 /** The saved state, or a fresh one when there is none or it is unreadable. */

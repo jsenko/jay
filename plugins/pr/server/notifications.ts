@@ -44,6 +44,7 @@ export async function pollNotifications(ctx: PollContext): Promise<void> {
 
     const watchedRepoSet = new Set(ctx.repos);
     const isFirstRun = !ctx.state.lastNotificationAt;
+    const seenAtCursor = new Set(ctx.state.notificationsAtCursor ?? []);
 
     let latestUpdatedAt = since ?? "";
 
@@ -53,6 +54,9 @@ export async function pollNotifications(ctx: PollContext): Promise<void> {
       }
 
       if (isFirstRun) continue;
+
+      // Delivered by the previous poll: `since` includes its own instant.
+      if (notif.updated_at === since && seenAtCursor.has(notif.id)) continue;
 
       if (notif.reason === "author" || notif.reason === "state_change") continue;
 
@@ -68,6 +72,9 @@ export async function pollNotifications(ctx: PollContext): Promise<void> {
     }
 
     ctx.state.lastNotificationAt = latestUpdatedAt || new Date().toISOString();
+    ctx.state.notificationsAtCursor = notifications
+      .filter((n) => n.updated_at === ctx.state.lastNotificationAt)
+      .map((n) => n.id);
     ctx.health.success("notifications");
   } catch (err) {
     const msg = `Error polling notifications: ${err}`;
