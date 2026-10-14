@@ -93,7 +93,7 @@ export const joinTool: Tool = {
   definition: {
     name: "crew_join",
     description:
-      "Register this session so others can see and reach it. Directory and repositories are detected automatically. Idempotent: rejoining the same directory with the same purpose returns the existing session.",
+      "Register this session so others can see and reach it. Directory and repositories are detected automatically: the repositories are the git checkouts in its directories, which route jobs by repository. Idempotent: rejoining the same directory with the same purpose returns the existing session.",
     inputSchema: {
       type: "object",
       properties: {

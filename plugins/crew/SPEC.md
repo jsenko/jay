@@ -77,7 +77,7 @@ settings, so polling is the default.
 | `purpose` | One line, from the caller |
 | `directory` | `process.cwd()` — the session's home directory |
 | `directories` | Additional directories this session works in |
-| `repos` | `Owner/Repo` list, derived from the above plus explicit additions |
+| `repos` | `Owner/Repo` list, derived from the above plus explicit additions: where it works, for affinity, not what it covers |
 | `capabilities` | From the fixed enum below |
 | `fallback` | If true, receives work nothing else matches — see §4 |
 | `status` | `idle` \| `busy` \| `focus` \| `offline` |
