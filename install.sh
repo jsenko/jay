@@ -76,6 +76,11 @@ parse_args() {
         command -v opencode >/dev/null && CLIENTS+=(opencode)
     fi
     (( ${#CLIENTS[@]} )) || die "neither claude nor opencode is installed"
+
+    # Without a terminal, read gets an empty answer, which would take every
+    # default, allowing the tools included, without the question being shown.
+    [[ "$YES" == true || "$UNINSTALL" == true || -t 0 ]] \
+        || die "no terminal to ask in: run it in one, or with --yes to take the defaults (which allow the plugins' tools) and keep current settings"
 }
 
 # ------------------------------------------------------------- Claude Code

@@ -17,6 +17,8 @@ DEFAULT_REPOS="Apicurio/*,Apitomy/*,ApicurioTesting/*"
 
 YES=false
 [[ "${1:-}" == "--yes" ]] && YES=true
+# Without a terminal, read fails at end of input and set -e ends the script mid-question.
+[[ "$YES" == true || -t 0 ]] || { echo "✗ no terminal to ask in: run it in one, or with --yes" >&2; exit 1; }
 
 # The current value of a github setting, repos joined with commas; empty if unset.
 current() {

@@ -26,6 +26,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] `./install.sh all` installs all five; with pr, the allow rules for
       its GitHub writes are offered, none matching `gh pr review --approve`
 - [ ] Re-running keeps every answer and changes nothing else
+- [ ] Without a terminal (`./install.sh fyi </dev/null`, or `!` in a
+      session), it stops before changing anything and points to `--yes`
 - [ ] After a restart, `/mcp` lists the plugins' servers, all connected
 - [ ] `~/.jay/plugins/<plugin>` links to the installed version after the
       first session starts
