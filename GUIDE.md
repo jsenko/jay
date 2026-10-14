@@ -90,7 +90,10 @@ back ([crew](plugins/crew/README.md#roles)).
 
 - **`/pr:checkout 1234`** checks a pull request out and briefs you: what
   it does, what the reviewer found, and what is left for you to decide.
-  A drafted review is posted only with your verdict.
+  On a simple PR the reviewer may already have requested changes, or
+  posted optional findings for the author to choose from. Any other
+  review waits as a draft, posted only with your verdict. Nothing is
+  ever approved for you.
 - **Or talk to the reviewer session** directly. It takes the review with
   you, and while you are there no other work is routed to it.
 

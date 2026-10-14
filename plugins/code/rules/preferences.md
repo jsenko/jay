@@ -18,7 +18,7 @@ this file.
 | P5 | **Link, don't repeat:** an instruction or explanation lives in one place, and the others point to it. |
 | P6 | **Lists** of names, fields or values that are sorted stay sorted; new lists are alphabetical unless order means something. |
 | P7 | **Security:** consider the implications of every change. |
-| P16 | **Commits** carry no AI attribution or co-author lines, whatever the client's default. |
+| P16 | **Commits, pull requests, issues and comments** carry no AI attribution or co-author lines, whatever the client's default. |
 
 ## Java
 

@@ -6,21 +6,26 @@ sessions running at the same time, status reports, and coding and pull
 request workflows. Each part is a separate plugin, so you install only
 what you need.
 
-**Status:** work in progress, not yet published. All five plugins work
-in Claude Code and in opencode.
-
 ## Plugins
 
-| Plugin | What it does | Dashboard | Needs | State |
-|---|---|---|---|---|
-| [fyi](plugins/fyi/README.md) | Store for tasks, notes, projects and tracked PRs, as Markdown under `~/.fyi` | Today, pull requests, projects | — | available |
-| [crew](plugins/crew/README.md) | Roles to start sessions as, and coordination between them: who is running, messages, and jobs | Sessions, jobs | fyi | available |
-| [status](plugins/status/README.md) | A brief status for teammates and a weekly report, built from your GitHub activity and fyi | — | fyi | available |
-| [code](plugins/code/README.md) | The coder role, one command for work of any size with as much tracking as it needs, and code-quality rules with stable IDs | — | fyi, crew | available |
-| [pr](plugins/pr/README.md) | A watcher that follows GitHub for you, a reviewer, and a queue of PRs waiting on you | — | fyi, crew, code | available |
+| Plugin | What it does | Dashboard | Needs |
+|---|---|---|---|
+| [fyi](plugins/fyi/README.md) | Store for tasks, notes, projects and tracked PRs, as Markdown under `~/.fyi` | Today, pull requests, projects | — |
+| [crew](plugins/crew/README.md) | Roles to start sessions as, and coordination between them: who is running, messages, and jobs | Sessions, jobs | fyi |
+| [status](plugins/status/README.md) | A brief status for teammates and a weekly report, built from your GitHub activity and fyi | — | fyi |
+| [code](plugins/code/README.md) | The coder role, one command for work of any size with as much tracking as it needs, and code-quality rules with stable IDs | — | fyi, crew |
+| [pr](plugins/pr/README.md) | A watcher that follows GitHub for you, a reviewer, and a queue of PRs waiting on you | — | fyi, crew, code |
 
 Installing a plugin also installs what it needs. The dashboards of all
 installed plugins share one menu, so each one can open the others.
+All five work in Claude Code and in opencode.
+
+**Written for Apicurio first.** code and pr have parts specific to the
+Apicurio projects, where jay's first users work: code has rules that
+load only in Apicurio and Apitomy repositories, and pr watches those
+organisations by default and reviews by their conventions. The
+repositories pr watches are a setting; making its processes fit any
+project is planned ([pr](plugins/pr/README.md#adapting-it-to-another-project)).
 
 ## Quickstart
 
@@ -36,8 +41,13 @@ cd jay
 The installer adds the jay marketplace to Claude Code, installs the
 plugin, lets sessions read `~/.jay` and read and write fyi's project
 folders, and, if you agree, use the plugin's tools without asking each
-time. It sets up opencode as well, if it is installed. It then asks for
-the plugin's settings. Restart your client afterwards.
+time. It then asks for the plugin's settings. Restart your client
+afterwards.
+
+If opencode is installed, the installer sets it up too. opencode has no
+plugin marketplace, so it loads the plugins straight from this clone:
+keep the clone where it is, and `git pull` in it to update
+([opencode](#opencode)).
 
 `./install.sh all` installs every plugin, and `./install.sh --help`
 lists the options.
@@ -143,9 +153,14 @@ What differs from Claude Code:
 | Notifications | Pushed, with the channels flag | Polled every ten minutes: opencode has no channels |
 | Instructions for every session | `~/.claude/CLAUDE.md` | `AGENTS.md` |
 
-Instruction files use Claude Code's names; opencode is given its names
-when the plugins load. Skills are kept as renamed copies under
-`~/.local/share/jay/<plugin>/opencode-skills/`.
+jay's files are written once, with Claude Code's names. When opencode
+loads a plugin, its commands and skills are registered under opencode's
+names, with the references inside them rewritten, so `/crew:start` in a
+command reads `/crew-start`. opencode takes a skill's name from its
+file, so each skill is renamed by writing a copy of its `SKILL.md` to
+`~/.local/share/jay/<plugin>/opencode-skills/`; its other files link
+back to the clone. Rules and processes, which sessions read when they
+need them, keep Claude Code's names, and the table above maps them.
 
 ## Developing
 
