@@ -53,7 +53,9 @@ function handler(args: Record<string, any>) {
   for (const key of Object.keys(fields)) {
     if (fields[key] === undefined) delete fields[key];
   }
-  if (Object.keys(fields).length === 0 && !add && !remove) throw new ToolError("no fields to update");
+  // Confirming an unchanged item is an update of its own: it stamps synced_at only.
+  const changes = Object.keys(fields).length > 0 || add !== undefined || remove !== undefined;
+  if (!changes && synced !== true) throw new ToolError("no fields to update");
   if (fields.type !== undefined) throw new ToolError("type cannot be changed; use fyi_convert");
   for (const name of [...Object.keys(add ?? {}), ...Object.keys(remove ?? {})]) {
     if (fields[name] !== undefined) throw new ToolError(`${name} is both set and changed by add/remove; use one`);
@@ -67,7 +69,7 @@ function handler(args: Record<string, any>) {
   Object.assign(fields, applyListOps(stored.item, add, remove));
 
   const now = nowIso();
-  const updated = { ...stored.item, ...fields, updated_at: now };
+  const updated = { ...stored.item, ...fields, updated_at: changes ? now : stored.item.updated_at };
   stampCompletion(updated, stored.item, fields, now);
 
   // Only an explicit claim counts. A local edit must not make a stale
@@ -102,7 +104,7 @@ export const updateTool: Tool = {
         synced: {
           type: "boolean",
           description:
-            "Set when these values came from re-reading the source of truth, not from local reasoning. Stamps synced_at, which is what clears a staleness warning.",
+            "Set when these values came from re-reading the source of truth, not from local reasoning. Stamps synced_at, which is what clears a staleness warning. On its own, it confirms an item that has not changed, and leaves updated_at alone.",
         },
         add: {
           type: "object",

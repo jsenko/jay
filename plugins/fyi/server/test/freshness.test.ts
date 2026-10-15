@@ -77,6 +77,11 @@ attention: true
   check("and clears the warning", after.freshness.stale === false, after.freshness);
   check("the synced value is what was written", after.lifecycle === "merged", after);
 
+  const confirmed = await call(c, "fyi_update", { id: pr.id, synced: true });
+  check("confirming with nothing changed is accepted", typeof confirmed.synced_at === "string", confirmed);
+  const unchanged = await call(c, "fyi_get", { id: pr.id });
+  check("and leaves updated_at alone", unchanged.updated_at === after.updated_at, unchanged);
+
   // --- never confirmed ------------------------------------------------
   const handmade = join(store, "default", "pr", "pr-by-hand.md");
   writeFileSync(handmade, `---

@@ -135,7 +135,8 @@ keeping it that way means a new mirrored type costs a schema entry
 rather than code here. It reports; the session that knows how to fetch
 truth calls `fyi_update` with `synced: true`. Only that explicit claim
 stamps `synced_at`, so a local edit cannot make a stale record look
-confirmed.
+confirmed. `synced: true` alone is a valid update: it confirms an item
+that has not changed, without touching `updated_at`.
 
 That is also what lets a review happen while the watcher is down:
 refresh the one PR, no full sync.
