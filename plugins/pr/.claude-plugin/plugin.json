@@ -1,6 +1,6 @@
 {
   "name": "pr",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "Apache-2.0",
   "description": "Pull requests with Claude: a watcher that follows GitHub for you, a reviewer, and a queue of what needs you",
   "author": {

@@ -1,6 +1,6 @@
 {
   "name": "fyi",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "Apache-2.0",
   "description": "Durable store for tasks, notes, projects and tracked pull requests, kept as Markdown under ~/.fyi",
   "author": { "name": "Jakub Senko" }
