@@ -33,7 +33,7 @@ Always `attention: true`, whatever the table says:
 
 - the user is @mentioned on the PR
 - `check_status: needs-approval`
-- a `merge` attention item
+- a `merge` attention item that is the user's move (`who: user`)
 - a `respond` attention item from a direct question
 - a `decide` attention item
 

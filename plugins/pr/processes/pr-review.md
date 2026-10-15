@@ -90,9 +90,9 @@ restate their findings; note what is already covered.
 
 `auto_review: reviewed`, `auto_reviewed_commit` at the reviewed SHA,
 `reviewed_at`, `findings` as `required/optional`, `complexity`, a
-`summary` giving the user what they need to decide, and `draft_review`
-if it was not posted. Clear the `review` attention item. The watcher
-sets `attention` when the job resolves.
+`summary` of what the user must decide (other maintainers' reviews go
+here: `manual_review` is the user's own), and `draft_review` if not
+posted. Clear the `review` item; the watcher sets `attention` on resolve.
 
 ## Modes
 

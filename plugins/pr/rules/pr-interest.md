@@ -31,9 +31,9 @@ them:
 | **Security or a breaking change** | Matters regardless of who holds it |
 | Assigned to **someone else**, and the user has context | Track at low importance; do not review unless asked |
 
-**Unassigned is a defect, not a triage task.** Assignment happens on open
-and undraft, so one still unassigned means the job failed — worth a look
-at the job, not an `assign` item on the PR.
+**Unassigned is a defect,** worth a look at the job, not an `assign` item:
+assignment happens on open and undraft. Except a maintainer's own PR: it
+only gets a suggested reviewer, so unassigned is expected there.
 
 ## Importance
 
