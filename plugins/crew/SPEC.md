@@ -5,7 +5,7 @@ concurrent sessions discover each other, exchange messages, and route
 work through a claimable queue (§1–§8). **Roles** are profiles a session
 starts as, through `/crew:start` (§9).
 
-Status: implemented, except expiry promotion to an fyi task (§4, §8).
+Status: implemented.
 Sections 1–8 were written before the server, and are kept for the
 reasoning.
 
@@ -127,6 +127,7 @@ Work that someone must do. Directed when `to` is set, pooled otherwise.
 | `state` | `open` \| `claimed` \| `done` \| `failed` \| `stuck` \| `expired` |
 | `claimed_by`, `lease_expires_at`, `attempts` | |
 | `created_at`, `expires_at` | Default expiry 4h |
+| `ended_at` | When it reached a final state: `done`, `failed`, `stuck` or `expired` |
 
 ---
 
@@ -242,17 +243,19 @@ means no live session matches at all. Three mechanisms, escalating:
    status still apply). This is the designated "I'll look at whatever is
    left" session the user knows to check.
 
-On expiry unclaimed, a job does both of the following — not one or the
-other, and not configurable:
-
-- **promotes to an fyi task**, so the work survives and surfaces in
-  `fyi_today` and the dashboard
-- **messages the poster**, so an automated poster (the watcher) learns
-  its delegation failed and can stop assuming it succeeded
+On expiry unclaimed, a job **messages the poster**, so an automated
+poster (the watcher) learns its delegation failed and can stop assuming
+it succeeded. The message carries the job's body and waits until read.
 
 Silently dropping an expired job is never correct: either the work
 mattered, in which case it belongs on a list, or it did not, in which
-case it should not have been posted.
+case it should not have been posted. Putting it on a list is the
+poster's move, with fyi's tools: a plugin never writes another plugin's
+data, so crew cannot promote the job itself.
+
+**Every ended job is pruned** an hour after `ended_at`, whatever its
+final state. The board keeps it that long, so the poster can still see
+it there; the message is what lasts.
 
 ---
 
@@ -299,11 +302,12 @@ operational state with a high write rate and locking needs; fyi items
 are durable knowledge, possibly kept in git. Forcing them together would
 churn the store with every heartbeat.
 
-The boundary is crossed in two places, both explicit:
+The boundary is crossed in two places, both explicit and both by a
+session, never by the server:
 
-> **Expiry promotion** — an unclaimed job that expires becomes an fyi
-> task. Work that needed doing *now* and didn't get done is work that
-> needs doing *later*, which is a task.
+> **Expiry** — the poster of an unclaimed job that expires is told, and
+> captures it as an fyi task if it still matters. Work that needed doing
+> *now* and didn't get done is work that needs doing *later* (§4).
 
 > **Handoff pointers** — `crew_send` carries a *reference* to fyi
 > content, never the content itself. See §7.
@@ -358,8 +362,6 @@ description.
 
 ## 8. Open items for implementation
 
-- **Expiry promotion.** An expired job is reported to its poster and
-  kept on the board, but not yet promoted to an fyi task (§4).
 - **`current_state` staleness.** Nothing forces a session to update it
   before exiting. fyi stamps it with `current_state_at` and the handoff
   shows its age, which makes stale state visible rather than preventing

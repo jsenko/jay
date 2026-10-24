@@ -8,10 +8,11 @@ import { run as queue } from "./queue.test.js";
 import { run as locking } from "./locking.test.js";
 import { run as version } from "./version.test.js";
 import { run as liveness } from "./liveness.test.js";
+import { run as retention } from "./retention.test.js";
 
 console.log("crew tests");
 
-for (const suite of [registry, messaging, queue, locking, version, liveness]) {
+for (const suite of [registry, messaging, queue, locking, version, liveness, retention]) {
   await suite();
 }
 

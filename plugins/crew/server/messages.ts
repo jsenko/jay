@@ -1,7 +1,7 @@
 /** Domain operations over the shared message log. */
 
 import { nowIso } from "./time.js";
-import type { Message, Session, State } from "./types.js";
+import { isLive, type Message, type Session, type State } from "./types.js";
 
 /** Grace period before a fully-consumed message becomes eligible for pruning. */
 const RETAIN_MS = 60 * 60 * 1000;
@@ -43,7 +43,7 @@ export function markRead(state: State, session: Session, upto: number): void {
  * retention window, so a session joining later still sees recent history.
  */
 export function pruneMessages(state: State): void {
-  const live = Object.values(state.sessions).filter((s) => s.status !== "offline");
+  const live = Object.values(state.sessions).filter((s) => isLive(s));
   const minCursor = live.length === 0 ? Infinity : Math.min(...live.map((s) => s.cursor));
   const cutoff = Date.now() - RETAIN_MS;
 

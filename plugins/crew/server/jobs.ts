@@ -1,7 +1,8 @@
 /** Domain operations over the job queue. See SPEC.md §4. */
 
 import { appendMessage } from "./messages.js";
-import { isStale, type Job, type Priority, type Session, type State } from "./types.js";
+import { nowIso } from "./time.js";
+import { isStale, type Job, type JobState, type Priority, type Session, type State } from "./types.js";
 
 /** Reserved sender for messages the server itself raises. */
 export const SYSTEM = "crew";
@@ -16,8 +17,15 @@ export const DEFAULT_EXPIRY_MIN = 240;
 /** Reclaims before a job is treated as poisonous and set aside. */
 const MAX_ATTEMPTS = 3;
 
-/** How long finished jobs linger so posters can still see the outcome. */
-const RESOLVED_RETAIN_MS = 60 * 60 * 1000;
+/**
+ * How long a job lingers after it ends, so its poster can still see the
+ * outcome on the board. The poster is also sent a message, which stays
+ * until read.
+ */
+const ENDED_RETAIN_MS = 60 * 60 * 1000;
+
+/** States a job never leaves. */
+const FINAL_STATES: ReadonlySet<JobState> = new Set(["done", "failed", "stuck", "expired"]);
 
 const PRIORITY_ORDER: Record<Priority, number> = { critical: 0, high: 1, normal: 2, low: 3 };
 
@@ -149,7 +157,7 @@ export function sweep(state: State, now = Date.now()): void {
     }
   }
 
-  pruneResolved(state, now);
+  pruneEnded(state, now);
 }
 
 /** Returns a job to the pool, or sets it aside once it has failed enough. */
@@ -160,6 +168,7 @@ export function reclaim(state: State, job: Job): void {
 
   if (job.attempts >= MAX_ATTEMPTS) {
     job.state = "stuck";
+    job.ended_at = nowIso();
     notifyPoster(state, job, `job ${job.id} is stuck after ${job.attempts} attempts: ${job.body}`);
   } else {
     job.state = "open";
@@ -176,6 +185,7 @@ export function reclaim(state: State, job: Job): void {
  */
 function expire(state: State, job: Job): void {
   job.state = "expired";
+  job.ended_at = nowIso();
   notifyPoster(
     state,
     job,
@@ -188,11 +198,14 @@ export function notifyPoster(state: State, job: Job, body: string): void {
   if (state.sessions[job.from]) appendMessage(state, SYSTEM, job.from, body);
 }
 
-/** Drops finished jobs once posters have had a chance to see them. */
-function pruneResolved(state: State, now: number): void {
+/**
+ * Drops jobs that have ended, once their posters have had a chance to see
+ * them. A job from before `ended_at` was recorded counts from creation.
+ */
+function pruneEnded(state: State, now: number): void {
   for (const [id, job] of Object.entries(state.jobs)) {
-    const resolved = job.state === "done" || job.state === "failed";
-    if (resolved && now - Date.parse(job.created_at) > RESOLVED_RETAIN_MS) {
+    if (!FINAL_STATES.has(job.state)) continue;
+    if (now - Date.parse(job.ended_at ?? job.created_at) > ENDED_RETAIN_MS) {
       delete state.jobs[id];
     }
   }

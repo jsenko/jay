@@ -80,6 +80,8 @@ export interface Job {
   attempts: number;
   created_at: string;
   expires_at: string;
+  /** When the job reached a final state; pruning counts from here. */
+  ended_at?: string;
 }
 
 /**

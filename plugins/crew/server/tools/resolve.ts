@@ -4,6 +4,7 @@ import { ToolError } from "../errors.js";
 import { notifyPoster, reclaim, sweep } from "../jobs.js";
 import { requireOwnSession } from "../sessions.js";
 import { mutate } from "../store.js";
+import { nowIso } from "../time.js";
 import { requireString } from "../validation.js";
 import type { Tool } from "./tool.js";
 
@@ -45,6 +46,7 @@ async function handler(args: Record<string, any>) {
     }
 
     job.state = outcome;
+    job.ended_at = nowIso();
     delete job.lease_expires_at;
     notifyPoster(state, job, `job ${job.id} ${outcome}${detail ? `: ${detail}` : ""}`);
     return { ok: true, state: job.state };
