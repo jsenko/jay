@@ -9,6 +9,7 @@ import { mutate } from "../store.js";
 import { nowIso } from "../time.js";
 import { isLive, type Session } from "../types.js";
 import { validateCapabilities, requireString } from "../validation.js";
+import { setupWarnings } from "../warnings.js";
 import { CAPABILITY_SCHEMA, type Tool } from "./tool.js";
 
 /**
@@ -78,6 +79,7 @@ async function handler(args: Record<string, any>) {
 
   greet();
 
+  const warnings = setupWarnings(result.state);
   return {
     session_id: result.session.id,
     resumed: result.resumed,
@@ -86,6 +88,7 @@ async function handler(args: Record<string, any>) {
     repos: result.session.repos,
     capabilities: result.session.capabilities,
     others,
+    ...(warnings.length > 0 && { warnings }),
   };
 }
 
@@ -93,7 +96,7 @@ export const joinTool: Tool = {
   definition: {
     name: "crew_join",
     description:
-      "Register this session so others can see and reach it. Directory and repositories are detected automatically: the repositories are the git checkouts in its directories, which route jobs by repository. Idempotent: rejoining the same directory with the same purpose returns the existing session.",
+      "Register this session so others can see and reach it. Directory and repositories are detected automatically: the repositories are the git checkouts in its directories, which route jobs by repository. Idempotent: rejoining the same directory with the same purpose returns the existing session. `warnings`, when present, names work no session can take: report each in one line.",
     inputSchema: {
       type: "object",
       properties: {

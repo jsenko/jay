@@ -89,7 +89,7 @@ none describes.
 
 | Tool | Purpose |
 |---|---|
-| `crew_join` | Register; the directory and repositories are detected |
+| `crew_join` | Register; the directory and repositories are detected, and stranded work is warned about |
 | `crew_leave` | Deregister, handing back held work |
 | `crew_who` | Who is running, where, doing what |
 | `crew_state` | Set status (`idle`, `busy`, `focus`, `offline`) and activity |

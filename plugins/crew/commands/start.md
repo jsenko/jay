@@ -47,6 +47,7 @@ An unknown name is an error, listing what exists.
   Crew:          <session-id>, advertising <capabilities>
   Notifications: <channel | poll>
   <whatever the profile's startup found>
+  <each of crew_join's warnings, one line>
 ```
 
 Keep it short. A session that opens with a wall of text has spent the

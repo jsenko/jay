@@ -28,7 +28,14 @@ export async function run(): Promise<void> {
   check("it waits past its expiry while nobody can take it", stateOf(waiting.job_id) === "open", board);
   check("it still expires after waiting three days", stateOf(ancient) === "expired", board);
 
+  const late = await connect(tempWorkDir(), crewDir);
+  const warned = await call(late, "crew_join", { purpose: "Starting late", capabilities: ["code"] });
+  check("a joining session is warned about stranded work", warned.warnings?.[0]?.includes("needing review"), warned);
+
   await call(reviewer, "crew_state", { status: "idle" });
+  const quiet = await call(late, "crew_join", { purpose: "Starting later", capabilities: ["code"], force_new: true });
+  check("and not once a session can take it", quiet.warnings === undefined, quiet);
+
   const claimed = await call(reviewer, "crew_claim");
   check("the reviewer claims it once out of focus", claimed.claimed?.id === waiting.job_id, claimed);
 
@@ -42,5 +49,5 @@ export async function run(): Promise<void> {
     later
   );
 
-  await Promise.all([watcher.close(), reviewer.close()]);
+  await Promise.all([watcher.close(), reviewer.close(), late.close()]);
 }

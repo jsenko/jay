@@ -82,7 +82,8 @@ Set `attention` on every item touched, per `~/.jay/plugins/pr/processes/pr-atten
 ## Result
 
 One line in the startup report: tracked, refreshed, closed, jobs
-posted. Nothing more — the dashboard has the detail.
+posted, and whether they wait for a reviewer (`routable: false`).
+Nothing more: the dashboard has the detail.
 
 ## Notes
 

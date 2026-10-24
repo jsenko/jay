@@ -240,7 +240,7 @@ reliably kills its claimer cycles forever, burning tokens on every retry.
 ### Jobs nobody can take
 
 Distinct from `stuck` (claimed and failed repeatedly): **unroutable**
-means no live session matches at all. Three mechanisms, escalating:
+means no live session matches at all. Four mechanisms, escalating:
 
 1. **Synchronous** — `crew_post` returns `routable: false`. The poster
    knows at once and can tell the user rather than assuming delivery.
@@ -257,6 +257,11 @@ means no live session matches at all. Three mechanisms, escalating:
    that match nothing else, *ignoring the capability check* (repo and
    status still apply). This is the designated "I'll look at whatever is
    left" session the user knows to check.
+4. **Warning at join** — `crew_join` returns `warnings` while open jobs
+   wait with no session able to take them, naming what they need and
+   whether any session sets `fallback`, and `/crew:start` prints each in
+   one line. Computed from the state the join already reads, and absent
+   when nothing is stranded, so a healthy crew pays nothing for it.
 
 On expiry unclaimed, a job **messages the poster**, so an automated
 poster (the watcher) learns its delegation failed and can stop assuming
