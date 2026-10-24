@@ -2,6 +2,7 @@
 
 import { captureTool } from "./capture.js";
 import { convertTool } from "./convert.js";
+import { createScopeTool } from "./create-scope.js";
 import { getTool } from "./get.js";
 import { handoffTool } from "./handoff.js";
 import { linkTool } from "./link.js";
@@ -20,6 +21,7 @@ export const tools: Tool[] = [
   linkTool,
   handoffTool,
   convertTool,
+  createScopeTool,
 ];
 
 /** Lookup used by the call dispatcher. */

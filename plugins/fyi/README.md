@@ -43,6 +43,7 @@ and `/fyi:dashboard` is `/fyi-dashboard` there.
 | `fyi_link` | Relate two items; the inverse link is written too |
 | `fyi_handoff` | Pick up a project where the last session stopped |
 | `fyi_convert` | Turn one item into another type, keeping where it came from |
+| `fyi_create_scope` | Create a scope |
 
 The plugin also brings a skill, `fyi-triggers`, that has sessions notice
 when something is worth keeping: a decision, work left for later, a fact
@@ -141,10 +142,18 @@ an item that silently belongs to nothing.
 
 ## Scopes
 
-Items live in a scope: `default`, `work` or `personal`, each its own
-directory. Calls that name no scope use the default scope, which is
-`default` unless [configured](#configuration) otherwise. Pass `scope` to
-use another, or `"all"` to search across them.
+Items live in a scope, each its own directory under `~/.fyi`. Every
+store has `default`, `work` and `personal`; any other directory there is
+a scope too, so you can keep one per job, client or side project. Ask a
+session to create one, or `mkdir ~/.fyi/<name>`: lowercase letters,
+digits and hyphens. `attachments` and dot-directories, such as `.git`,
+are not scopes.
+
+Calls that name no scope use the default scope, which is `default`
+unless [configured](#configuration) otherwise. Pass `scope` to use
+another; searches also take a list, such as `["work", "personal"]`, or
+`"all"`. A scope that doesn't exist is refused, so a typo never starts a
+new one.
 
 A scope is separate from a `pr`'s `repo` field, which is its
 `Owner/Repo` on GitHub.
@@ -236,7 +245,7 @@ changing files.
 
 | Setting | Where | Default | Purpose |
 |---|---|---|---|
-| `defaultScope` | `~/.fyi/config.json` | `default` | The scope calls use when they name none: `default`, `work` or `personal` |
+| `defaultScope` | `~/.fyi/config.json` | `default` | The scope calls use when they name none: `default`, `work`, `personal`, or one of your own |
 | `FYI_DIR` | environment | `~/.fyi` | Where the store and its `config.json` live |
 
 ```json

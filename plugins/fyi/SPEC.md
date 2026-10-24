@@ -16,8 +16,13 @@ User documentation is in [README.md](README.md).
 
 ## 1. Storage
 
-**One file per item**, `~/.fyi/<scope>/<type>/<id>.md`, where `<scope>`
-is `default`, `work` or `personal`. `config.json` in the store's root
+**One file per item**, `~/.fyi/<scope>/<type>/<id>.md`. A scope is any
+directory in the root with a valid name, `default`, `work` and
+`personal` are always available, and `fyi_create_scope` adds one. The
+scopes stay in place rather than moving under `~/.fyi/scopes/`: the
+non-scope entries that once argued for that (`crew/`, `reports/`) are
+gone, and `attachments/` and dot-directories are simply excluded, so no
+migration was needed. `config.json` in the store's root
 names the scope calls use when they name none, `default` if unset; it
 lives with the store so `FYI_DIR` moves both.
 
@@ -105,6 +110,7 @@ a file path or a storage region.
 | `fyi_link` | Relate two items. |
 | `fyi_handoff` | Assemble resume context for a project. |
 | `fyi_convert` | Change an item's type, carrying context and provenance. |
+| `fyi_create_scope` | Create a scope's directory. |
 
 `fyi_search` keeps to filters a query engine can serve — equality,
 membership, substring, ranges, presence — rather than growing ad-hoc
@@ -174,7 +180,9 @@ but should be rare.
 
 **Scope defaults to `default`**, or to `defaultScope` in the store's
 `config.json`, read once at start. `fyi_search` and `fyi_today` look in the default
-unless asked otherwise; `scope: "personal"` or `"all"` widens. A session
+unless asked otherwise; `scope: "personal"`, a list, or `"all"` widens.
+A scope that doesn't exist is refused, in captures and searches alike,
+so a typo is an error rather than a new, empty scope. A session
 is never locked to one store — a work task that turns up a personal
 errand can capture it directly — but crossing over is opt-in per call
 rather than the default.
@@ -212,10 +220,6 @@ boundary is crossed in two places:
 - **Human-readable listing.** One file per item loses `cat TASKS.md`.
   A server-generated `INDEX.md` per type would restore it — derived and
   disposable, so it does not reintroduce hand-maintained indexes.
-- **Scopes as directories.** The scopes are a fixed list. Making them
-  the directories that exist, with a tool to create one, needs the
-  non-scope entries in `~/.fyi` (`crew/`, `reports/`) out of the way
-  first, for example under `~/.fyi/scopes/`.
 - **`current_state` staleness.** `current_state_at` records the age, but
   nothing forces an update before a session exits.
 
@@ -326,5 +330,5 @@ on.
 | Migration of existing tasks, notes, projects, PR files | Done |
 | A dashboard over the store | Done |
 | Packaged as a jay plugin, with a configurable default scope | Done |
-| Scopes as directories, with a tool to create one | Planned |
+| Scopes as directories, with a tool to create one | Done |
 

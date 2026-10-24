@@ -18,7 +18,8 @@ import { archiveDir, FYI_DIR, itemPath, typeDir } from "./paths.js";
 import { shouldArchive } from "./archiving.js";
 import { assertWritable, writable } from "./store-version.js";
 import { nowIso } from "./time.js";
-import { ITEM_TYPES, SCOPES, type Item, type ItemType, type Scope, type StoredItem } from "./types.js";
+import { scopeDirs } from "./scopes.js";
+import { ITEM_TYPES, type Item, type ItemType, type Scope, type StoredItem } from "./types.js";
 
 interface Entry extends StoredItem {
   mtimeMs: number;
@@ -77,7 +78,7 @@ function scanInto(map: Map<string, Entry>, dir: string, scope: Scope, type: Item
 export function refresh(): void {
   const seen = new Set<string>();
 
-  for (const scope of SCOPES) {
+  for (const scope of scopeDirs()) {
     for (const type of ITEM_TYPES) {
       scanInto(active, typeDir(scope, type), scope, type, seen);
     }
@@ -93,7 +94,7 @@ export function refresh(): void {
 /** Loads the archive, which is otherwise left alone. */
 function loadArchive(): void {
   const seen = new Set<string>();
-  for (const scope of SCOPES) {
+  for (const scope of scopeDirs()) {
     for (const type of ITEM_TYPES) {
       scanInto(archive, archiveDir(scope, type), scope, type, seen);
     }

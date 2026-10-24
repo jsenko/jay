@@ -13,7 +13,8 @@ import { matchesWhere, type Where } from "./where.js";
 
 /** A search request. Every field is optional and they combine with AND. */
 export interface Query {
-  scope?: Scope | "all";
+  /** Scopes to search, or every scope; nothing named means the default. */
+  scope?: Scope | Scope[] | "all";
   type?: ItemType | ItemType[];
   text?: string;
   /** Field conditions; see `where.ts`. */
@@ -50,9 +51,9 @@ function byRecency(a: StoredItem, b: StoredItem): number {
 
 /** Applies a query to a set of items. */
 export function search(items: StoredItem[], q: Query): StoredItem[] {
-  const scope = q.scope ?? DEFAULT_SCOPE;
+  const scopes = q.scope === "all" ? "all" : asList(q.scope) ?? [DEFAULT_SCOPE];
   const found = items
-    .filter((stored) => scope === "all" || stored.scope === scope)
+    .filter((stored) => scopes === "all" || scopes.includes(stored.scope))
     .filter((stored) => matches(stored.item, q))
     .sort(byRecency);
   return q.limit ? found.slice(0, q.limit) : found;

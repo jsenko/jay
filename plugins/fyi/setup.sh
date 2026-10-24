@@ -13,7 +13,14 @@ set -euo pipefail
 
 STORE="${FYI_DIR:-$HOME/.fyi}"
 CONFIG="$STORE/config.json"
+# The built-in scopes, then any of the user's own: a scope is a directory in the store.
 SCOPES=(default work personal)
+if [[ -d "$STORE" ]]; then
+    for dir in "$STORE"/*/; do
+        name="$(basename "$dir")"
+        [[ "$name" =~ ^[a-z0-9][a-z0-9-]{0,39}$ && "$name" != attachments && " ${SCOPES[*]} " != *" $name "* ]] && SCOPES+=("$name")
+    done
+fi
 
 YES=false
 [[ "${1:-}" == "--yes" ]] && YES=true
@@ -31,6 +38,7 @@ if [[ "$YES" == false ]]; then
     echo "  default    for most people"
     echo "  work       to keep work and personal items apart, with work the usual one"
     echo "  personal   the same, with personal the usual one"
+    for s in "${SCOPES[@]:3}"; do echo "  $s"; done
     while true; do
         read -r -p "Default scope [$current]: " scope
         scope="${scope:-$current}"

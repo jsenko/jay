@@ -16,10 +16,11 @@ import { run as config } from "./config.test.js";
 import { run as completion } from "./completion.test.js";
 import { run as folders } from "./folders.test.js";
 import { run as storeVersion } from "./storeversion.test.js";
+import { run as scopes } from "./scopes.test.js";
 
 console.log("fyi tests");
 
-for (const suite of [items, views, archiving, freshness, handedit, identity, where, refs, listops, checker, config, completion, folders, storeVersion]) {
+for (const suite of [items, views, archiving, freshness, handedit, identity, where, refs, listops, checker, config, completion, folders, storeVersion, scopes]) {
   await suite();
 }
 

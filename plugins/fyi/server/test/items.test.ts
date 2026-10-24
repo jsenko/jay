@@ -60,7 +60,7 @@ export async function run(): Promise<void> {
   // --- scope is not a PR's repo -------------------------------------
   // These were one parameter once, so every PR capture was rejected as
   // an invalid storage scope.
-  check("scope and repo are separate fields", props.scope.enum !== undefined && props.repo.description.startsWith("(pr)"), { scope: props.scope, repo: props.repo });
+  check("scope and repo are separate fields", props.scope.description.includes("personal") && props.repo.description.startsWith("(pr)"), { scope: props.scope, repo: props.repo });
 
   const pr = await call(c, "fyi_capture", {
     type: "pr", title: "fix(kafkasql): retry topic config verification",
@@ -68,7 +68,7 @@ export async function run(): Promise<void> {
   });
   check("a PR captures with an Owner/Repo", pr.id !== undefined && pr.error === undefined, pr);
   check("the PR keeps its repo", (await call(c, "fyi_get", { id: pr.id })).repo === "acme/widgets");
-  check("a bad storage scope is still rejected", (await call(c, "fyi_capture", { type: "note", title: "x", content: "y", scope: "nope" })).error?.includes("scope must be one of"));
+  check("a bad storage scope is still rejected", (await call(c, "fyi_capture", { type: "note", title: "x", content: "y", scope: "nope" })).error?.includes('no scope "nope"'));
 
   // --- notes and projects -------------------------------------------
   const project = await call(c, "fyi_capture", {

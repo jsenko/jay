@@ -1,10 +1,10 @@
 /** `fyi_search` — find items. */
 
-import { DEFAULT_SCOPE } from "../config.js";
+import { requireScopes, scopesInputSchema } from "../config.js";
 import { ToolError } from "../errors.js";
 import { search, summarise, type Query } from "../query.js";
 import { all } from "../store.js";
-import { ITEM_TYPES, SCOPES, type ItemType } from "../types.js";
+import { ITEM_TYPES, type ItemType } from "../types.js";
 import { validateWhere, whereInputSchema } from "../where.js";
 import type { Tool } from "./tool.js";
 
@@ -27,7 +27,7 @@ function handler(args: Record<string, any>) {
 
   const types: ItemType[] | undefined = args.type;
   const query: Query = {
-    scope: args.scope,
+    scope: requireScopes(args.scope),
     type: types,
     text: args.text,
     where: args.where === undefined ? undefined : validateWhere(args.where, types?.length ? types : undefined),
@@ -46,11 +46,7 @@ export const searchTool: Tool = {
     inputSchema: {
       type: "object",
       properties: {
-        scope: {
-          type: "string",
-          enum: [...SCOPES, "all"],
-          description: `Which store to look in. Defaults to ${DEFAULT_SCOPE}; use "all" only when the question genuinely spans several.`,
-        },
+        scope: scopesInputSchema(),
         type: {
           type: "array",
           items: { type: "string", enum: [...ITEM_TYPES] },

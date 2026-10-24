@@ -1,10 +1,10 @@
 /** `fyi_today` — everything that wants attention now, in one call. */
 
-import { DEFAULT_SCOPE } from "../config.js";
+import { requireScopes, scopesInputSchema } from "../config.js";
 import { search, summarise } from "../query.js";
 import { all } from "../store.js";
 import { daysFrom, today } from "../time.js";
-import { SCOPES, type Scope, type StoredItem } from "../types.js";
+import type { StoredItem } from "../types.js";
 import type { Tool } from "./tool.js";
 
 /** Statuses that take a task out of the running. */
@@ -32,7 +32,7 @@ function byUrgency(a: StoredItem, b: StoredItem): number {
  */
 function handler(args: Record<string, any>) {
   const items = all();
-  const scope = (args.scope as Scope | "all") ?? DEFAULT_SCOPE;
+  const scope = requireScopes(args.scope);
   const horizon = Number(args.horizon_days) || 7;
   const now = today();
 
@@ -55,7 +55,7 @@ function handler(args: Record<string, any>) {
 
   return {
     date: now,
-    scope,
+    scope: scope !== "all" && scope.length === 1 ? scope[0] : scope,
     due: due.map((s) => ({ ...summarise(s), overdue_days: -daysFrom(String(s.item.next_action_at)) })),
     upcoming: upcoming.map(summarise),
     blocked: blocked.map((s) => ({ ...summarise(s), blocked_on: s.item.blocked_on })),
@@ -72,11 +72,7 @@ export const todayTool: Tool = {
     inputSchema: {
       type: "object",
       properties: {
-        scope: {
-          type: "string",
-          enum: [...SCOPES, "all"],
-          description: `Which store to look in. Defaults to ${DEFAULT_SCOPE}; use "all" only when the question genuinely spans several.`,
-        },
+        scope: scopesInputSchema(),
         horizon_days: {
           type: "number",
           description: "How far ahead to include upcoming tasks. Defaults to 7.",

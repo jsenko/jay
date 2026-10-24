@@ -23,7 +23,8 @@ import { keyField, keyIdCandidates, parseKey } from "./keys.js";
 import { archiveDir, FYI_DIR, typeDir } from "./paths.js";
 import { refProblems } from "./refs.js";
 import { problems } from "./schema.js";
-import { ITEM_TYPES, SCOPES, type Item, type ItemType, type Scope } from "./types.js";
+import { scopeDirs } from "./scopes.js";
+import { ITEM_TYPES, type Item, type ItemType, type Scope } from "./types.js";
 
 /** One file as found on disk. */
 interface Found {
@@ -37,7 +38,7 @@ interface Found {
 /** Every item file in the store, parsed or not. */
 function scan(): Found[] {
   const out: Found[] = [];
-  for (const scope of SCOPES) {
+  for (const scope of scopeDirs()) {
     for (const type of ITEM_TYPES) {
       for (const [dir, archivedDir] of [[typeDir(scope, type), false], [archiveDir(scope, type), true]] as const) {
         if (!existsSync(dir)) continue;

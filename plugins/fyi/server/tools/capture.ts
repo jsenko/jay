@@ -1,7 +1,7 @@
 /** `fyi_capture` — create an item. */
 
 import { stampCompletion } from "../completion.js";
-import { DEFAULT_SCOPE } from "../config.js";
+import { DEFAULT_SCOPE, knownScopes, requireScope } from "../config.js";
 import { ToolError } from "../errors.js";
 import { projectFolder } from "../folders.js";
 import { isMirrored } from "../freshness.js";
@@ -11,7 +11,7 @@ import { checkRefs } from "../refs.js";
 import { applyDefaults, unionProperties, validate } from "../schema.js";
 import { write } from "../store.js";
 import { nowIso } from "../time.js";
-import { ITEM_TYPES, SCOPES, type Item, type ItemType, type Scope } from "../types.js";
+import { ITEM_TYPES, type Item, type ItemType } from "../types.js";
 import type { Tool } from "./tool.js";
 
 /**
@@ -21,14 +21,12 @@ import type { Tool } from "./tool.js";
  * server can work out for itself is not asked for.
  */
 function handler(args: Record<string, any>) {
-  const { type, scope = DEFAULT_SCOPE, slug, ...fields } = args;
+  const { type, scope: named, slug, ...fields } = args;
 
   if (!ITEM_TYPES.includes(type)) {
     throw new ToolError(`type must be one of: ${ITEM_TYPES.join(", ")}`);
   }
-  if (!SCOPES.includes(scope)) {
-    throw new ToolError(`scope must be one of: ${SCOPES.join(", ")}`);
-  }
+  const scope = named === undefined ? DEFAULT_SCOPE : requireScope(named);
   if (typeof fields.title !== "string" || !fields.title.trim()) {
     throw new ToolError("title is required");
   }
@@ -71,7 +69,7 @@ function handler(args: Record<string, any>) {
 
   stampCompletion(item, undefined, fields, now);
 
-  const stored = write(item, scope as Scope);
+  const stored = write(item, scope);
   const folder = projectFolder(stored);
   return { id: item.id, type: item.type, path: stored.path, ...(folder ? { folder } : {}) };
 }
@@ -87,8 +85,7 @@ export const captureTool: Tool = {
         type: { type: "string", enum: [...ITEM_TYPES] },
         scope: {
           type: "string",
-          enum: [...SCOPES],
-          description: `Which store this belongs in. Defaults to ${DEFAULT_SCOPE}.`,
+          description: `Which scope this belongs in: ${knownScopes().join(", ")}. Defaults to ${DEFAULT_SCOPE}. fyi_create_scope adds one.`,
         },
         slug: {
           type: "string",

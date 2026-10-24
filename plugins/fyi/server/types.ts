@@ -6,13 +6,11 @@ export const ITEM_TYPES = ["task", "note", "project", "pr"] as const;
 export type ItemType = (typeof ITEM_TYPES)[number];
 
 /**
- * Storage scopes, kept apart so personal items stay separable. `default` is where
- * items go unless config.json names another; the list becomes the directories that
- * exist once scopes can be created.
+ * A storage scope, kept apart so personal items stay separable: a directory
+ * under the store's root (`scopes.ts`). Items go to the default scope unless
+ * a call names another.
  */
-export const SCOPES = ["default", "work", "personal"] as const;
-
-export type Scope = (typeof SCOPES)[number];
+export type Scope = string;
 
 /** A structured relationship between two items. */
 export interface Link {
