@@ -22,6 +22,9 @@ on:
       pr:
         description: "pr: version to release (empty: not released)"
         required: false
+      timer:
+        description: "timer: version to release (empty: not released)"
+        required: false
 
 # One release at a time: each pushes to main.
 concurrency: release
@@ -61,7 +64,8 @@ jobs:
           STATUS: ${{ inputs.status }}
           CODE: ${{ inputs.code }}
           PR: ${{ inputs.pr }}
+          TIMER: ${{ inputs.timer }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          tools/release/release.sh "fyi=$FYI" "crew=$CREW" "status=$STATUS" "code=$CODE" "pr=$PR"
+          tools/release/release.sh "fyi=$FYI" "crew=$CREW" "status=$STATUS" "code=$CODE" "pr=$PR" "timer=$TIMER"
