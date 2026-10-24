@@ -57,7 +57,7 @@ New commits arrived, so any prior review is stale.
 3. `crew_post` a re-review job, `prefer` the session that reviewed it
    last. When `manual_review` is `changes-requested`, include the user's
    comments and ask the reviewer to set `author_response`.
-4. No reviewer available → add a `re-review` attention item
+4. `routable: false` → add a `re-review` attention item, per Errors
 
 ## Labels
 
@@ -107,10 +107,10 @@ Set `lifecycle` to `merged` or `closed`, clear attention items and
 
 ## Errors
 
-A failed write is logged and skipped, not retried into a loop. A failed
-`crew_post` means nobody takes it — leave the attention item so the
-dashboard shows it. GitHub API failures: act on what is known and say the
-state is uncertain.
+A failed write is logged and skipped, not retried into a loop. A job
+posted with `routable: false` waits for a reviewer: never re-post it, and
+begin `activity` with "review queue stalled" until one is claimed. On
+GitHub API failures, act on what is known and say it is uncertain.
 
 ## Notes
 

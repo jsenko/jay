@@ -42,6 +42,7 @@ async function handler(args: Record<string, any>) {
       throw new ToolError(`unknown session "${args.prefer}" for prefer`);
     }
 
+    const expiryMin = Number(args.expires_in) || DEFAULT_EXPIRY_MIN;
     const job: Job = {
       id: nextJobId(state),
       from: poster.id,
@@ -57,7 +58,8 @@ async function handler(args: Record<string, any>) {
       state: "open",
       attempts: 0,
       created_at: nowIso(),
-      expires_at: minutesFrom(now, Number(args.expires_in) || DEFAULT_EXPIRY_MIN),
+      expires_at: minutesFrom(now, expiryMin),
+      expiry_min: expiryMin,
     };
 
     state.jobs[job.id] = job;
@@ -76,7 +78,7 @@ export const postTool: Tool = {
   definition: {
     name: "crew_post",
     description:
-      "Post work for another session to do. Omit 'to' to offer it to whoever matches — the first session to claim it wins. Check 'routable' in the result: false means nobody can take it right now.",
+      "Post work for another session to do. Omit 'to' to offer it to whoever matches — the first session to claim it wins. Check 'routable' in the result: false means nobody can take it right now, and the job waits until a session can, up to three days. Post it once: re-posting a waiting job only duplicates it.",
     inputSchema: {
       type: "object",
       properties: {
@@ -93,7 +95,10 @@ export const postTool: Tool = {
           type: "string",
           description: "Give this session first refusal for 10 minutes, then open it to everyone.",
         },
-        expires_in: { type: "number", description: "Minutes before the job expires unclaimed." },
+        expires_in: {
+          type: "number",
+          description: "Minutes the job stays claimable before it expires unclaimed. Time with no session able to take it does not count.",
+        },
         ref: { type: "string", description: "Pointer such as pr:Owner/Repo#123." },
       },
       required: ["body"],

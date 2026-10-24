@@ -79,7 +79,10 @@ export interface Job {
   lease_expires_at?: string;
   attempts: number;
   created_at: string;
+  /** Pushed back while no session can take the job; see `expiry_min`. */
   expires_at: string;
+  /** How long the job stays claimable before it expires, in minutes. */
+  expiry_min?: number;
   /** When the job reached a final state; pruning counts from here. */
   ended_at?: string;
 }

@@ -126,7 +126,7 @@ Work that someone must do. Directed when `to` is set, pooled otherwise.
 | `ref` | Opaque pointer, e.g. `pr:example/widgets#42` |
 | `state` | `open` \| `claimed` \| `done` \| `failed` \| `stuck` \| `expired` |
 | `claimed_by`, `lease_expires_at`, `attempts` | |
-| `created_at`, `expires_at` | Default expiry 4h |
+| `created_at`, `expires_at`, `expiry_min` | Default expiry 4h of claimable time |
 | `ended_at` | When it reached a final state: `done`, `failed`, `stuck` or `expired` |
 
 ---
@@ -234,6 +234,11 @@ means no live session matches at all. Three mechanisms, escalating:
 
 1. **Synchronous** — `crew_post` returns `routable: false`. The poster
    knows at once and can tell the user rather than assuming delivery.
+   The job then **waits**: expiry counts only time when some session
+   could have claimed it, so a queue held up by a reviewer in `focus`
+   is intact when focus ends. A job waits at most three days from
+   posting, so work for a session that never comes still reaches its
+   poster. Re-posting a waiting job only duplicates it.
 2. **Re-evaluation** — when any session joins, changes status, or changes
    capabilities, the server re-checks open jobs and notifies sessions
    that have become eligible. A job unroutable at post time routes itself

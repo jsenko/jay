@@ -14,6 +14,13 @@ export const MAX_LEASE_MIN = 240;
 /** Default time a job stays claimable before it is considered abandoned. */
 export const DEFAULT_EXPIRY_MIN = 240;
 
+/**
+ * The longest a job waits for a session able to take it, counted from
+ * posting, so work meant for a session that never comes still reaches
+ * its poster.
+ */
+const MAX_WAIT_MS = 72 * 60 * 60 * 1000;
+
 /** Reclaims before a job is treated as poisonous and set aside. */
 const MAX_ATTEMPTS = 3;
 
@@ -145,8 +152,8 @@ export function isSlow(job: Job, state: State, now = Date.now()): boolean {
  */
 export function sweep(state: State, now = Date.now()): void {
   for (const job of Object.values(state.jobs)) {
-    if (job.state === "open" && now > Date.parse(job.expires_at)) {
-      expire(state, job);
+    if (job.state === "open") {
+      sweepOpen(state, job, now);
       continue;
     }
 
@@ -158,6 +165,22 @@ export function sweep(state: State, now = Date.now()): void {
   }
 
   pruneEnded(state, now);
+}
+
+/**
+ * Expires an open job only for time a session could have claimed it:
+ * while none can, as when the only reviewer is in focus, the expiry is
+ * pushed back, so the job waits rather than lapsing (SPEC.md §4).
+ */
+function sweepOpen(state: State, job: Job, now: number): void {
+  const waitedMs = now - Date.parse(job.created_at);
+  if (waitedMs > MAX_WAIT_MS) {
+    expire(state, job, `expired after ${Math.round(waitedMs / 3_600_000)}h with no session able to take it`);
+  } else if (eligibleSessions(state, job, now).length === 0) {
+    job.expires_at = minutesFrom(now, job.expiry_min ?? DEFAULT_EXPIRY_MIN);
+  } else if (now > Date.parse(job.expires_at)) {
+    expire(state, job, "expired unclaimed");
+  }
 }
 
 /** Returns a job to the pool, or sets it aside once it has failed enough. */
@@ -176,21 +199,13 @@ export function reclaim(state: State, job: Job): void {
 }
 
 /**
- * Marks an unclaimed job expired and tells the poster.
- *
- * SPEC.md §4 also requires promotion to an fyi task so the work survives
- * outside crew; that half is not built yet (SPEC.md §8). Until then the job is retained in
- * `expired` state and reported through `crew_poll` and the board, so it
- * is still never silently dropped.
+ * Marks an unclaimed job expired and tells the poster, whose move it is
+ * to capture the work if it still matters (SPEC.md §4).
  */
-function expire(state: State, job: Job): void {
+function expire(state: State, job: Job, reason: string): void {
   job.state = "expired";
   job.ended_at = nowIso();
-  notifyPoster(
-    state,
-    job,
-    `job ${job.id} expired with no session able to take it: ${job.body}`
-  );
+  notifyPoster(state, job, `job ${job.id} ${reason}: ${job.body}`);
 }
 
 /** Sends a system message to a job's poster, if that session still exists. */
