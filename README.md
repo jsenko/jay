@@ -11,13 +11,18 @@ what you need.
 | Plugin | What it does | Dashboard | Needs |
 |---|---|---|---|
 | [fyi](plugins/fyi/README.md) | Tasks, notes, projects and tracked PRs, stored as Markdown in `~/.fyi` | Today, pull requests, projects | — |
-| [crew](plugins/crew/README.md) | Start each session in a role, and let sessions work together: see who is doing what, send messages, and hand off jobs | Sessions, jobs | fyi |
+| [crew](plugins/crew/README.md) | Start each session in a role, and let sessions work together: see who is doing what, send messages, and hand off jobs | Sessions, jobs | fyi, timer\* |
 | [status](plugins/status/README.md) | A short status for teammates and a weekly report, written from your GitHub activity and fyi | — | fyi |
-| [code](plugins/code/README.md) | A coder role, one command for changes of any size, tracked as much as each needs, and code-quality rules with stable IDs | — | fyi, crew |
-| [pr](plugins/pr/README.md) | A watcher that follows GitHub for you, a reviewer role, and a queue of the PRs waiting on you | — | fyi, crew, code |
+| [code](plugins/code/README.md) | A coder role, one command for changes of any size, tracked as much as each needs, and code-quality rules with stable IDs | — | fyi, crew, timer\* |
+| [pr](plugins/pr/README.md) | A watcher that follows GitHub for you, a reviewer role, and a queue of the PRs waiting on you | — | fyi, crew, code, timer\* |
 | [timer](plugins/timer/README.md) | Timers for opencode sessions, so they can poll and check back on their own. Claude Code has its own | — | — |
 
-Installing a plugin also installs what it needs. The dashboards of all
+\* In opencode only, where sessions poll for work on its timers. Claude
+Code has timers built in, so timer isn't a declared dependency, and
+installing these doesn't install it: add it with
+`./install.sh --opencode timer`, or install `all`.
+
+Installing a plugin also installs what else it needs. The dashboards of all
 installed plugins share one menu, so each one can open the others.
 The first five work in Claude Code and in opencode; timer is for opencode
 only, and the installer skips it for Claude Code.
