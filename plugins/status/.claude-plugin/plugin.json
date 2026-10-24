@@ -1,6 +1,6 @@
 {
   "name": "status",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "Apache-2.0",
   "description": "A brief status for teammates and a weekly report, built from your GitHub activity and fyi",
   "author": {
