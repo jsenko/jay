@@ -26,7 +26,10 @@ Reports are usually asked for on the period's last day or the working
 day after. A period that ends in the future, or more than one period
 back, is a question for the user, not a guess.
 
-Confirm the period in one line before gathering. When the user states
+Confirm the period in one line before gathering, naming what it
+continues from: "14–20 Oct, Wednesday to Tuesday, after the weekly of
+7–13 Oct". Take each weekday from `date`, never work it
+out. When the user states
 how their weeks run, offer to keep it as a note tagged `decision` and
 `status`.
 

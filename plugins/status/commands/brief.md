@@ -17,8 +17,10 @@ the latest brief: `fyi_search`, type note, `include_archived: true`,
 day after the end date in its title to today. With no earlier brief, it
 is yesterday and today.
 
-State the period in the reply's first line; it needs no confirmation,
-unless it is longer than a week, which is a question for the user.
+State the period in the reply's first line, naming what it continues
+from ("since the brief of 13–17 Oct"), with any weekday taken from
+`date`. It needs no confirmation, unless it is longer than a
+week, which is a question for the user.
 
 # Gather
 
