@@ -18,8 +18,8 @@ export async function run(): Promise<void> {
   const reviewerId = (await call(reviewer, "crew_join", { purpose: "Reviewing PRs", capabilities: ["review"] })).session_id;
   const deadId = (await call(dead, "crew_join", { purpose: "Reviewing then killed", capabilities: ["review"] })).session_id;
 
-  const expired = (await call(watcher, "crew_post", { body: "Cut a release", needs: ["release"], expires_in: 0.001 })).job_id;
-  const recent = (await call(watcher, "crew_post", { body: "Cut another", needs: ["release"], expires_in: 0.001 })).job_id;
+  const expired = (await call(watcher, "crew_post", { body: "Cut a release", needs: ["release"] })).job_id;
+  const recent = (await call(watcher, "crew_post", { body: "Cut another", needs: ["release"] })).job_id;
   const legacy = (await call(watcher, "crew_post", { body: "Old expired job", needs: ["release"] })).job_id;
   const done = (await call(watcher, "crew_post", { body: "Review PR 1", needs: ["review"], to: reviewerId })).job_id;
   await call(reviewer, "crew_claim", { job_id: done });
@@ -30,17 +30,13 @@ export async function run(): Promise<void> {
   await call(reviewer, "crew_poll");
 
   editState(crewDir, (state) => {
-    state.jobs[expired].expires_at = hoursAgo(3);
-    state.jobs[recent].expires_at = hoursAgo(3);
-    state.jobs[legacy].state = "expired";
+    for (const id of [expired, recent, legacy]) state.jobs[id].state = "expired";
+    state.jobs[expired].ended_at = hoursAgo(2);
+    state.jobs[recent].ended_at = hoursAgo(0.1);
     state.jobs[legacy].created_at = hoursAgo(30);
+    state.jobs[done].ended_at = hoursAgo(2);
     state.sessions[deadId].last_seen = hoursAgo(2);
     for (const m of state.messages) m.at = hoursAgo(2);
-  });
-  await call(watcher, "crew_poll");
-  editState(crewDir, (state) => {
-    state.jobs[expired].ended_at = hoursAgo(2);
-    state.jobs[done].ended_at = hoursAgo(2);
   });
 
   const board = (await call(watcher, "crew_poll", { board: true })).board.map((j: any) => j.id);

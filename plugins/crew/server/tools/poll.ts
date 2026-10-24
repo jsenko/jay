@@ -29,9 +29,9 @@ async function handler(args: Record<string, any>) {
     const session = requireOwnSession(state);
 
     const unread = unreadFor(state, session);
-    if (unread.length > 0) {
-      markRead(state, session, Math.max(...unread.map((m) => m.seq)));
-    }
+    // Everything up to the latest message is now consumed: what isn't in
+    // `unread` was never for this session, and must not hold the cursor back.
+    markRead(state, session, state.seq);
     pruneMessages(state);
 
     const held = jobsHeldBy(state, session.id);
