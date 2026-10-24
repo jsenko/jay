@@ -10,10 +10,12 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { Cache } from "./cache.js";
+import { checkStatus } from "./check-status.js";
 import { loadConfig, validateConfig } from "./config.js";
 import { truncateEvent } from "./format.js";
 import { API, fetchGitHubApi } from "./github.js";
 import { greetOnce } from "./hello.js";
+import { involvedPrs } from "./involved-prs.js";
 import { Poller } from "./poller.js";
 import { Backoff } from "./polling/backoff.js";
 
@@ -94,6 +96,30 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
+      name: "get_involved_prs",
+      description: "Lists the open PRs in the watched repositories that the user authored, is assigned, or is asked to review, read live from each repository rather than from search, whose index can lag. `failed` names repositories that could not be read.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {},
+      },
+    },
+    {
+      name: "get_check_status",
+      description: "Derives a PR's check_status (passing, failing, pending, needs-approval) from its head: the latest run of each check, skipped runs ignored, and workflow runs held for approval, which the status rollup leaves out.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          url: { type: "string", description: "The PR, e.g. https://github.com/owner/repo/pull/42" },
+          gates: {
+            type: "array",
+            items: { type: "string" },
+            description: "Check names that stay pending until run on demand; their failure reads as pending. A project rule names them.",
+          },
+        },
+        required: ["url"],
+      },
+    },
+    {
       name: "get_status",
       description: "Returns the health status of the GitHub events server: authenticated user, monitored repos, last successful poll times per source (repo_events, workflow_runs, notifications), and any recent errors. Use this to diagnose whether empty results mean 'no events' or 'polling is broken'.",
       inputSchema: {
@@ -161,6 +187,31 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
       return {
         content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
       };
+    }
+
+    case "get_involved_prs": {
+      await poller.ensureStarted();
+      const { user, repos } = poller.watched();
+      if (!user) {
+        return { content: [{ type: "text", text: "The authenticated user is unknown, so nothing can be matched to them" }], isError: true };
+      }
+      const found = await involvedPrs(repos, user, config.githubToken);
+      return { content: [{ type: "text", text: JSON.stringify(found, null, 2) }] };
+    }
+
+    case "get_check_status": {
+      const match = String(args.url ?? "").match(/github\.com\/([^/]+\/[^/]+)\/pull\/(\d+)/);
+      if (!match) {
+        return { content: [{ type: "text", text: "url must be a pull request, e.g. https://github.com/owner/repo/pull/42" }], isError: true };
+      }
+      const gates = Array.isArray(args.gates) ? args.gates.map(String) : [];
+      try {
+        const report = await checkStatus(match[1], Number(match[2]), gates, config.githubToken);
+        return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
+      } catch (err: any) {
+        console.error(`[github-events] check status failed: ${err.stack ?? err}`);
+        return { content: [{ type: "text", text: `Could not read the checks: ${err.message}` }], isError: true };
+      }
     }
 
     case "get_status": {

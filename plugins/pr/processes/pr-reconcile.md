@@ -11,16 +11,21 @@ showing a gap in `coverage.oldestBufferedEvent` mid-session
 
 ## 1. What GitHub says involves the user
 
-For each repository `get_status` lists as watched, with
-`GH_HOST=github.com`:
+`get_involved_prs` lists the open PRs the user authored, is assigned or
+is asked to review, read live from every watched repository. A
+repository in its `failed` is unknown this run: leave its tracked items
+as they are.
+
+Mentions and comments come only from search, for each watched entry
+(`owner/*` is `--owner <owner>`):
 
 ```bash
 gh search prs --state open --repo <owner/repo> --involves @me --json url,number,title
-gh search prs --state open --repo <owner/repo> --review-requested @me --json url,number,title
 ```
 
-`--involves` covers authored, assigned, mentioned and commented; review
-requests need the second search. An `owner/*` entry is `--owner <owner>`.
+The search index can lag, so an empty answer proves nothing. Prefix with
+`GH_HOST=github.com` only when `gh auth status` lists another host;
+without it, the allow rules for `gh` still match.
 
 ## 2. Compare with what is tracked
 
@@ -31,13 +36,17 @@ Open tracked items: `fyi_search({type: ["pr"], where: {lifecycle:
 |---|---|---|
 | Open, and `~/.jay/plugins/pr/rules/pr-interest.md` says track | Untracked | Triage, per `~/.jay/plugins/pr/processes/pr-events.md` |
 | Open | Tracked | Refresh, below |
-| Not in the searches | Tracked | `gh pr view <url>`: merged or closed → Close, per `~/.jay/plugins/pr/processes/pr-events.md`; still open → refresh |
+| In neither list | Tracked | `gh pr view <url>`: merged or closed → Close, per `~/.jay/plugins/pr/processes/pr-events.md`; still open → refresh |
 
 ## 3. Refresh a tracked PR
 
 ```bash
-gh pr view <url> --json headRefOid,state,labels,milestone,reviews,statusCheckRollup
+gh pr view <url> --json headRefOid,state,labels,milestone,reviews
 ```
+
+and `get_check_status({url, gates})`, with the gates
+`~/.jay/plugins/pr/rules/apicurio-prs.md` names, rather than reading the
+checks by hand.
 
 Then handle whatever moved as the event would have been handled, per
 `~/.jay/plugins/pr/processes/pr-events.md`:
@@ -47,7 +56,7 @@ Then handle whatever moved as the event would have been handled, per
 | Head differs from `auto_reviewed_commit`, and it was reviewed | Push |
 | A review by the user not in `manual_review` | Review |
 | Lifecycle labels differ from `lifecycle` | Labels |
-| Checks differ from `check_status` | CI |
+| `get_check_status` differs from `check_status` | CI |
 
 Give every attention item that lacks `who` one, read from its
 description — "Author move: rebase" is `author`, "Decision owed by Eric"

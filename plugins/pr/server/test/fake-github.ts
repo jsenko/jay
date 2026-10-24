@@ -2,7 +2,8 @@
  * A fake GitHub API, enough for the poller: the authenticated user, a
  * repository's events with ETags, empty workflow runs, and notifications
  * with their latest comments. Tests add events and notifications and
- * watch what reaches a session.
+ * watch what reaches a session. It also serves open pulls and a head's
+ * checks, for the tools that read them.
  */
 
 import { createServer, type Server } from "node:http";
@@ -27,6 +28,13 @@ export interface RawNotification {
   subject: { type: string; title: string; url: string; latest_comment_url?: string };
 }
 
+/** What a commit's checks look like: check runs, commit statuses, and runs held for approval. */
+export interface FakeChecks {
+  runs: { id: number; name: string; status: string; conclusion: string | null; started_at: string | null }[];
+  statuses?: { context: string; state: string }[];
+  held?: string[];
+}
+
 /** The running fake, and the events it serves. */
 export interface FakeGitHub {
   url: string;
@@ -36,6 +44,12 @@ export interface FakeGitHub {
   add(event: RawEvent): void;
   /** Adds a notification, or updates the one with its id, and the comment it points to. */
   notify(notification: RawNotification, comment: { body: string; login: string }): void;
+  /** Adds an open pull to a repository's list; `head` is its head commit. */
+  pull(repo: string, pull: Record<string, unknown> & { number: number; head?: string }): void;
+  /** Sets a commit's checks. */
+  checks(sha: string, checks: FakeChecks): void;
+  /** Makes a repository's pull list fail. */
+  breakRepo(repo: string): void;
   close(): Promise<void>;
 }
 
@@ -65,6 +79,9 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
   const notifications = new Map<string, RawNotification>();
   const comments = new Map<string, unknown>();
   const requests: string[] = [];
+  const pulls = new Map<string, Record<string, any>[]>();
+  const checks = new Map<string, FakeChecks>();
+  const broken = new Set<string>();
   const server: Server = createServer((req, res) => {
     const [path, query] = (req.url ?? "").split("?");
     requests.push(path);
@@ -79,7 +96,27 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
       if (req.headers["if-none-match"] === etag) return json(304, undefined, { etag });
       return json(200, events, { etag });
     }
-    if (path.endsWith("/actions/runs")) return json(200, { workflow_runs: [] });
+    const repoPulls = path.match(/^\/repos\/([^/]+\/[^/]+)\/pulls(?:\/(\d+))?$/);
+    if (repoPulls) {
+      const [, repo, number] = repoPulls;
+      if (broken.has(repo)) return json(500, { message: "broken" });
+      const list = pulls.get(repo) ?? [];
+      if (number) {
+        const found = list.find((p) => p.number === Number(number));
+        return found ? json(200, found) : json(404, { message: "Not Found" });
+      }
+      return json(200, new URLSearchParams(query).get("page") === "1" ? list : []);
+    }
+    const commit = path.match(/\/commits\/([^/]+)\/(check-runs|status)$/);
+    if (commit) {
+      const found = checks.get(commit[1]) ?? { runs: [] };
+      return commit[2] === "check-runs" ? json(200, { check_runs: found.runs }) : json(200, { statuses: found.statuses ?? [] });
+    }
+    if (path.endsWith("/actions/runs")) {
+      const sha = new URLSearchParams(query).get("head_sha");
+      const held = sha ? (checks.get(sha)?.held ?? []) : [];
+      return json(200, { workflow_runs: held.map((name) => ({ name, status: "action_required" })) });
+    }
     if (path === "/notifications") {
       // Like GitHub, `since` includes notifications updated at that instant.
       const since = new URLSearchParams(query).get("since") ?? "";
@@ -99,6 +136,12 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
       const url = notification.subject.latest_comment_url;
       if (url) comments.set(new URL(url).pathname, { body: comment.body, user: { login: comment.login }, html_url: url });
     },
+    pull: (repo, pull) => {
+      const { head, ...rest } = pull;
+      pulls.set(repo, [...(pulls.get(repo) ?? []), { html_url: `https://github.com/${repo}/pull/${pull.number}`, head: { sha: head ?? `sha-${pull.number}` }, ...rest }]);
+    },
+    checks: (sha, value) => checks.set(sha, value),
+    breakRepo: (repo) => broken.add(repo),
     close: () => new Promise((r) => server.close(() => r())),
   };
 }

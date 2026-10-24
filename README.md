@@ -20,12 +20,21 @@ Installing a plugin also installs what it needs. The dashboards of all
 installed plugins share one menu, so each one can open the others.
 All five work in Claude Code and in opencode.
 
-**Written for Apicurio first.** code and pr have parts specific to the
-Apicurio projects, where jay's first users work: code has rules that
-load only in Apicurio and Apitomy repositories, and pr watches those
-organisations by default and reviews by their conventions. The
-repositories pr watches are a setting; making its processes fit any
-project is planned ([pr](plugins/pr/README.md#adapting-it-to-another-project)).
+### Written for Apicurio first
+
+jay's first users work on the Apicurio projects, so parts of code and pr
+follow their conventions:
+
+| Part | What is Apicurio's | Elsewhere |
+|---|---|---|
+| code, `rules/apicurio.md` | The A rules | Loaded only in Apicurio and Apitomy repositories |
+| pr, watched repositories | `Apicurio/*`, `Apitomy/*` and `ApicurioTesting/*` by default | The `github.repos` setting |
+| pr, `rules/apicurio-prs.md` | Maintainers and reviewer assignment read from `.github/pr-lifecycle.yml`, maintainer-only labels, `lifecycle/*` labels driving PR state, and the `Verification Gate` check read as pending | Needs a version of the file for the project |
+| pr, `rules/pr-interest.md` | Tracking what is assigned to you, which assumes reviewers are assigned automatically | Needs changing for a project that doesn't |
+| pr, `server/filters.ts` | The project's bot account, ignored | Hard-coded |
+
+Making pr fit any project is planned
+([pr](plugins/pr/README.md#adapting-it-to-another-project)).
 
 ## Quickstart
 

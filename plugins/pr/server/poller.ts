@@ -39,6 +39,11 @@ export class Poller {
     this.onEvent = onEvent;
   }
 
+  /** Who the user is and what is watched, for scans beyond the event stream. */
+  watched(): { user: string; repos: string[] } {
+    return { user: this.authenticatedUser, repos: [...this.resolvedRepos] };
+  }
+
   /** Health and coverage, for `get_status`. */
   getStatus(): PollerStatus {
     return {
