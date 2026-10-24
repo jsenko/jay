@@ -99,15 +99,7 @@ puts it in `focus`, so no other work is routed to it while you do.
 ## Notifications
 
 Launch every session the same way, with the channels flag for both
-plugins:
-
-```bash
-claude --dangerously-load-development-channels plugin:crew@jay plugin:pr@jay
-```
-
-Claude Code asks you to confirm at each start. The setting that would
-allow it permanently is read only from managed settings, so the
-installer can't turn it on.
+plugins, as [Efficiency](../../README.md#efficiency) describes.
 
 Every session runs its own github-events server, but **only a session
 that asks for events polls GitHub**: the server starts on the first

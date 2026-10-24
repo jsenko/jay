@@ -50,7 +50,8 @@ keep the clone where it is, and `git pull` in it to update
 ([opencode](#opencode)).
 
 `./install.sh all` installs every plugin, and `./install.sh --help`
-lists the options.
+lists the options. If you install crew or pr, launch Claude Code with
+the channels flag ([Efficiency](#efficiency)).
 
 ## Usage
 
@@ -88,6 +89,41 @@ Each plugin's README lists what it adds, and [GUIDE.md](GUIDE.md) walks
 through a working day with all of them.
 
 ## Installing and managing plugins
+
+### Efficiency
+
+Sessions that coordinate spend tokens while they wait for work. Two
+things keep that low.
+
+**Launch with channels: strongly recommended** with crew or pr. Claude
+Code then wakes a session when something arrives, from the crew or from
+GitHub, so a waiting session costs nothing:
+
+```bash
+claude --dangerously-load-development-channels plugin:crew@jay plugin:pr@jay
+```
+
+Name only the installed plugins: `plugin:crew@jay` alone without pr.
+Claude Code asks you to confirm at each start. A setting can't replace
+the argument: the allowlist that would is read only from managed
+settings, which need root. An alias saves the typing:
+
+```bash
+alias claude-jay='claude --dangerously-load-development-channels plugin:crew@jay plugin:pr@jay'
+```
+
+**Without channels, polling adapts.** A session checks on a timer: ten
+minutes after anything happens, ten more after each check that finds
+nothing, up to an hour. opencode has no channels, so it always polls.
+The bounds are minutes in `~/.jay/config.json`:
+
+```json
+{ "polling": { "min": 10, "step": 10, "max": 60 } }
+```
+
+Only sessions that take work set a timer at all: a role with no
+capabilities, such as `general`, waits for you, and only the watcher
+polls GitHub.
 
 ### Permissions
 

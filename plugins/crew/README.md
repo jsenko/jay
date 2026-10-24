@@ -118,27 +118,20 @@ crew_resolve({ job_id: "job-1", outcome: "done", detail: "2 must-fix" })
 ```
 
 `routable: false` means no session can take the job now, so the poster
-knows at once. A job still unclaimed when it expires (after 4 hours by
-default), or handed back or abandoned three times, is
-reported to the poster and flagged on the dashboard.
+knows at once. The job then waits for one, for example while the only
+reviewer is in `focus`, rather than expiring: expiry (4 hours by
+default) counts only time when some session could have claimed it, and
+a job waits at most three days. A job that expires, or is handed back or
+abandoned three times, is reported to the poster and flagged on the
+dashboard, then cleared an hour later.
 
 ### Notifications
 
 By default a session checks for work on a timer: ten minutes after
 anything happens, ten more after each check that finds nothing, up to an
-hour. Claude Code can
-instead wake it when something arrives, through its channels feature,
-which a plugin cannot switch on by itself:
-
-```bash
-claude --dangerously-load-development-channels plugin:crew@jay
-```
-
-Claude Code asks you to confirm at each start. Several channels go in
-one argument: with [pr](../pr/README.md) installed too, use
-`--dangerously-load-development-channels plugin:crew@jay plugin:pr@jay`. Settings cannot replace the argument: the
-allowlist that would is read only from managed settings, which need
-root.
+hour. Launched with the channels flag, Claude Code instead wakes it when
+something arrives, which is the recommended setup: see
+[Efficiency](../../README.md#efficiency).
 
 Claude Code does not tell crew whether it delivers the pushes, so a
 session finds out by receiving one. Right after `crew_join`, crew pushes
