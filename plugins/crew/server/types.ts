@@ -83,6 +83,8 @@ export interface Job {
   expires_at: string;
   /** How long the job stays claimable before it expires, in minutes. */
   expiry_min?: number;
+  /** Set while no session can take the job, so the first sweep that finds one restarts its expiry. */
+  waiting?: boolean;
   /** When the job reached a final state; pruning counts from here. */
   ended_at?: string;
 }

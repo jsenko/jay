@@ -169,15 +169,22 @@ export function sweep(state: State, now = Date.now()): void {
 
 /**
  * Expires an open job only for time a session could have claimed it:
- * while none can, as when the only reviewer is in focus, the expiry is
- * pushed back, so the job waits rather than lapsing (SPEC.md §4).
+ * while none can, as when the only reviewer is in focus, the job waits
+ * rather than lapsing, and gets its whole expiry again from the first
+ * sweep that finds a session able to take it (SPEC.md §4). Sweeps run
+ * only on job calls, so the last one while it waited may be long past.
  */
 function sweepOpen(state: State, job: Job, now: number): void {
   const waitedMs = now - Date.parse(job.created_at);
+  const restart = () => (job.expires_at = minutesFrom(now, job.expiry_min ?? DEFAULT_EXPIRY_MIN));
   if (waitedMs > MAX_WAIT_MS) {
     expire(state, job, `expired after ${Math.round(waitedMs / 3_600_000)}h with no session able to take it`);
   } else if (eligibleSessions(state, job, now).length === 0) {
-    job.expires_at = minutesFrom(now, job.expiry_min ?? DEFAULT_EXPIRY_MIN);
+    job.waiting = true;
+    restart();
+  } else if (job.waiting) {
+    delete job.waiting;
+    restart();
   } else if (now > Date.parse(job.expires_at)) {
     expire(state, job, "expired unclaimed");
   }

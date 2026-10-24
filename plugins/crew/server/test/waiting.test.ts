@@ -36,8 +36,10 @@ export async function run(): Promise<void> {
   const quiet = await call(late, "crew_join", { purpose: "Starting later", capabilities: ["code"], force_new: true });
   check("and not once a session can take it", quiet.warnings === undefined, quiet);
 
+  // As if the last sweep while it waited were long past.
+  editState(crewDir, (state) => (state.jobs[waiting.job_id].expires_at = hoursAgo(1)));
   const claimed = await call(reviewer, "crew_claim");
-  check("the reviewer claims it once out of focus", claimed.claimed?.id === waiting.job_id, claimed);
+  check("the reviewer claims it once out of focus, its expiry started afresh", claimed.claimed?.id === waiting.job_id, claimed);
 
   const unclaimed = (await call(watcher, "crew_post", { body: "Review PR 2", needs: ["review"], expires_in: 0.005 })).job_id;
   await call(reviewer, "crew_state", { status: "busy" });

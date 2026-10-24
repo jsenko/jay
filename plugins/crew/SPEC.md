@@ -246,7 +246,7 @@ means no live session matches at all. Four mechanisms, escalating:
    knows at once and can tell the user rather than assuming delivery.
    The job then **waits**: expiry counts only time when some session
    could have claimed it, so a queue held up by a reviewer in `focus`
-   is intact when focus ends. A job waits at most three days from
+   is intact when focus ends, each job with its whole expiry ahead. A job waits at most three days from
    posting, so work for a session that never comes still reaches its
    poster. Re-posting a waiting job only duplicates it.
 2. **Re-evaluation** — when any session joins, changes status, or changes
