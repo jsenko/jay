@@ -37,11 +37,12 @@ function handler(args: Record<string, any>) {
   const items = all(archived);
   const limit = Number(args.notes) || DEFAULT_NOTES;
 
-  const tasks = search(items, { type: "task", where: { project: id }, scope: stored.scope, include_archived: archived }).filter(
+  // Tasks and notes belong to the project by id, whichever scope holds them.
+  const tasks = search(items, { type: "task", where: { project: id }, scope: "all", include_archived: archived }).filter(
     (s) => !CLOSED.includes(String(s.item.status ?? "open"))
   );
 
-  const notes = search(items, { type: "note", where: { project: id }, scope: stored.scope, include_archived: archived })
+  const notes = search(items, { type: "note", where: { project: id }, scope: "all", include_archived: archived })
     .sort((a, b) => String(b.item.created_at).localeCompare(String(a.item.created_at)))
     .slice(0, limit);
 

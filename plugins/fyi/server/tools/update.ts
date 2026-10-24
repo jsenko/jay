@@ -1,13 +1,16 @@
 /** `fyi_update` — change fields on an existing item. */
 
+import { requireScope } from "../config.js";
 import { ToolError } from "../errors.js";
+import { checkFolderMove, moveFolder, projectFolder } from "../folders.js";
 import { DERIVED_FIELDS, deriveFromKey, keyField, parseKey } from "../keys.js";
 import { applyListOps } from "../listops.js";
 import { stampCompletion } from "../completion.js";
 import { checkRefs } from "../refs.js";
 import { unionProperties, validate } from "../schema.js";
-import { get, write } from "../store.js";
+import { all, get, moveScope, write } from "../store.js";
 import { nowIso } from "../time.js";
+import type { Scope, StoredItem } from "../types.js";
 import { requireString } from "../validation.js";
 import type { Tool } from "./tool.js";
 
@@ -44,7 +47,7 @@ function keepIdentity(item: Record<string, any>, fields: Record<string, unknown>
  * previously run over the same file at once.
  */
 function handler(args: Record<string, any>) {
-  const { id: rawId, synced, add, remove, ...fields } = args;
+  const { id: rawId, synced, add, remove, scope: named, ...fields } = args;
   const id = requireString(rawId, "id");
 
   const stored = get(id);
@@ -53,8 +56,12 @@ function handler(args: Record<string, any>) {
   for (const key of Object.keys(fields)) {
     if (fields[key] === undefined) delete fields[key];
   }
+  const scope = named === undefined ? stored.scope : requireScope(named);
+  const moving = scope !== stored.scope;
+  if (moving) checkFolderMove(stored, scope);
+
   // Confirming an unchanged item is an update of its own: it stamps synced_at only.
-  const changes = Object.keys(fields).length > 0 || add !== undefined || remove !== undefined;
+  const changes = Object.keys(fields).length > 0 || add !== undefined || remove !== undefined || moving;
   if (!changes && synced !== true) throw new ToolError("no fields to update");
   if (fields.type !== undefined) throw new ToolError("type cannot be changed; use fyi_convert");
   for (const name of [...Object.keys(add ?? {}), ...Object.keys(remove ?? {})]) {
@@ -76,13 +83,31 @@ function handler(args: Record<string, any>) {
   // record look freshly confirmed.
   if (synced === true) updated.synced_at = now;
 
-  write(updated, stored.scope);
+  if (!moving) write(updated, stored.scope);
+  const moved = moving ? moveScope(updated, stored, scope) : undefined;
+  const folder = moved && (moveFolder(stored, scope) ?? projectFolder(moved));
+  const alsoMoved = moving ? moveProjectItems(stored, scope) : [];
 
   return {
     id,
-    updated: Object.keys(fields).sort(),
+    updated: [...Object.keys(fields), ...(moving ? ["scope"] : [])].sort(),
     ...(synced === true ? { synced_at: now } : {}),
+    ...(folder ? { folder } : {}),
+    ...(alsoMoved.length > 0 ? { also_moved: alsoMoved } : {}),
   };
+}
+
+/**
+ * Moves a project's tasks and notes along with it, those in the scope it
+ * left: someone moving a project means its work too. Ones the user had
+ * already put elsewhere stay there.
+ */
+function moveProjectItems(project: StoredItem, scope: Scope): string[] {
+  if (project.item.type !== "project") return [];
+  return all(true)
+    .filter((s) => s.scope === project.scope && s.item.project === project.item.id)
+    .map((s) => moveScope(s.item, s, scope).item.id)
+    .sort();
 }
 
 /** The list fields across all types, as `add` advertises them. */
@@ -96,11 +121,12 @@ export const updateTool: Tool = {
   definition: {
     name: "fyi_update",
     description:
-      "Change fields on an existing item. Only the fields given are touched. Set archived:true to archive an item — nothing is ever deleted.",
+      "Change fields on an existing item. Only the fields given are touched. Set archived:true to archive an item — nothing is ever deleted. Set scope to move it to another scope, keeping its id, links and project folder; a project's tasks and notes come with it.",
     inputSchema: {
       type: "object",
       properties: {
         id: { type: "string" },
+        scope: { type: "string", description: "Move the item to this scope." },
         synced: {
           type: "boolean",
           description:

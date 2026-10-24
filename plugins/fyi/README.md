@@ -155,6 +155,12 @@ another; searches also take a list, such as `["work", "personal"]`, or
 `"all"`. A scope that doesn't exist is refused, so a typo never starts a
 new one.
 
+To move an item, set its `scope` with `fyi_update`. It keeps its id, so
+links to it still work. A project brings its tasks and notes from the
+scope it leaves, and its folder, leaving a link at the old path so
+checkouts linked there keep working. A project's handoff finds its
+tasks and notes in any scope.
+
 A scope is separate from a `pr`'s `repo` field, which is its
 `Owner/Repo` on GitHub.
 

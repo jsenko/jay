@@ -213,5 +213,15 @@ export function rename(id: string, newId: string): StoredItem {
   return moved;
 }
 
+/**
+ * Moves an item to another scope, keeping its id: written there, then
+ * removed here. Links name items by id, so they still resolve.
+ */
+export function moveScope(item: Item, from: StoredItem, scope: Scope): StoredItem {
+  const moved = write(item, scope);
+  rmSync(from.path, { force: true });
+  return moved;
+}
+
 /** Where the store lives, for diagnostics. */
 export const root = FYI_DIR;

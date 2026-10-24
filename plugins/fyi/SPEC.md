@@ -182,7 +182,15 @@ but should be rare.
 `config.json`, read once at start. `fyi_search` and `fyi_today` look in the default
 unless asked otherwise; `scope: "personal"`, a list, or `"all"` widens.
 A scope that doesn't exist is refused, in captures and searches alike,
-so a typo is an error rather than a new, empty scope. A session
+so a typo is an error rather than a new, empty scope.
+
+**Moving between scopes** is `fyi_update` with `scope`. Ids are global,
+so the item keeps its id and every link to it. A project takes its tasks
+and notes from the scope it leaves, since moving a project means its
+work, and its folder, leaving a symlink at the old path: checkouts link
+to the folder by path, and fyi doesn't know where they are. A project's
+handoff searches every scope for its tasks and notes, which belong to it
+by id wherever they live. A session
 is never locked to one store — a work task that turns up a personal
 errand can capture it directly — but crossing over is opt-in per call
 rather than the default.
