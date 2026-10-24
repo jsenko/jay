@@ -53,6 +53,10 @@ export async function run(): Promise<void> {
 
   const back = await call(c, "fyi_update", { id: project.id, scope: "work" });
   check("and it can move back", back.folder === project.folder && !lstatSync(project.folder).isSymbolicLink() && readFileSync(join(project.folder, "PLAN.md"), "utf8") === "the plan", back);
+  const again = await call(c, "fyi_update", { id: project.id, scope: "side-project" });
+  check("after a second move, every earlier path still reaches it",
+    again.folder === join(store, "side-project", "projects", "garden-shed") &&
+      [project.folder, moved.folder].every((p) => readFileSync(join(p, "PLAN.md"), "utf8") === "the plan"), again);
   check("moving to a scope that doesn't exist is refused", (await call(c, "fyi_update", { id: project.id, scope: "wrok" })).error?.includes('no scope "wrok"'));
   await c.close();
 

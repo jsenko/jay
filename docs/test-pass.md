@@ -53,7 +53,8 @@ Use a scratch configuration, so your own stays untouched:
       and stays silent when there is nothing, in both clients. `general`
       sets up no check until it takes capabilities
 - [ ] `/crew:stop` writes `current_state` when a project is in play,
-      saves a `session` note expiring in 7 days, releases held jobs, and
+      asks whether to save a `session` note, saves one expiring in 7
+      days on a yes and nothing on a no, releases held jobs, and
       leaves; `crew_who` from another session no longer lists it
 - [ ] `/crew:start` with the same role, in the same repository or
       another checkout of it, offers that session; picking it up checks

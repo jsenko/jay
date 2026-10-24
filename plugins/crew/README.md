@@ -45,7 +45,8 @@ there, and sessions poll instead of receiving pushes.
 what the role lists, and reports in a few lines. With no role it starts
 as `general` and names the others. `/crew:stop` saves where the session
 stopped (the project's current state, any decisions not yet recorded,
-and a session note), hands back work it holds, and leaves the crew.
+and, if you say yes, a session note), hands back work it holds, and
+leaves the crew.
 
 **End a session started with `/crew:start` with `/crew:stop`.** The
 session note is what lets a later `/crew:start` offer to continue: it

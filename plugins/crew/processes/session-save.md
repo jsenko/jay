@@ -9,8 +9,19 @@ the session, project or not.
 **Source:** `/crew:stop`, step 1 → this session
 **Processed by:** this session, once, after `current_state` is written
 
-Skip it when the session did nothing worth resuming: a question
-answered, a status checked.
+Never for an `unattended` role: pickup never offers its notes.
+
+Otherwise ask first, in one line, since writing the note costs a
+summary's worth of work the user may not want:
+
+```
+Save this session to pick up later? <yes or no>: <why, in a few words>
+```
+
+Suggest no when the project's `current_state` already says where it
+stopped, or when the session did nothing worth resuming: a question
+answered, a status checked. Suggest yes when half-done work lives only
+in this conversation. Write the note only on a yes.
 
 ## Write the note
 

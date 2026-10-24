@@ -46,8 +46,9 @@ Documents live in the project's folder: its `folder`, from `fyi_get` or
 Each checkout the project is worked in links to the folder with a
 symlink at `.projects/<name>`, where `<name>` is the folder's own name.
 Whenever tracking starts or a tracked project is picked up, create the
-link if it is missing, and add `.projects` to the repository's
-`.gitignore` if it isn't there. One folder serves every checkout of a
+link if it is missing, point it at `folder` if it points elsewhere (a
+move between scopes leaves a link forwarding from the old path), and add
+`.projects` to the repository's `.gitignore` if it isn't there. One folder serves every checkout of a
 project, and a checkout can link several projects.
 
 ## Documents

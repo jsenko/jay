@@ -22,8 +22,9 @@ Anything in progress that another session could not reconstruct:
   then return to the default branch.
 - **Uncommitted changes** — tell the user, do not act. Whether to commit
   or stash is theirs.
-- **The session itself** — a note a later `/crew:start` can offer to
-  pick up, per `~/.jay/plugins/crew/processes/session-save.md`.
+- **The session itself** — ask whether to save a note a later
+  `/crew:start` can offer to pick up, per
+  `~/.jay/plugins/crew/processes/session-save.md`.
 
 ## 2. Resolve or release claimed work
 

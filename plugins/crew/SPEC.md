@@ -373,7 +373,10 @@ and B calls `fyi_handoff`. Content lives in fyi, routing lives in crew,
 neither reimplements the other.
 
 **Session notes** cover what a project doesn't: where *this session*
-stopped, project or not. `/crew:stop` writes one, an fyi note tagged
+stopped, project or not. `/crew:stop` asks whether to write one, since
+a summary costs tokens and a project's `current_state` often says enough
+already; unattended roles never do, as nothing offers their notes. A note
+is an fyi note tagged
 `session` with a fixed header (role, directory, repositories, project,
 purpose) and a body written as a compaction summary would be. The next
 `/crew:start` lists the notes, offers at most three that match its role
