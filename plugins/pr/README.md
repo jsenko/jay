@@ -116,7 +116,8 @@ Coder and reviewer sessions never do, so their servers make no GitHub
 calls and push nothing, flag or not. `github_api` works everywhere.
 
 In the watcher, GitHub activity arrives as pushes. Without the flag it
-polls every ten minutes instead, which always works. It can't otherwise
+polls instead, which always works: every ten minutes after activity,
+and less often while nothing happens, up to an hour. It can't otherwise
 tell which it has, so after its first call the server pushes
 `{"github":"hello"}`: a session that receives it stops polling.
 
@@ -172,7 +173,7 @@ follow-up, waiting for users outside Apicurio.
 
 | Tool | Gives |
 |---|---|
-| `get_new_events` | Events not returned before, with bodies cut to 200 characters |
+| `get_new_events` | Events not returned before, with bodies cut to 200 characters, and when to poll next |
 | `get_event` | One event in full |
 | `github_api` | Any GitHub API URL, cached |
 | `get_status` | The user, repositories, last success per source and recent errors, to tell "nothing happened" from "polling is broken" |

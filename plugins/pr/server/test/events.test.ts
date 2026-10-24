@@ -33,10 +33,10 @@ export async function run(): Promise<void> {
   await settle(1500);
   check("nothing says hello before the session calls a tool", first.hellos === 0, first.hellos);
   await until(() => false, 1000);
-  const nothing = await call(first.client, "get_new_events");
+  const nothing = (await call(first.client, "get_new_events")).events;
   await firstRound(first.client);
   check("events already there when watching starts are not delivered",
-    first.pushes.length === 0 && nothing.length === 0 && (await call(first.client, "get_new_events")).length === 0, first.pushes);
+    first.pushes.length === 0 && nothing.length === 0 && (await call(first.client, "get_new_events")).events.length === 0, first.pushes);
 
   const long = comment("alice", "x".repeat(300));
   const ignored = comment("EricWittbot", "routine bot comment");
@@ -58,9 +58,11 @@ export async function run(): Promise<void> {
   const full = await call(first.client, "get_event", { event_id: long.id });
   check("get_event gives the whole body", full.body?.length === 300, full.body?.length);
 
-  const polled = (await call(first.client, "get_new_events")).map((e: any) => e.event_id);
+  const answer = await call(first.client, "get_new_events");
+  const polled = answer.events.map((e: any) => e.event_id);
   check("get_new_events returns what arrived", polled.includes(long.id) && polled.includes(mention.id), polled);
-  check("and returns it only once", (await call(first.client, "get_new_events")).length === 0);
+  check("and returns it only once", (await call(first.client, "get_new_events")).events.length === 0);
+  check("events reset the suggested interval", answer.next_poll_minutes === 10, answer.next_poll_minutes);
 
   await settle(500);
   check("the first tool call brings one hello, and later calls none", first.hellos === 1, first.hellos);

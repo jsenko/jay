@@ -33,7 +33,7 @@ reviews happen without the user and only decisions reach them.
    `{"github":"hello"}` if pushes reach this session. Begin every
    `activity` with them, as crew's `repos` is only this checkout.
 2. `~/.jay/plugins/pr/processes/pr-reconcile.md`, every time, before starting the loop
-3. Poll `get_new_events` every ~10 min on a timer, unless a github push
+3. Poll `get_new_events` on a timer, waiting the `next_poll_minutes` it returns, unless a github push
    (the hello, or an event) has arrived: then pushes reach this session,
    so cancel the timer. Crew follows `~/.jay/plugins/crew/rules/crew.md`.
 

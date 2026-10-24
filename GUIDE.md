@@ -19,7 +19,7 @@ The installer asks for fyi's default scope, and for your GitHub handle
 and the repositories to watch. Restart your client afterwards.
 
 Launch Claude Code with the channels flag, so the crew and GitHub can
-wake a session instead of it polling every ten minutes:
+wake a session instead of it polling on a timer:
 
 ```bash
 claude --dangerously-load-development-channels plugin:crew@jay plugin:pr@jay

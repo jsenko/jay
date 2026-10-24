@@ -260,13 +260,15 @@ check_manifests() {
 # ------------------------------------------------------------- shared links
 
 # What every plugin shares, as each plugin's path and the master it must link to.
-# LICENSE and hooks/ go into every plugin; the dashboard pieces into each that declares one.
+# LICENSE and hooks/ go into every plugin; the dashboard pieces into each that declares one;
+# server pieces into the servers that use them.
 SHARED_LINKS=(
     "LICENSE:LICENSE"
     "hooks:tools/plugin/hooks"
     "opencode:tools/plugin/opencode"
     "dashboard/shell:tools/plugin/dashboard/shell"
     "dashboard/run.sh:tools/plugin/dashboard/run.sh"
+    "server/polling:tools/plugin/polling"
 )
 
 # Each shared path must be a symlink resolving to its master in tools/plugin/, so
@@ -278,6 +280,8 @@ check_links() {
         for entry in "${SHARED_LINKS[@]}"; do
             path="${entry%%:*}" master="${entry#*:}"
             [[ "$path" == dashboard/* && ! -f "$REPO/plugins/$p/dashboard/dashboard.json" ]] && continue
+            # Server pieces are for the servers that use them, so only checked where present.
+            [[ "$path" == server/* && ! -e "$REPO/plugins/$p/$path" && ! -L "$REPO/plugins/$p/$path" ]] && continue
             if [[ ! -L "$REPO/plugins/$p/$path" ]]; then
                 err "plugins/$p/$path must be a symlink to $master (ln -s with a relative path)"
             elif [[ "$(realpath "$REPO/plugins/$p/$path")" != "$(realpath "$REPO/$master")" ]]; then

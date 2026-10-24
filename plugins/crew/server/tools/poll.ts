@@ -9,9 +9,13 @@ import {
   sweep,
 } from "../jobs.js";
 import { markRead, pruneMessages, unreadFor } from "../messages.js";
+import { Backoff } from "../polling/backoff.js";
 import { requireOwnSession } from "../sessions.js";
 import { mutate } from "../store.js";
 import type { Tool } from "./tool.js";
+
+/** This session's polling interval; one server serves one session. */
+const backoff = new Backoff();
 
 /**
  * The single delivery path for messages, whether the session was woken
@@ -21,6 +25,9 @@ import type { Tool } from "./tool.js";
  * almost no context — the point of replacing the old per-tick command
  * file. `board` asks instead for everything outstanding anywhere, which
  * is deliberately not part of the cheap path.
+ *
+ * `next_poll_minutes` is always there: the server can't tell whether
+ * pushes reach the session, and one woken by them ignores it.
  */
 async function handler(args: Record<string, any>) {
   return mutate((state) => {
@@ -38,7 +45,9 @@ async function handler(args: Record<string, any>) {
     const needsPoster = jobsNeedingPoster(state, session.id);
     const claimable = nextJobFor(state, session, now);
 
-    const result: Record<string, unknown> = {};
+    const result: Record<string, unknown> = {
+      next_poll_minutes: backoff.next(unread.length > 0 || claimable !== undefined || needsPoster.length > 0),
+    };
     if (unread.length > 0) {
       result.messages = unread.map((m) => ({ seq: m.seq, from: m.from, body: m.body, at: m.at }));
     }
@@ -67,7 +76,7 @@ export const pollTool: Tool = {
   definition: {
     name: "crew_poll",
     description:
-      "Check for messages and work waiting for this session. Returns an empty object when there is nothing. Call after a crew wake notification, or on a timer when notifications are unavailable. Pass board:true to see everything outstanding across all sessions, including work nothing can currently take.",
+      "Check for messages and work waiting for this session. Returns only next_poll_minutes when there is nothing. Call after a crew wake notification, or on a timer when notifications are unavailable, waiting next_poll_minutes before the next call: it grows while nothing happens. Pass board:true to see everything outstanding across all sessions, including work nothing can currently take.",
     inputSchema: {
       type: "object",
       properties: {

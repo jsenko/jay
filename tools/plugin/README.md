@@ -13,6 +13,7 @@ or points elsewhere.
 | `opencode/` | `plugins/<name>/opencode` | every plugin, with `opencode.mjs` beside it |
 | `dashboard/shell/` | `plugins/<name>/dashboard/shell` | plugins with `dashboard/dashboard.json` |
 | `dashboard/run.sh` | `plugins/<name>/dashboard/run.sh` | the same |
+| `polling/` | `plugins/<name>/server/polling` | servers whose sessions poll: crew and pr |
 
 For a new plugin, from its folder:
 
@@ -75,3 +76,11 @@ starts it in the background and prints its URL, and `run.sh stop` stops it
 by asking the server to exit (`POST /shutdown`), however it was started.
 `--open` opens a browser too. The menu starts other dashboards with
 `run.sh start`.
+
+## polling
+
+`backoff.ts` paces a session that polls on a timer: each answer suggests
+the next interval, from ten minutes after activity up to an hour while
+idle, bounded by the `polling` section of `~/.jay/config.json`. It
+imports only Node, since it resolves from where the link points, and its
+own `package.json` marks it as an ES module for the same reason.

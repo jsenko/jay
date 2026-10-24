@@ -137,6 +137,11 @@ receives it knows pushes reach it and stops polling. Without channels
 Claude Code drops the hello, and polling continues, which is always
 safe. crew does the same after `crew_join`.
 
+**Adaptive polling.** `get_new_events` returns `{events,
+next_poll_minutes}`: the interval grows while nothing arrives and resets
+when something does, as crew's does, from the same shared code
+(`tools/plugin/polling/`).
+
 **Truncation.** Pushes and `get_new_events` carry bodies cut to 200
 characters, because a session reads many events and acts on few;
 `get_event` returns one in full.

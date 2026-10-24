@@ -48,7 +48,8 @@ Use a scratch configuration, so your own stays untouched:
       `Notifications: channel` or `poll`
 - [ ] Launched with the channels flag, a session reports `channel`;
       without it, `poll`
-- [ ] In `poll` mode a role with capabilities checks every ten minutes,
+- [ ] In `poll` mode a role with capabilities checks at the interval
+      `crew_poll` suggests, 10 minutes growing to 60 while idle,
       and stays silent when there is nothing, in both clients. `general`
       sets up no check until it takes capabilities
 - [ ] `/crew:stop` writes `current_state` when a project is in play,

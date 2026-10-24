@@ -145,7 +145,7 @@ three, and the full-board view is a flag rather than an eleventh tool.
 | `crew_who` | `{}` | `{sessions[]}` — id, purpose, repos, status, capabilities, last-seen |
 | `crew_send` | `{to, body}` | `{seq, warning?}` |
 | `crew_post` | `{body, to?, needs?, repo?, repo_required?, priority?, prefer?, expires_in?, ref?}` | `{job_id, routable, eligible_sessions[]}` |
-| `crew_poll` | `{board?}` | `{}` when idle — see below |
+| `crew_poll` | `{board?}` | `{next_poll_minutes}` when idle — see below |
 | `crew_claim` | `{job_id?}` | The job, or `{claimed: null}` |
 | `crew_resolve` | `{job_id, outcome, detail?}` | `{ok}` — outcome `done` \| `failed` \| `released` |
 | `crew_extend` | `{job_id, minutes}` | `{lease_expires_at}` |
@@ -168,18 +168,28 @@ later. See §4.
 best-matching open job and returns its content in one call, instead of
 list-then-pick-then-claim.
 
-**`crew_poll` returns `{}` when there is nothing.** Populated:
+**`crew_poll` returns only `next_poll_minutes` when there is nothing.** Populated:
 
 ```json
 {
+  "next_poll_minutes": 10,
   "messages": [{"seq": 42, "from": "watch-gh", "body": "...", "at": "..."}],
-  "jobs_claimable": 2,
+  "claimable": {"id": "job-9", "body": "...", "priority": "normal"},
   "jobs_mine": [{"id": "job-7", "lease_expires_at": "...", "slow": false}],
-  "jobs_stuck": [{"id": "job-3", "attempts": 3, "body": "..."}]
+  "jobs_needing_attention": [{"id": "job-3", "state": "stuck", "attempts": 3, "body": "..."}]
 }
 ```
 
-`jobs_stuck` is reported to the job's *poster*, not to claimers.
+`jobs_needing_attention` (stuck or expired) is reported to the job's
+*poster*, not to claimers.
+
+**`next_poll_minutes`** paces a session polling on a timer: 10 after
+anything arrives (a message, a claimable job, one needing attention),
+10 more after each poll that finds nothing, up to 60. The bounds are the
+`polling` section of `~/.jay/config.json` (`min`, `step`, `max`). The
+server can't tell whether pushes reach the session, so it always
+answers; a session woken by pushes ignores it. github-events paces
+`get_new_events` the same way, from the same shared code.
 
 **`crew_poll({board: true})`** additionally returns every open, stuck and
 orphaned job regardless of whether this session matches — the deliberate

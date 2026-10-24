@@ -124,7 +124,9 @@ reported to the poster and flagged on the dashboard.
 
 ### Notifications
 
-By default a session checks for work every 10 minutes. Claude Code can
+By default a session checks for work on a timer: ten minutes after
+anything happens, ten more after each check that finds nothing, up to an
+hour. Claude Code can
 instead wake it when something arrives, through its channels feature,
 which a plugin cannot switch on by itself:
 

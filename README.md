@@ -170,7 +170,7 @@ What differs from Claude Code:
 | Commands | `/crew:start` | `/crew-start`: opencode doesn't group commands by plugin, so each is prefixed with its plugin's name |
 | Skills | `code:style` | `code-style`, for the same reason |
 | Tool names | `mcp__plugin_fyi_fyi__fyi_capture` | `fyi_fyi_capture`, as before jay |
-| Notifications | Pushed, with the channels flag | Polled every ten minutes: opencode has no channels |
+| Notifications | Pushed, with the channels flag | Polled every 10 to 60 minutes: opencode has no channels |
 | Instructions for every session | `~/.claude/CLAUDE.md` | `AGENTS.md` |
 
 jay's files are written once, with Claude Code's names. When opencode

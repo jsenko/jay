@@ -15,11 +15,15 @@ import { truncateEvent } from "./format.js";
 import { API, fetchGitHubApi } from "./github.js";
 import { greetOnce } from "./hello.js";
 import { Poller } from "./poller.js";
+import { Backoff } from "./polling/backoff.js";
 
 /** The plugin's version, so the server reports the release it ships in. */
 const { version } = JSON.parse(readFileSync(new URL("../.claude-plugin/plugin.json", import.meta.url), "utf8"));
 
 const cache = new Cache();
+
+/** The watching session's polling interval; one server serves one session. */
+const backoff = new Backoff();
 const config = loadConfig();
 
 try {
@@ -69,7 +73,7 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: "get_new_events",
-      description: "Returns GitHub events that have not been returned by a previous call to this tool. Events are truncated (use get_event for full content). Each event includes an event_id and meta fields. Returns an empty array if no new events are available.",
+      description: "Returns GitHub events that have not been returned by a previous call to this tool, as `events`. Events are truncated (use get_event for full content). Each event includes an event_id and meta fields. `next_poll_minutes` says when to call again when polling on a timer: it grows while nothing arrives.",
       inputSchema: {
         type: "object" as const,
         properties: {},
@@ -127,10 +131,13 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
     case "get_new_events": {
       await poller.ensureStarted();
       const newEvents = cache.consumeNewEvents();
-      const result = newEvents.map(({ id, event }) => ({
-        event_id: id,
-        event: truncateEvent(event),
-      }));
+      const result = {
+        events: newEvents.map(({ id, event }) => ({
+          event_id: id,
+          event: truncateEvent(event),
+        })),
+        next_poll_minutes: backoff.next(newEvents.length > 0),
+      };
       return {
         content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
       };

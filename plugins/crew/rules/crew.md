@@ -46,7 +46,7 @@ from routing, so leaving it set strands work.
 
 | Event | Action |
 |---|---|
-| `crew_join` reports `notifications: "poll"` | Check with `crew_poll` every ~10 minutes, on a timer |
+| `crew_join` reports `notifications: "poll"` | Check with `crew_poll` on a timer, waiting the `next_poll_minutes` each answer gives |
 | A crew push `{"crew":"hello"}` arrives | Pushes reach this session: cancel the timer. Nothing to read |
 | A crew push `{"crew":"wake"}` arrives | Something is waiting: `crew_poll`. Cancel the timer if one runs |
 

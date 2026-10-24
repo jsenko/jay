@@ -10,10 +10,11 @@ import { run as version } from "./version.test.js";
 import { run as liveness } from "./liveness.test.js";
 import { run as retention } from "./retention.test.js";
 import { run as waiting } from "./waiting.test.js";
+import { run as polling } from "./polling.test.js";
 
 console.log("crew tests");
 
-for (const suite of [registry, messaging, queue, locking, version, liveness, retention, waiting]) {
+for (const suite of [registry, messaging, queue, locking, version, liveness, retention, waiting, polling]) {
   await suite();
 }
 

@@ -2,6 +2,11 @@
 
 import { call, check, connect, section, settle, tempCrewDir, tempWorkDir, REPO_DIR } from "./harness.js";
 
+/** Whether a poll found nothing: only the suggested interval came back. */
+function isEmpty(poll: Record<string, unknown>): boolean {
+  return Object.keys(poll).every((key) => key === "next_poll_minutes");
+}
+
 /** Exercises delivery, idempotency, recipient validation and push signals. */
 export async function run(): Promise<void> {
   section("messaging");
@@ -25,7 +30,7 @@ export async function run(): Promise<void> {
   check("a joined session is greeted once", JSON.stringify(signals) === JSON.stringify([{ crew: "hello" }]), signals);
   signals.length = 0;
 
-  check("idle poll returns nothing", Object.keys(await call(b, "crew_poll")).length === 0);
+  check("idle poll returns nothing", isEmpty(await call(b, "crew_poll")));
 
   const sent = await call(a, "crew_send", { to: idB, body: "PR 8676 needs a look" });
   check("send returns a sequence number", typeof sent.seq === "number", sent);
@@ -41,15 +46,15 @@ export async function run(): Promise<void> {
   check("recipient receives the message", polled.messages?.[0]?.body === "PR 8676 needs a look", polled);
   check("message names its sender", polled.messages?.[0]?.from === idA, polled.messages?.[0]);
 
-  check("cursor prevents redelivery", Object.keys(await call(b, "crew_poll")).length === 0);
-  check("message not delivered to unrelated session", Object.keys(await call(c, "crew_poll")).length === 0);
+  check("cursor prevents redelivery", isEmpty(await call(b, "crew_poll")));
+  check("message not delivered to unrelated session", isEmpty(await call(c, "crew_poll")));
 
   await call(a, "crew_send", { to: "all", body: "switching to release branch" });
   const broadcastB = await call(b, "crew_poll");
   const broadcastC = await call(c, "crew_poll");
   check("broadcast reaches one recipient", broadcastB.messages?.[0]?.body === "switching to release branch", broadcastB);
   check("broadcast reaches the other", broadcastC.messages?.[0]?.body === "switching to release branch", broadcastC);
-  check("sender does not receive its own broadcast", Object.keys(await call(a, "crew_poll")).length === 0);
+  check("sender does not receive its own broadcast", isEmpty(await call(a, "crew_poll")));
 
   const unknown = await call(a, "crew_send", { to: "nobody-here", body: "hello" });
   check("unknown recipient is rejected", unknown.error?.includes("unknown session"), unknown);
@@ -64,7 +69,7 @@ export async function run(): Promise<void> {
   // inherit the backlog of conversations it was never part of.
   const d = await connect(tempWorkDir(), crewDir);
   await call(d, "crew_join", { purpose: "Docs work", capabilities: ["docs"] });
-  check("new session gets no backlog", Object.keys(await call(d, "crew_poll")).length === 0);
+  check("new session gets no backlog", isEmpty(await call(d, "crew_poll")));
 
   const notJoined = await connect(tempWorkDir(), crewDir);
   const orphan = await call(notJoined, "crew_poll");
