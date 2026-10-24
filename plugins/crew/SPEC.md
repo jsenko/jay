@@ -191,6 +191,12 @@ server can't tell whether pushes reach the session, so it always
 answers; a session woken by pushes ignores it. github-events paces
 `get_new_events` the same way, from the same shared code.
 
+A session polling both keeps **one timer**, set to the shorter answer,
+per `processes/polling.md`. The cost of polling is the wakeup, a turn,
+not the tool calls in it, so two timers would double it for nothing.
+Checking a source early is harmless: it finds nothing, and its interval
+grows.
+
 **`crew_poll({board: true})`** additionally returns every open, stuck and
 orphaned job regardless of whether this session matches — the deliberate
 "what is outstanding anywhere?" view. Kept behind a flag so the routine

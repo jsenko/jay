@@ -136,7 +136,8 @@ The bounds are minutes in `~/.jay/config.json`:
 
 Only sessions that take work set a timer at all: a role with no
 capabilities, such as `general`, waits for you, and only the watcher
-polls GitHub.
+polls GitHub. The watcher polls crew and GitHub on one timer, so each
+check costs one turn.
 
 ### Permissions
 

@@ -34,7 +34,7 @@ An unknown name is an error, listing what exists.
    profile's description) and the profile's `capabilities` and
    `fallback`. If the result says `notifications: "poll"` and the role
    advertises capabilities, check for work on a timer per
-   `~/.jay/plugins/crew/rules/crew.md`. If `"channel"`, wait to be woken.
+   `~/.jay/plugins/crew/processes/polling.md`. If `"channel"`, wait to be woken.
 3. **Load** everything under the profile's **Load at start**. Not its
    **Load when needed** files: those are for the moment they apply.
 4. **Follow the profile's Startup section.**

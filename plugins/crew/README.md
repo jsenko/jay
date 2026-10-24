@@ -142,6 +142,13 @@ hour. Launched with the channels flag, Claude Code instead wakes it when
 something arrives, which is the recommended setup: see
 [Efficiency](../../README.md#efficiency).
 
+A session that polls more than crew, such as the pr watcher, which also
+polls GitHub events, keeps one timer for both and wakes at the shorter
+of the two waits: each wakeup costs a turn, and the checks in it are
+cheap. opencode has no timer for the model of its own; jay's
+[timer](../timer/README.md) plugin gives it one, and a session without
+a timer says so when it starts.
+
 Claude Code does not tell crew whether it delivers the pushes, so a
 session finds out by receiving one. Right after `crew_join`, crew pushes
 `{"crew":"hello"}`. A session starts polling on a timer as usual, and

@@ -54,6 +54,9 @@ Use a scratch configuration, so your own stays untouched:
       `crew_poll` suggests, 10 minutes growing to 60 while idle,
       and stays silent when there is nothing, in both clients. `general`
       sets up no check until it takes capabilities
+- [ ] In opencode with timer, the poll arrives as `[timer poll] …` while
+      opencode is idle; without timer, the ready report says
+      `poll, but no timer` and names the plugin
 - [ ] In opencode, "check back in a minute" sets a timer; one that falls
       due while a long command runs waits until the turn ends, then
       arrives as its own turn; `timer_list` shows it until then
@@ -98,7 +101,7 @@ Use a scratch configuration, so your own stays untouched:
 
 - [ ] The watcher, with the channels flag, gets `{"github":"hello"}` and
       receives events without polling; without it, polls
-      `get_new_events` as well as crew
+      `get_new_events` and crew on one timer, waking at the shorter wait
 - [ ] In `crew_who`, the watcher's activity starts with the repositories
       it watches, and a reviewer elsewhere doesn't conclude from `repos`
       that its work won't arrive

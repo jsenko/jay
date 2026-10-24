@@ -46,13 +46,11 @@ from routing, so leaving it set strands work.
 
 | Event | Action |
 |---|---|
-| `crew_join` reports `notifications: "poll"` | Check with `crew_poll` on a timer, waiting the `next_poll_minutes` each answer gives |
-| A crew push `{"crew":"hello"}` arrives | Pushes reach this session: cancel the timer. Nothing to read |
-| A crew push `{"crew":"wake"}` arrives | Something is waiting: `crew_poll`. Cancel the timer if one runs |
+| `crew_join` reports `notifications: "poll"` | With capabilities, poll per `~/.jay/plugins/crew/processes/polling.md` |
+| A crew push `{"crew":"hello"}` arrives | Pushes reach this session: stop polling crew. Nothing to read |
+| A crew push `{"crew":"wake"}` arrives | Something is waiting: `crew_poll` |
 
-Shorter intervals cost tokens for no gain. No capabilities, no timer —
-nothing is routed there; start one on taking capabilities with
-`crew_state`, unless a push has arrived.
+No capabilities, no polling: nothing is routed there.
 
 ## Leaving
 
