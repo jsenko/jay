@@ -72,6 +72,13 @@ notes() {
         "$previous..HEAD" -- "plugins/$name" tools/plugin
 }
 
+# The milestone named after a release, as "<number> <url>", or nothing: its
+# issues are what the release ships, so the notes link it and releasing closes it.
+milestone() {
+    gh api "repos/$1/milestones?state=all&per_page=100" \
+        --jq ".[] | select(.title == \"$2\") | \"\(.number) \(.html_url)\"" 2>/dev/null || true
+}
+
 parse_args "$@"
 [[ -z "$(git -C "$REPO" status --porcelain)" ]] || die "the working tree has changes; commit or stash them first"
 # Until the bump is committed, any exit puts the manifests back as they were.
@@ -104,10 +111,15 @@ if [[ -n "$(git -C "$REPO" status --porcelain)" ]]; then
     trap - EXIT
     git -C "$REPO" push -q origin HEAD:main
 fi
+repo="${GITHUB_REPOSITORY:-jsenko/jay}"
 for entry in "${RELEASES[@]}"; do
     name="${entry%%=*}" version="${entry#*=}"
     body="$(notes "$name")"
+    body="${body:-No changes inside the plugin since its previous release.}"
+    read -r number url <<<"$(milestone "$repo" "$name $version")"
+    [[ -z "$url" ]] || body="Issues: $url"$'\n\n'"$body"
     (cd "$REPO" && claude plugin tag "plugins/$name" --push -m "$name %s")
-    gh release create "$name--v$version" --repo "${GITHUB_REPOSITORY:-jsenko/jay}" --verify-tag \
-        --title "$name $version" --notes "${body:-No changes inside the plugin since its previous release.}"
+    gh release create "$name--v$version" --repo "$repo" --verify-tag \
+        --title "$name $version" --notes "$body"
+    [[ -z "$number" ]] || gh api -X PATCH "repos/$repo/milestones/$number" -f state=closed >/dev/null
 done

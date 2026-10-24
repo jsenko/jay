@@ -164,6 +164,13 @@ plugin to release and the rest left empty. It runs
 4. tags each plugin `<plugin>--v<version>`, the tags Claude Code resolves dependency ranges against
 5. creates a GitHub release listing the plugin's commits since its previous tag
 
+Each plugin release has a milestone named after it, such as `crew 1.2.0`,
+holding the issues it ships, so a user can see what changed in that
+version. An issue changing two plugins goes in the milestone of the one
+it mostly changes, and the other milestone's description names it. The
+release links its milestone in the notes and closes it. A batch of work
+across plugins is an epic, not a milestone.
+
 `tools/release/release.sh --dry-run fyi=1.3.0` shows the bump and the notes,
 then undoes the bump. A version must come after the current one; the
 current one is accepted while it has no tag, which is how a plugin is
