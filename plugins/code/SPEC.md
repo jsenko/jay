@@ -83,6 +83,10 @@ where every one of these went wrong:
 - **The same ID used for two items,** because the list grew past the
   point where anyone read it end to end.
 
+Without milestone epics nothing says what ships when, which is what
+others read; without an area epic the long-term shape is argued again
+each release.
+
 The drift is never a decision. The tracking file is what is in front of
 you while working, so it gets updated and the epic does not. Hence a
 fixed direction of reference (files cite issues, never the reverse) and
@@ -101,6 +105,19 @@ named moments to sync, rather than judgement.
 | The next milestone's epic as a parking place for cut work | Deferred, with reasons; the work stays in the area epic |
 | Issues filed for work already merged | Issues are for work not yet done |
 | A milestone epic padded with finished work | It lists what must happen to ship; release notes list contents |
+| An evaluation issue left open after the decision, its proposal text stale | Rescoped in place into an adoption epic |
+| An adoption tracked by counts in the body | The target state, stated so it can be checked |
+
+**Adoption epics** are a third kind, for moving existing code to a
+decided target state, which ships nothing a user sees and has an end.
+Neither existing kind fitted. Two efforts in Apicurio Registry showed
+the shape: moving operator tests onto a retrying Kubernetes helper
+(Apicurio/apicurio-registry#9701), which began as an evaluation and was
+rescoped in place once the answer was yes; and value types for domain
+concepts (#7815), large enough to be organised by area. Both needed a
+checkable target state, decisions recorded once, ordered items with the
+finished ones kept in place, and a written convention at the end, since
+the code otherwise drifts back.
 
 **Sub-issues and references.** Sub-issues are a real parent and child in
 GitHub: progress rolls up, and the link is queryable. A task list

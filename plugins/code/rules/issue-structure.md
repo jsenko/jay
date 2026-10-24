@@ -12,9 +12,9 @@ filing them is `~/.jay/plugins/code/processes/issue-planning.md`.
 | **Milestone epic** | "What ships in 3.4?" | One release | The release ships |
 | **Work issue** | "What is this PR?" | Days | The PR merges |
 
-All three, always. Without milestone epics nothing says what ships when,
-which is what others read. Without an area epic the long-term shape is
-argued again each release.
+All three for a feature shipping across releases. Moving existing code
+to a decided target state is an adoption epic instead:
+`~/.jay/plugins/code/rules/adoption-epic.md`.
 
 ## Area epic
 

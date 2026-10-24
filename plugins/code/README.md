@@ -56,7 +56,10 @@ files (`DESIGN.md`, `TASKS.md`, and for phased work `PLAN.md` and
 Decisions are fyi notes against the project, which is what lets the next
 session pick the work up from any directory. When a plan settles, the
 session offers to turn it into GitHub issues, shaped in three layers:
-area epic, milestone epic and work issues.
+area epic, milestone epic and work issues. Work that moves existing code
+to a decided target state, such as adopting a helper across a test
+suite, gets an adoption epic instead: the target state, the decisions,
+and ordered items ending in a written convention.
 
 ## Rules
 

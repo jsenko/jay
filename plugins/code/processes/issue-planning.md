@@ -8,7 +8,8 @@ large epic, following `~/.jay/plugins/code/rules/issue-structure.md`.
 From `~/.jay/plugins/code/processes/issue-sync.md`, once the user agrees
 to turn a plan into issues; or when the user asks to restructure an epic.
 Issues are public commitments in the user's name: show what will be
-filed, and file nothing they haven't agreed to.
+filed, and file nothing they haven't agreed to. An adoption epic is
+`~/.jay/plugins/code/processes/adoption-planning.md` instead.
 
 ## Filing for a plan
 
