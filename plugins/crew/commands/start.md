@@ -53,6 +53,9 @@ An unknown name is an error, listing what exists.
 Keep it short. A session that opens with a wall of text has spent the
 user's attention before doing anything.
 
+6. **Offer an earlier session** to pick up, per
+   `~/.jay/plugins/crew/processes/session-pickup.md`.
+
 # Behaviour for the rest of the session
 
 The profile's **Work** and **Behaviour** sections apply until the

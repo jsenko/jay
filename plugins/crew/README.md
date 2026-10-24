@@ -44,8 +44,16 @@ there, and sessions poll instead of receiving pushes.
 `/crew:start <role> [purpose]` reads the role, joins the crew, loads
 what the role lists, and reports in a few lines. With no role it starts
 as `general` and names the others. `/crew:stop` saves where the session
-stopped (the project's current state, and any decisions not yet
-recorded), hands back work it holds, and leaves the crew.
+stopped (the project's current state, any decisions not yet recorded,
+and a session note), hands back work it holds, and leaves the crew.
+
+**End a session started with `/crew:start` with `/crew:stop`.** The
+session note is what lets a later `/crew:start` offer to continue: it
+lists up to three earlier sessions matching its role and its directory,
+repository or purpose, and picks one up if you say so. Notes expire
+after 7 days. A session that just exits still leaves the crew and hands
+back its work, but saves nothing; `claude --resume` reopens its
+conversation instead.
 
 A role is a Markdown file:
 
@@ -182,6 +190,13 @@ deleting it loses only what is in flight.
 | Variable | Default | Purpose |
 |---|---|---|
 | `CREW_DIR` | `~/.jay/crew` | Where the state lives |
+
+In `~/.jay/config.json`:
+
+| Setting | Default | Purpose |
+|---|---|---|
+| `sessions.keep_days` | `7` | How long a session note is offered for pickup |
+| `polling.min`, `.step`, `.max` | `10`, `10`, `60` | Minutes between checks without channels ([Efficiency](../../README.md#efficiency)) |
 
 ## Developing
 

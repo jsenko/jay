@@ -372,11 +372,28 @@ Crew's only role is to carry the pointer: session A sends
 and B calls `fyi_handoff`. Content lives in fyi, routing lives in crew,
 neither reimplements the other.
 
-Ad-hoc work with no project has no handoff. That is a deliberate forcing
-function — if work is worth resuming later, it is worth one
-`fyi_capture({type: "project"})` now. It is only a fair trade if creating
-a project is nearly free — a project needs only a title and a
-description.
+**Session notes** cover what a project doesn't: where *this session*
+stopped, project or not. `/crew:stop` writes one, an fyi note tagged
+`session` with a fixed header (role, directory, repositories, project,
+purpose) and a body written as a compaction summary would be. The next
+`/crew:start` lists the notes, offers at most three that match its role
+and its directory or purpose, and a session that picks one up archives
+it, so it is offered once. Matching is on the repository rather than the
+path, since a watcher may run from anywhere and a repository may have
+several checkouts.
+
+They expire, after 7 days unless `sessions.keep_days` in
+`~/.jay/config.json` says otherwise, through fyi's `archive_after_days`
+on a note: a stopped session is worth resuming for days, not months, and
+a project is where longer-lived work belongs. They leave `project`
+unset, so they don't enter its decision log, and link to it instead.
+
+An earlier version left ad-hoc work with no handoff at all, as a forcing
+function towards creating a project. In practice sessions were stopped
+mid-thought with nothing to resume from, which a short-lived note fixes
+without asking for a project. Claude Code has no exit hook that can ask
+the user anything, so a session that ends without `/crew:stop` writes no
+note; `claude --resume` still reopens its conversation.
 
 ---
 

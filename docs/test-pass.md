@@ -53,8 +53,14 @@ Use a scratch configuration, so your own stays untouched:
       and stays silent when there is nothing, in both clients. `general`
       sets up no check until it takes capabilities
 - [ ] `/crew:stop` writes `current_state` when a project is in play,
-      releases held jobs, and leaves; `crew_who` from another session no
-      longer lists it
+      saves a `session` note expiring in 7 days, releases held jobs, and
+      leaves; `crew_who` from another session no longer lists it
+- [ ] `/crew:start` with the same role, in the same repository or
+      another checkout of it, offers that session; picking it up checks
+      the branch first and archives the note. An unattended role offers
+      nothing
+- [ ] A session left quiet on channels for over an hour is still offered
+      a job and woken for it
 - [ ] With hooks disabled, `/crew:start` says `~/.jay/plugins/` is
       missing and stops
 
@@ -136,6 +142,12 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] A "remind me" with no date is challenged or becomes a note, never
       a task with an invented date
 - [ ] "…, personal" goes to the personal scope
+- [ ] "Create a scope for my side project" creates it; capturing into it
+      and searching it, alone or with `work`, works; a misspelt scope is
+      refused
+- [ ] "Move the <name> project to personal" moves it with its tasks,
+      notes and folder; its checkout's `.projects` link still opens the
+      folder
 - [ ] "What needs me today?" returns due, upcoming, blocked, PRs and
       projects in one answer
 - [ ] A note with `archive_after_days: 1` is archived the day after its
@@ -160,6 +172,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] A hand edit to a task file shows in the next tool call
 - [ ] crew's Sessions view flags a stale session; Jobs flags one past its
       lease
+- [ ] fyi's scope selector shows one scope or all, survives a reload, and
+      items outside the default scope carry a scope chip
 
 ## Several sessions
 
@@ -168,7 +182,9 @@ Use a scratch configuration, so your own stays untouched:
       meanwhile goes elsewhere or waits
 - [ ] "Start taking review work too" changes capabilities without a
       restart
-- [ ] Posting a job no session can take reports it at once
+- [ ] Posting a job no session can take reports it at once; it waits
+      rather than expiring, and the next `/crew:start` warns about it in
+      one line
 - [ ] A Claude Code watcher and an opencode reviewer see each other and
       pass a job
 - [ ] `/crew:retry-smaller` (`/crew-retry-smaller` in opencode), after a

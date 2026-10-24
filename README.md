@@ -80,7 +80,8 @@ Talk to a session as usual; the plugins give it tools and habits.
 - **`/crew:start coder`** starts a session as the coder role: it joins
   the crew, reads what the role lists, and says what it found. Other
   sessions see what it is doing, and work it can take is routed to it.
-  `/crew:stop` saves where it stopped before it leaves.
+  `/crew:stop` saves where it stopped before it leaves, and the next
+  `/crew:start` offers to pick it up.
 - **`/status:brief`** writes a few bullets on what you did since your
   last brief, ready to paste into your team's channel, and asks first
   about anything personal or not yet public. **`/status:weekly`** writes

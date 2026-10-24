@@ -1,0 +1,49 @@
+# Session save
+
+Saving where a session stopped, so a later `/crew:start` can offer to
+pick it up. A project's `current_state` covers project work; this covers
+the session, project or not.
+
+## Start
+
+**Source:** `/crew:stop`, step 1 → this session
+**Processed by:** this session, once, after `current_state` is written
+
+Skip it when the session did nothing worth resuming: a question
+answered, a status checked.
+
+## Write the note
+
+`fyi_capture` a note:
+
+| Field | Value |
+|---|---|
+| `title` | `Session: <role> in <directory name> — <purpose>` |
+| `tags` | `session` and the role's name |
+| `archive_after_days` | `sessions.keep_days` in `~/.jay/config.json`, else 7 |
+| `links` | `relates-to` the project, when one is in play |
+| `paths` | The directory, and any files central to the work |
+
+Leave `project` unset: notes with a project are its decision log.
+
+`content`, written as if for a compaction summary, for a session that
+has none of this context:
+
+```markdown
+role: <role>
+directory: <absolute path>
+repos: <Owner/Repo, comma-separated, or none>
+project: <project id, or none>
+purpose: <the purpose the session joined with>
+
+## Where it stopped
+<What was done, what is half done, the branch and uncommitted state.>
+
+## Next
+<The next steps, in order.>
+
+## Open
+<Questions for the user, decisions pending, anything promised.>
+```
+
+Say in the stop report that it was saved, and for how long.

@@ -84,7 +84,8 @@ Along the way, say what is worth keeping:
 
 When you stop, `/crew:stop` saves where the work stands. Tomorrow, from
 this or any other directory, **"pick up the storage project"** brings it
-back ([crew](plugins/crew/README.md#roles)).
+back, and `/crew:start coder` in the same repository offers to continue
+the session itself ([crew](plugins/crew/README.md#roles)).
 
 ## Reviewing
 
