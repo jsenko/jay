@@ -12,8 +12,13 @@ function row(key, inner, { selected, tone = "" }) {
   return `<div class="row ${tone}${selected === key ? " selected" : ""}" role="button" tabindex="0" data-select="${esc(key)}">${inner}</div>`;
 }
 
+/** The item's scope, when it isn't the default one; with every scope shown, that is what tells them apart. */
+function scopeChip(item, defaultScope) {
+  return item.scope && item.scope !== defaultScope ? chip(item.scope, "info") : "";
+}
+
 /** A task: when, how urgent, and the two quick actions. */
-function taskRow(task, selected) {
+function taskRow(task, selected, defaultScope) {
   const late = task.overdue_days > 0;
   const when = late ? chip(`${task.overdue_days}d overdue`, "warn") : chip(task.overdue_days === 0 ? "today" : task.next);
   const chips = [
@@ -22,7 +27,7 @@ function taskRow(task, selected) {
     task.priority && task.priority !== "medium" ? chip(task.priority, task.priority === "critical" || task.priority === "high" ? "bad" : "") : "",
     task.status === "blocked" ? chip("blocked", "bad") : "",
     task.project ? chip(task.project.replace(/^project-/, "")) : "",
-    task.scope === "personal" ? chip("personal", "info") : "",
+    scopeChip(task, defaultScope),
   ].join("");
 
   return row(
@@ -45,8 +50,8 @@ export function today(state, selected) {
   const { due, upcoming } = state.tasks;
   if (!due.length && !upcoming.length) return `<div class="empty">Nothing due, and nothing in the next fortnight.</div>`;
   return [
-    due.length ? `<h2>Due (${due.length})</h2>${due.map((t) => taskRow(t, selected)).join("")}` : "",
-    upcoming.length ? `<h2>Next 14 days (${upcoming.length})</h2>${upcoming.map((t) => taskRow(t, selected)).join("")}` : "",
+    due.length ? `<h2>Due (${due.length})</h2>${due.map((t) => taskRow(t, selected, state.default_scope)).join("")}` : "",
+    upcoming.length ? `<h2>Next 14 days (${upcoming.length})</h2>${upcoming.map((t) => taskRow(t, selected, state.default_scope)).join("")}` : "",
   ].join("");
 }
 
@@ -67,14 +72,14 @@ function why(items) {
 }
 
 /** A PR: what it is, where it stands, and why it wants anyone. */
-function prRow(pr, selected) {
+function prRow(pr, selected, defaultScope) {
   return row(
     `pr:${pr.id}`,
     `<div class="line">
        <span class="title">${esc(pr.title)}</span>
        <span class="ref">#${esc(pr.number)}</span>
      </div>
-     <div class="chips">${prChips(pr)}</div>
+     <div class="chips">${prChips(pr)}${scopeChip(pr, defaultScope)}</div>
      ${why(pr.attention_items)}`,
     { selected, tone: pr.attention ? "attention" : "" }
   );
@@ -86,17 +91,18 @@ export function prs(state, selected) {
   const wants = state.prs.filter((p) => p.attention);
   const rest = state.prs.filter((p) => !p.attention);
   return [
-    wants.length ? `<h2>Needs you (${wants.length})</h2>${wants.map((p) => prRow(p, selected)).join("")}` : "",
-    rest.length ? `<h2>Waiting on others (${rest.length})</h2>${rest.map((p) => prRow(p, selected)).join("")}` : "",
+    wants.length ? `<h2>Needs you (${wants.length})</h2>${wants.map((p) => prRow(p, selected, state.default_scope)).join("")}` : "",
+    rest.length ? `<h2>Waiting on others (${rest.length})</h2>${rest.map((p) => prRow(p, selected, state.default_scope)).join("")}` : "",
   ].join("");
 }
 
 /** A project: where it stopped, and how long ago. */
-function projectRow(p, selected) {
+function projectRow(p, selected, defaultScope) {
   const age = p.current_state_age;
   const chips = [
     age !== null ? chip(`state ${age}d old`, age > 30 ? "warn" : "") : chip("no saved state", "warn"),
     p.issues?.length ? chip(`${p.issues.length} issue${p.issues.length > 1 ? "s" : ""}`, "info") : "",
+    scopeChip(p, defaultScope),
   ].join("");
   const first = String(p.current_state ?? "").split("\n").find((l) => l.trim()) ?? "";
   return row(
@@ -114,7 +120,7 @@ export function projects(state, selected) {
   const paused = state.projects.filter((p) => p.status === "paused");
   if (!active.length && !paused.length) return `<div class="empty">No active or paused projects.</div>`;
   return [
-    active.length ? `<h2>Active (${active.length})</h2>${active.map((p) => projectRow(p, selected)).join("")}` : "",
-    paused.length ? `<h2>Paused (${paused.length})</h2>${paused.map((p) => projectRow(p, selected)).join("")}` : "",
+    active.length ? `<h2>Active (${active.length})</h2>${active.map((p) => projectRow(p, selected, state.default_scope)).join("")}` : "",
+    paused.length ? `<h2>Paused (${paused.length})</h2>${paused.map((p) => projectRow(p, selected, state.default_scope)).join("")}` : "",
   ].join("");
 }

@@ -7,12 +7,16 @@
 import { complete, snooze } from "./actions.js";
 import { badges } from "./badges.js";
 import { snapshot } from "./data.js";
+import { knownScopes } from "../server/config.js";
 import { serve } from "./shell/server.js";
-import type { Scope } from "../server/types.js";
 
 await serve({
   dir: import.meta.dirname,
-  state: (params) => snapshot((params.get("scope") as Scope | "all" | null) ?? "all"),
+  // A scope that has gone, remembered by a browser, shows every scope rather than failing.
+  state: (params) => {
+    const scope = params.get("scope");
+    return snapshot(scope !== null && knownScopes().includes(scope) ? scope : "all");
+  },
   badges,
   actions: {
     "/api/complete": ({ id }) => complete(String(id)),

@@ -12,5 +12,13 @@ export const actions = [
   { selector: "[data-snooze]", request: (el) => ["/api/snooze", { id: el.dataset.snooze, days: Number(el.dataset.days) }] },
 ];
 
+/** Every scope, or one: the list's header offers the store's scopes. */
+export const filter = {
+  param: "scope",
+  label: "Scope",
+  fallback: "all",
+  options: (state) => [{ value: "all", label: "All scopes" }, ...state.scopes.map((s) => ({ value: s, label: s }))],
+};
+
 /** Today's date, under the menu. */
 export const footer = (state) => state.date;

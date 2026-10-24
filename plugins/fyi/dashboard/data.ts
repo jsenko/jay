@@ -7,6 +7,7 @@
  * copy of the parsing.
  */
 
+import { DEFAULT_SCOPE, knownScopes } from "../server/config.js";
 import { search } from "../server/query.js";
 import { all } from "../server/store.js";
 import { daysFrom, today } from "../server/time.js";
@@ -88,6 +89,8 @@ export function snapshot(scope: Scope | "all" = "all") {
 
   return {
     date: now,
+    scopes: knownScopes(),
+    default_scope: DEFAULT_SCOPE,
     tasks: { due: due.map(taskView), upcoming: upcoming.map(taskView) },
     prs,
     projects,

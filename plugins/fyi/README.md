@@ -76,6 +76,10 @@ and its attention items by whose move they are, yours first. Tasks can
 be marked done or snoozed by a day or a week; everything else is
 read-only. The page refreshes every 30 seconds.
 
+The scope selector beside the heading shows every scope or one, and the
+browser remembers the choice. An item outside the default scope carries
+its scope as a chip.
+
 The menu also lists the views of other installed plugins that have a
 dashboard; choosing one opens that plugin's dashboard, starting it if
 needed. The counts beside views are only what wants attention.

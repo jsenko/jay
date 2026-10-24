@@ -8,6 +8,8 @@
  *   renderDetail  (found) => { label, html }
  *   actions       optional [{ selector, request: (element) => [path, body] }]
  *   footer        optional (state) => text under the menu
+ *   filter        optional { param, label, fallback, options: (state) => [{ value, label }] },
+ *                 a select in the list's header, sent to /api/state as ?<param>=<value>
  *
  * Refreshes every 30 seconds, keeping the view, the selection and an open panel.
  * Shared by every plugin's dashboard through a link.
@@ -41,6 +43,8 @@ let state = null;
 let view = null;
 let selected = null;
 let updatedAt = null;
+/** The filter's value, remembered across visits; each dashboard's own origin keeps its own. */
+let filterValue = views.filter ? recall("jay.filter", views.filter.fallback) : null;
 
 const $ = (id) => document.getElementById(id);
 const own = () => nav.dashboards.find((d) => d.plugin === nav.current);
@@ -82,6 +86,24 @@ function renderPanel() {
   $("detail-body").innerHTML = html;
 }
 
+/** The filter's select, with the options the state offers. A remembered value no longer offered falls back. */
+function renderFilter() {
+  const { filter } = views;
+  if (!filter) return;
+  const options = filter.options(state);
+  if (!options.some((o) => o.value === filterValue) && filterValue !== filter.fallback) {
+    filterValue = filter.fallback;
+    return void load();
+  }
+  const select = $("filter");
+  select.hidden = false;
+  select.setAttribute("aria-label", filter.label);
+  select.title = filter.label;
+  select.innerHTML = options
+    .map((o) => `<option value="${esc(o.value)}"${o.value === filterValue ? " selected" : ""}>${esc(o.label)}</option>`)
+    .join("");
+}
+
 /** Everything, from the current state. */
 function render() {
   if (!nav || !state) return;
@@ -91,6 +113,7 @@ function render() {
   $("heading").textContent = own().views.find((v) => v.id === view)?.label ?? "";
   $("updated").textContent = updatedAt ? `updated ${updatedAt.toLocaleTimeString()}` : "";
   renderNav();
+  renderFilter();
   $("items").innerHTML = views.rows[view](state, selected);
   renderPanel();
 }
@@ -98,7 +121,8 @@ function render() {
 /** Fetches a fresh state and menu. */
 async function load() {
   try {
-    [state, nav] = await Promise.all([(await fetch("/api/state")).json(), (await fetch("/nav")).json()]);
+    const query = views.filter ? `?${new URLSearchParams({ [views.filter.param]: filterValue })}` : "";
+    [state, nav] = await Promise.all([(await fetch(`/api/state${query}`)).json(), (await fetch("/nav")).json()]);
     view ??= initialView();
     updatedAt = new Date();
     render();
@@ -176,6 +200,13 @@ $("close").addEventListener("click", () => {
 });
 
 $("refresh").addEventListener("click", load);
+
+$("filter").addEventListener("change", (e) => {
+  filterValue = e.target.value;
+  remember("jay.filter", filterValue);
+  selected = null;
+  load();
+});
 
 $("collapse").addEventListener("click", () => {
   const collapsed = !$("app").classList.contains("collapsed");

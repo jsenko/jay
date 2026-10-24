@@ -58,7 +58,7 @@ and `run.sh`. A plugin adds four things to its `dashboard/`:
 |---|---|
 | `dashboard.json` | `title`, a fixed `port`, and `views`: the menu entries, each `{ id, label, icon }` |
 | `server.ts` | Calls `serve()` from `shell/server.ts` with the dashboard's `state`, `badges` and `actions` |
-| `public/views.js` | The page's rendering: `rows`, `find`, `renderDetail`, and optionally `actions` and `footer`, as listed at the top of `shell/public/shell.js` |
+| `public/views.js` | The page's rendering: `rows`, `find`, `renderDetail`, and optionally `actions`, `footer` and `filter`, as listed at the top of `shell/public/shell.js` |
 | `../package.json` | At the plugin root: `"type": "module"`, and `tsx` among the dependencies |
 
 Ports so far: fyi 3456, crew 3457.

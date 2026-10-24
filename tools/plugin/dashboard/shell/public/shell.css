@@ -168,6 +168,15 @@ button { font: inherit; color: inherit; cursor: pointer; }
   height: 32px;
 }
 .listhead button:hover, .detailhead button:hover { border-color: var(--muted); }
+#filter {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: inherit;
+  border-radius: 6px;
+  height: 32px;
+  padding: 0 8px;
+  font: inherit;
+}
 .spacer { flex: 1; }
 
 #items { padding: 16px 20px 40px; }
