@@ -42,14 +42,25 @@ arrive in two turns rather than one joining the other. A repeating timer
 due again while its prompt still waits replaces it, so a long turn
 doesn't leave a backlog.
 
-## 4. In memory
+## 4. Subagents
+
+A tool call's context names the calling session, so a timer needs no
+mapping to find its session: a session sets timers only for itself. A
+subagent is the exception. It runs in a child session of its own, and a
+prompt sent there after it finishes would start a turn nobody sees. So
+a timer set, listed or cancelled from a child session belongs to the
+top-level session above it, found through each session's `parentID`,
+and the tool says where the prompt will arrive. It runs under that
+session's default agent, since the subagent's agent isn't its.
+
+## 5. In memory
 
 Timers live in opencode's process and end with it. A timer is for
 something the session is doing now, and a session that restarts sets
 its timers again as part of starting, as crew's roles do. Persisting
 them would deliver prompts into sessions nobody has open.
 
-## 5. Nothing for Claude Code
+## 6. Nothing for Claude Code
 
 The plugin has no commands, skills or servers, so it would do nothing in
 Claude Code. It is in the marketplace so that `./install.sh all` and

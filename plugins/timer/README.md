@@ -41,6 +41,10 @@ and the session sets the timer. A prompt arrives marked
 waits until the turn ends, and when several are waiting, they arrive
 one turn at a time.
 
+**A subagent's timers go to your session.** A subagent runs in a
+session of its own that ends when it finishes, so a timer it sets
+arrives in the session that started it.
+
 **Timers last as long as opencode does.** They are kept in opencode's
 process: closing opencode ends them, and nothing is written to disk.
 

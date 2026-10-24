@@ -59,7 +59,8 @@ Use a scratch configuration, so your own stays untouched:
       `poll, but no timer` and names the plugin
 - [ ] In opencode, "check back in a minute" sets a timer; one that falls
       due while a long command runs waits until the turn ends, then
-      arrives as its own turn; `timer_list` shows it until then
+      arrives as its own turn; `timer_list` shows it until then. A timer
+      a subagent sets arrives in the session that started it
 - [ ] `/crew:stop` writes `current_state` when a project is in play,
       asks whether to save a `session` note, saves one expiring in 7
       days on a yes and nothing on a no, releases held jobs, and

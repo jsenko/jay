@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+import { rootSession } from "../timer/root.mjs";
 import { Timers } from "../timer/timers.mjs";
 
 /** Minutes for a timer that fires almost at once. */
@@ -112,4 +113,17 @@ test("a send that fails leaves the session free for the next timer", async () =>
   timers.set("s1", { name: "b", minutes: SOON, prompt: "arrives" });
   await wait();
   assert.deepEqual(sent, ["s1: [timer b] arrives"]);
+});
+
+test("a subagent's timers belong to the top-level session above it", async () => {
+  const parents = { sub2: "sub1", sub1: "main" };
+  const parentOf = async (id) => parents[id];
+  assert.equal(await rootSession("sub2", parentOf), "main");
+  assert.equal(await rootSession("main", parentOf), "main");
+  const failing = async () => {
+    throw new Error("unreachable");
+  };
+  assert.equal(await rootSession("sub1", failing), "sub1", "a failed lookup keeps the session it has");
+  const loop = async (id) => (id === "a" ? "b" : "a");
+  assert.ok(["a", "b"].includes(await rootSession("a", loop)), "a loop ends");
 });
