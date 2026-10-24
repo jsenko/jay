@@ -1,0 +1,9 @@
+{
+  "name": "timer",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "description": "Timers for opencode sessions: a prompt sent into the session later, once or repeating. Claude Code has its own",
+  "author": {
+    "name": "Jakub Senko"
+  }
+}

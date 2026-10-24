@@ -23,7 +23,7 @@ Use a scratch configuration, so your own stays untouched:
       installs fyi, asks for the default scope, and offers to allow the
       tools; `settings.json.before-jay` holds the previous settings
 - [ ] `./install.sh code` installs fyi and crew too
-- [ ] `./install.sh all` installs all five; with pr, the allow rules for
+- [ ] `./install.sh all` installs all six; with pr, the allow rules for
       its GitHub writes are offered, none matching `gh pr review --approve`
 - [ ] Re-running keeps every answer and changes nothing else
 - [ ] Without a terminal (`./install.sh fyi </dev/null`, or `!` in a
@@ -34,6 +34,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] `--opencode`: one `jay-<plugin>.js` per plugin in
       `~/.config/opencode/plugins/`, commands as `/<plugin>-<name>`, and
       the servers connect
+- [ ] `./install.sh all` skips timer for Claude Code, saying it is for
+      opencode only, and installs it in opencode
 - [ ] `./install.sh --uninstall pr` removes pr, keeps `~/.jay/config.json`
       and fyi's items, and removes it from opencode too
 - [ ] No server is configured outside the plugins (`claude mcp list`): an
@@ -52,6 +54,9 @@ Use a scratch configuration, so your own stays untouched:
       `crew_poll` suggests, 10 minutes growing to 60 while idle,
       and stays silent when there is nothing, in both clients. `general`
       sets up no check until it takes capabilities
+- [ ] In opencode, "check back in a minute" sets a timer; one that falls
+      due while a long command runs waits until the turn ends, then
+      arrives as its own turn; `timer_list` shows it until then
 - [ ] `/crew:stop` writes `current_state` when a project is in play,
       asks whether to save a `session` note, saves one expiring in 7
       days on a yes and nothing on a no, releases held jobs, and

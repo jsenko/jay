@@ -29,6 +29,11 @@
       "name": "pr",
       "source": "./plugins/pr",
       "description": "Pull requests with Claude: a watcher that follows GitHub for you, a reviewer, and a queue of what needs you"
+    },
+    {
+      "name": "timer",
+      "source": "./plugins/timer",
+      "description": "Timers for opencode sessions: a prompt sent into the session later, once or repeating. Claude Code has its own"
     }
   ]
 }

@@ -15,10 +15,12 @@ what you need.
 | [status](plugins/status/README.md) | A short status for teammates and a weekly report, written from your GitHub activity and fyi | — | fyi |
 | [code](plugins/code/README.md) | A coder role, one command for changes of any size, tracked as much as each needs, and code-quality rules with stable IDs | — | fyi, crew |
 | [pr](plugins/pr/README.md) | A watcher that follows GitHub for you, a reviewer role, and a queue of the PRs waiting on you | — | fyi, crew, code |
+| [timer](plugins/timer/README.md) | Timers for opencode sessions, so they can poll and check back on their own. Claude Code has its own | — | — |
 
 Installing a plugin also installs what it needs. The dashboards of all
 installed plugins share one menu, so each one can open the others.
-All five work in Claude Code and in opencode.
+The first five work in Claude Code and in opencode; timer is for opencode
+only, and the installer skips it for Claude Code.
 
 ### Written for Apicurio first
 
@@ -124,7 +126,8 @@ alias claude-jay='claude --dangerously-load-development-channels plugin:crew@jay
 
 **Without channels, polling adapts.** A session checks on a timer: ten
 minutes after anything happens, ten more after each check that finds
-nothing, up to an hour. opencode has no channels, so it always polls.
+nothing, up to an hour. opencode has no channels, so it always polls,
+on timers from the [timer](plugins/timer/README.md) plugin.
 The bounds are minutes in `~/.jay/config.json`:
 
 ```json
@@ -216,7 +219,7 @@ What differs from Claude Code:
 | Commands | `/crew:start` | `/crew-start`: opencode doesn't group commands by plugin, so each is prefixed with its plugin's name |
 | Skills | `code:style` | `code-style`, for the same reason |
 | Tool names | `mcp__plugin_fyi_fyi__fyi_capture` | `fyi_fyi_capture`, as before jay |
-| Notifications | Pushed, with the channels flag | Polled every 10 to 60 minutes: opencode has no channels |
+| Notifications | Pushed, with the channels flag | Polled every 10 to 60 minutes: opencode has no channels. Polling needs a timer, which the [timer](plugins/timer/README.md) plugin provides |
 | Instructions for every session | `~/.claude/CLAUDE.md` | `AGENTS.md` |
 
 jay's files are written once, with Claude Code's names. When opencode

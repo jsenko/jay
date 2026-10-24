@@ -22,6 +22,8 @@ MARKETPLACE=jay
 GITHUB_SOURCE=jsenko/jay
 CLAUDE_SETTINGS="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"
 OPENCODE_DIR="${OPENCODE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/opencode}"
+# Plugins with nothing for Claude Code: it has timers of its own.
+OPENCODE_ONLY=" timer "
 
 DEV=false
 UNINSTALL=false
@@ -129,7 +131,9 @@ claude_install() {
     local installed p
     installed="$(claude_installed)"
     for p in "${PLUGINS[@]}"; do
-        if grep -qx "$p" <<< "$installed"; then
+        if [[ "$OPENCODE_ONLY" == *" $p "* ]]; then
+            say "skipping $p in Claude Code: it is for opencode only"
+        elif grep -qx "$p" <<< "$installed"; then
             say "updating $p in Claude Code"
             claude plugin update "$p@$MARKETPLACE" --scope user >/dev/null
         else
