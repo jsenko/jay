@@ -31,15 +31,16 @@ with their verdict through `/pr:checkout`.
 **Verified** means reproduced, tested or run — not reasoned about. One
 plausible required finding drafts the whole review.
 
-With the user present, show the review first in every case.
+With the user present, show the review first in every case. Unattended,
+the table is the user's standing approval: a preference for seeing
+reviews first, in memory or elsewhere, covers attended sessions only.
 
 ## 1. Decision
 
 Lead with it. Short, and the first sentence matches the verdict — never
 open with "solid" or "clean" when blockers follow.
 
-On a re-review, say what was addressed here. That is the author's first
-question and they should not have to scroll for it.
+On a re-review, say what was addressed here: the author's first question.
 
 ## 2. Context
 
@@ -92,10 +93,9 @@ to address it here, prefer a follow-up issue, or would rather skip it —
 e.g. "O1 here, O2 issue".* The ids are what make a one-line answer
 possible.
 
-**Inline comments are pointers, not copies.** Where a line anchor helps,
-post `**R2** — <one line>` inline and leave the full item in the summary.
-Inline positions break on force-push, so the summary is the source of
-truth.
+**Inline comments are pointers, not copies:** `**R2** — <one line>`
+where a line anchor helps, the full item in the summary, which is the
+source of truth since inline positions break on force-push.
 
 ## 6. Checked
 
