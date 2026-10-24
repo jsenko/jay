@@ -3,7 +3,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -62,15 +62,18 @@ export function tempWorkDir(): string {
   return mkdtempSync(join(tmpdir(), "crew-work-"));
 }
 
-/** Starts a server subprocess and connects a client to it over stdio. */
-export async function connect(cwd: string, crewDir: string): Promise<Client> {
+/**
+ * Starts a server subprocess and connects a client to it over stdio. `env`
+ * adds variables, such as a shorter heartbeat.
+ */
+export async function connect(cwd: string, crewDir: string, env: Record<string, string> = {}): Promise<Client> {
   const client = new Client({ name: "crew-test", version: "0" }, { capabilities: {} });
   await client.connect(
     new StdioClientTransport({
       command: TSX,
       args: [SERVER],
       cwd,
-      env: { ...process.env, CREW_DIR: crewDir },
+      env: { ...process.env, CREW_DIR: crewDir, ...env },
     })
   );
   return client;
@@ -90,4 +93,21 @@ export async function call(
 /** Waits for asynchronous effects such as disconnect handling. */
 export function settle(ms = 1200): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Rewrites the state file directly, to set up conditions that would
+ * otherwise take hours, such as a session last seen long ago. Only safe
+ * between calls, when no server is writing.
+ */
+export function editState(crewDir: string, fn: (state: any) => void): void {
+  const file = join(crewDir, "state.json");
+  const state = JSON.parse(readFileSync(file, "utf8"));
+  fn(state);
+  writeFileSync(file, JSON.stringify(state, null, 2));
+}
+
+/** An ISO timestamp `hours` before now. */
+export function hoursAgo(hours: number): string {
+  return new Date(Date.now() - hours * 3_600_000).toISOString();
 }

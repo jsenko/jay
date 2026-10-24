@@ -7,10 +7,11 @@ import { run as messaging } from "./messaging.test.js";
 import { run as queue } from "./queue.test.js";
 import { run as locking } from "./locking.test.js";
 import { run as version } from "./version.test.js";
+import { run as liveness } from "./liveness.test.js";
 
 console.log("crew tests");
 
-for (const suite of [registry, messaging, queue, locking, version]) {
+for (const suite of [registry, messaging, queue, locking, version, liveness]) {
   await suite();
 }
 

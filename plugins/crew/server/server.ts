@@ -14,6 +14,7 @@ import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprot
 import { readFileSync } from "node:fs";
 
 import { getSessionId, setNotificationModeProvider } from "./context.js";
+import { startHeartbeat } from "./heartbeat.js";
 import { startNotifier } from "./notifications.js";
 import { leave } from "./tools/leave.js";
 import { tools, toolsByName } from "./tools/index.js";
@@ -77,6 +78,8 @@ process.on("SIGTERM", shutdown);
 process.stdin.on("end", shutdown);
 
 await mcp.connect(new StdioServerTransport());
+
+startHeartbeat();
 
 startNotifier((kind) => {
   mcp.notification({

@@ -285,6 +285,10 @@ Two tiers:
    exits and closed terminals, which is nearly all of them.
 2. **Backstop** — `last_seen` older than 45 minutes is stale. Covers
    `SIGKILL` and machine loss, where nothing got a chance to run.
+   Every tool call refreshes `last_seen`, and so does a heartbeat every
+   five minutes while the server runs: a session woken by pushes makes
+   no calls while it waits, and without the heartbeat it went stale and
+   was never offered work.
 
 ---
 
