@@ -61,6 +61,21 @@ function reservationAllows(job: Job, session: Session, now: number): boolean {
   return job.prefer_until !== undefined && now > Date.parse(job.prefer_until);
 }
 
+/** Whether everything but status and capabilities lets this session take the job. */
+function placementAllows(job: Job, session: Session, now: number): boolean {
+  return (
+    !isStale(session, now) &&
+    repoAllows(job, session) &&
+    reservationAllows(job, session, now) &&
+    (job.to === undefined || job.to === session.id)
+  );
+}
+
+/** Whether the session advertises everything the job needs. */
+function hasCapabilities(job: Job, session: Session): boolean {
+  return job.needs.every((need) => session.capabilities.includes(need));
+}
+
 /**
  * Sessions that could claim this job right now.
  *
@@ -72,17 +87,10 @@ export function eligibleSessions(state: State, job: Job, now = Date.now()): Sess
   if (job.state !== "open") return [];
 
   const candidates = Object.values(state.sessions).filter(
-    (s) =>
-      isAvailable(s, now) &&
-      !isStale(s, now) &&
-      repoAllows(job, s) &&
-      reservationAllows(job, s, now) &&
-      (job.to === undefined || job.to === s.id)
+    (s) => isAvailable(s, now) && placementAllows(job, s, now)
   );
 
-  const byCapability = candidates.filter((s) =>
-    job.needs.every((need) => s.capabilities.includes(need))
-  );
+  const byCapability = candidates.filter((s) => hasCapabilities(job, s));
   if (byCapability.length > 0) return byCapability;
 
   return candidates.filter((s) => s.fallback);
@@ -91,6 +99,28 @@ export function eligibleSessions(state: State, job: Job, now = Date.now()): Sess
 /** Whether one specific session may claim one specific job. */
 export function isEligible(state: State, job: Job, session: Session, now = Date.now()): boolean {
   return eligibleSessions(state, job, now).some((s) => s.id === session.id);
+}
+
+/**
+ * Whether a session may claim a job it names. Like routing, except that
+ * `focus` does not stop it: focus keeps work from being pushed at a
+ * session the user is driving, and a claim by id is the session taking
+ * work the user had it do (SPEC.md §4).
+ */
+export function mayClaimById(state: State, job: Job, session: Session, now = Date.now()): boolean {
+  if (session.status !== "focus") return isEligible(state, job, session, now);
+  return job.state === "open" && placementAllows(job, session, now) && hasCapabilities(job, session);
+}
+
+/**
+ * Whether a session may close an open job without claiming it: its
+ * poster withdrawing it, or a session that could take it reporting the
+ * work done some other way.
+ */
+export function mayCloseUnclaimed(job: Job, session: Session): boolean {
+  if (job.state !== "open") return false;
+  if (job.from === session.id) return true;
+  return hasCapabilities(job, session) && (job.to === undefined || job.to === session.id);
 }
 
 /**

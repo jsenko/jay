@@ -1,6 +1,6 @@
 /** `crew_claim` — take work off the board. */
 
-import { DEFAULT_LEASE_MIN, isEligible, minutesFrom, nextJobFor, sweep } from "../jobs.js";
+import { DEFAULT_LEASE_MIN, isEligible, mayClaimById, minutesFrom, nextJobFor, sweep } from "../jobs.js";
 import { requireOwnSession } from "../sessions.js";
 import { mutate } from "../store.js";
 import type { Tool } from "./tool.js";
@@ -28,7 +28,8 @@ async function handler(args: Record<string, any>) {
     if (job.state !== "open") {
       return { claimed: null, reason: job.state === "claimed" ? "taken" : job.state };
     }
-    if (!isEligible(state, job, session, now)) {
+    const eligible = args.job_id ? mayClaimById(state, job, session, now) : isEligible(state, job, session, now);
+    if (!eligible) {
       return { claimed: null, reason: "not eligible for this session" };
     }
 
@@ -55,7 +56,7 @@ export const claimTool: Tool = {
   definition: {
     name: "crew_claim",
     description:
-      "Take the next job matching this session. Call with no arguments for the best match. Returns {claimed: null} when there is nothing — that is normal, not an error. Finish with crew_resolve.",
+      "Take the next job matching this session. Call with no arguments for the best match. Returns {claimed: null} when there is nothing — that is normal, not an error. Finish with crew_resolve. A session in focus is never routed work, but may claim a job by id: work the user had it do.",
     inputSchema: {
       type: "object",
       properties: {

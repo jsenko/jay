@@ -40,7 +40,9 @@ Keep `crew_state` current — other sessions route work by it.
 
 Set `focus` whenever the user is actively working in this session, and
 back to `idle` or `busy` when they move on. Focus removes the session
-from routing, so leaving it set strands work.
+from routing, so leaving it set strands work. When the user has it do
+work an open job asks for (same `ref`), claim that job by id first;
+when the work is already done, `crew_resolve` the open job as `done`.
 
 ## Receiving
 

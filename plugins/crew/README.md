@@ -105,13 +105,14 @@ none describes.
 | `crew_send` | A message to one session, or to all |
 | `crew_post` | Post work, to one session or to whoever can take it |
 | `crew_poll` | Collect what is waiting; `board: true` shows everything outstanding |
-| `crew_claim` | Take the best-matching job |
-| `crew_resolve` | Report the outcome: `done`, `failed` or `released` |
+| `crew_claim` | Take the best-matching job, or one by id |
+| `crew_resolve` | Report the outcome: `done`, `failed` or `released`. Also closes an open job: its poster withdrawing it, or work done outside it |
 | `crew_extend` | Extend the lease on long-running work |
 
 Work goes to a pool, not to a session: any session advertising the
 capabilities a job needs can claim it, and the first claim wins. A
-session the user is driving sets `focus`, and gets no work routed to it.
+session the user is driving sets `focus`, and gets no work routed to it,
+though it can still claim a job by id when the user has it do that work.
 Capabilities are a fixed set (`review`, `code`, `watch`, `triage`, `ci`,
 `docs`, `release`, `research`), so a typo fails at the call instead of
 silently never matching.

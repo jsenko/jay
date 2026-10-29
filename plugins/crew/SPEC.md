@@ -86,7 +86,7 @@ settings, so polling is the default.
 | `cursor` | Highest message `seq` consumed |
 
 `focus` means the user is actively driving this session — the router
-never assigns to it.
+never assigns to it. It may still claim a job by id (§4).
 
 A session has one home `directory` but may work across several; repo
 affinity (§4) matches against the whole `repos` set. Several sessions may
@@ -217,6 +217,18 @@ A job is **eligible** for a session when all hold:
 
 Ordering among eligible jobs: **priority desc → repo match → oldest
 first.**
+
+**A claim by id ignores `focus`.** Every other condition holds, but a
+session the user is driving may take a job it names. Focus exists to
+keep the router from pushing work at a session behind the user's back;
+a claim by id is the opposite, the user having that session do the
+work. Without it, a reviewer the user drove through a re-review could
+not close the job for it, and the next free reviewer did it again.
+
+**An open job closes without a claim** when its poster withdraws it, or
+when a session able to take it did the work outside the job. Both are
+`crew_resolve` on the open job; the poster is told who closed it.
+`released` needs a claim, as there is nothing to hand back.
 
 **A pooled job is offered to every eligible session at once, and the
 first `crew_claim` wins.** Claims are atomic under the state lock; losers

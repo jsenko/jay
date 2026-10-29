@@ -106,6 +106,29 @@ export async function run(): Promise<void> {
   const stranded = await call(watcher, "crew_post", { body: "Fix the build again", needs: ["code"] });
   check("with no fallback left, the job is unroutable", stranded.routable === false, stranded);
 
+  check("a focused session still sees nothing routed", (await call(coder, "crew_claim")).claimed === null);
+  const byId = await call(coder, "crew_claim", { job_id: stranded.job_id });
+  check("a focused session claims a job by id", byId.claimed?.id === stranded.job_id, byId);
+  check("and resolves it", (await call(coder, "crew_resolve", { job_id: stranded.job_id, outcome: "done" })).state === "done");
+  const notCapable = await call(coder, "crew_claim", { job_id: matched.job_id });
+  check("a claim by id still needs the capabilities", notCapable.claimed === null, notCapable);
+
+  // --- closing open jobs ------------------------------------------
+  const doneElsewhere = await call(watcher, "crew_post", { body: "Re-review PR 10716", needs: ["review"] });
+  const outsider = await call(coder, "crew_resolve", { job_id: doneElsewhere.job_id, outcome: "done" });
+  check("a session unable to take an open job cannot close it", outsider.error?.includes("only its poster"), outsider);
+  const noRelease = await call(reviewer2, "crew_resolve", { job_id: doneElsewhere.job_id, outcome: "released" });
+  check("an open job cannot be released", noRelease.error?.includes("not claimed"), noRelease);
+  const closed = await call(reviewer2, "crew_resolve", { job_id: doneElsewhere.job_id, outcome: "done", detail: "reviewed with the user" });
+  check("a capable session closes an open job it covered", closed.state === "done", closed);
+  const closedMail = await call(watcher, "crew_poll");
+  check("the poster is told who closed it",
+    closedMail.messages?.some((m: any) => m.body.includes(`closed without a claim by ${reviewer2Id}: reviewed with the user`)), closedMail.messages);
+
+  const moot = await call(watcher, "crew_post", { body: "Review PR 10733", needs: ["review"] });
+  const withdrawn = await call(watcher, "crew_resolve", { job_id: moot.job_id, outcome: "failed", detail: "merged before review" });
+  check("the poster withdraws its own open job", withdrawn.state === "failed", withdrawn);
+
   check("watcher id is stable", typeof watcherId === "string");
 
   await watcher.close();
