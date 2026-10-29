@@ -162,8 +162,10 @@ is planned, not built.
 The project conventions are in
 [`rules/apicurio-prs.md`](rules/apicurio-prs.md): where maintainers and
 reviewer assignment are declared, maintainer-only labels, and the
-`lifecycle/*` labels that drive PR state, and the checks
-`get_check_status` reads as pending gates. `rules/pr-interest.md` tracks
+`lifecycle/*` labels that drive PR state, the checks
+`get_check_status` reads as pending gates, and the bots whose PRs merge
+on green CI, which get no review job unless one is still open a day
+later. `rules/pr-interest.md` tracks
 what is assigned to you, so it assumes the project assigns reviewers
 automatically. A project without lifecycle labels needs
 `processes/pr-events.md` changed as well. Making this configurable is a

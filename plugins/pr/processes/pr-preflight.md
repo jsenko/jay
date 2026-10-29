@@ -70,6 +70,13 @@ under "For the author" and "For a maintainer" with a status per
 requirement (#10386). Read it rather than working the same thing out
 from the check rollup.
 
+## 7. A bot PR left waiting
+
+On a watcher sweep only. The project's rule names the authors it
+auto-accepts; their PRs get no review job at triage, as CI approves
+them. One still open 24 hours after `opened_at` was not: post the review
+job triage would have posted, once.
+
 ## Result
 
 Either the PR is unblocked and review can proceed, or there is an

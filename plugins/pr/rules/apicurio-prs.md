@@ -48,6 +48,10 @@ changed, not just this file.
 `lifecycle/tested` and `lifecycle/full-verified` are CI signals, not
 states.
 
+**Auto-accepted authors** are `auto_accept` in `.github/pr-lifecycle.yml`
+(Renovate): the lifecycle workflow approves their PRs once CI passes,
+and they merge themselves.
+
 **Gates:** `Verification Gate` stays pending until a maintainer runs
 `/verify`, so pass it in `gates` to `get_check_status`: its failure is
 not a CI failure.

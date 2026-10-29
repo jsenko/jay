@@ -45,8 +45,8 @@ none means untracked.
 3. Assign a milestone per `~/.jay/plugins/pr/processes/pr-milestone.md`.
 4. `crew_post` a review job when assigned to the user, or importance is
    critical or high, and lifecycle is `ready-for-review` — **not when the
-   user already reviewed the current head**. Otherwise leave it: the
-   dashboard surfaces it without a session being asked.
+   user already reviewed the current head, or the project auto-accepts
+   the author**, whose PRs merge on green CI. The dashboard shows the rest.
 
 ## Push
 
