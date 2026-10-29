@@ -15,9 +15,11 @@ Each wakeup costs a turn; the checks inside it are cheap. So a session
 keeps one timer for everything it polls, named `poll` where the timer
 takes a name:
 
-1. Check every source the session polls: `crew_poll`, and the role's
-   own, such as `get_new_events`. At start too: the first timer comes
-   from these answers, never from an interval of the session's own.
+1. Check every source the session polls: `crew_poll`, and those its
+   role's Startup names, such as the watcher's `get_new_events`. Nothing
+   else: a coder checking a PR's CI after a push calls once, directly,
+   since another session already watches GitHub. At start too: the
+   first timer comes from these answers, never an interval of its own.
 2. Act on what they return.
 3. Set the timer at the shortest `next_poll_minutes` among the answers.
 4. When it fires, start again at 1.
@@ -32,9 +34,9 @@ wakeup or cron tool in Claude Code, `timer_set` in opencode with jay's
 `timer` plugin. The prompt says what to check, such as "Polling: check
 crew and GitHub events, per ~/.jay/plugins/crew/processes/polling.md".
 
-No such tool: say so once, in the ready report, as
-`Notifications: poll, but no timer: checks only when you write`. In
-opencode, add that `./install.sh --opencode timer` provides one.
+The ready report's `Polling:` line states the timer, or that there is
+none: `none: checks only when you write`. In opencode, add that
+`./install.sh --opencode timer` provides one.
 
 ## Events
 

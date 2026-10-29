@@ -149,8 +149,10 @@ A session that polls more than crew, such as the pr watcher, which also
 polls GitHub events, keeps one timer for both and wakes at the shorter
 of the two waits: each wakeup costs a turn, and the checks in it are
 cheap. opencode has no timer for the model of its own; jay's
-[timer](../timer/README.md) plugin gives it one, and a session without
-a timer says so when it starts.
+[timer](../timer/README.md) plugin gives it one. The ready report's
+`Polling:` line says which timer is set, or that none is. A session
+polls only what its role watches: a coder polls crew, never GitHub,
+which the watcher already does.
 
 Claude Code does not tell crew whether it delivers the pushes, so a
 session finds out by receiving one. Right after `crew_join`, crew pushes

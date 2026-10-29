@@ -54,9 +54,11 @@ Use a scratch configuration, so your own stays untouched:
       `crew_poll` suggests, 10 minutes growing to 60 while idle,
       and stays silent when there is nothing, in both clients. `general`
       sets up no check until it takes capabilities
+- [ ] In `poll` mode the ready report has a `Polling:` line naming the
+      timer; a coder's timer checks crew only, never GitHub events
 - [ ] In opencode with timer, the poll arrives as `[timer poll] …` while
-      opencode is idle; without timer, the ready report says
-      `poll, but no timer` and names the plugin
+      opencode is idle; without timer, the `Polling:` line says
+      `none: checks only when you write` and names the plugin
 - [ ] In opencode, "check back in a minute" sets a timer; one that falls
       due while a long command runs waits until the turn ends, then
       arrives as its own turn; `timer_list` shows it until then. A timer
@@ -67,8 +69,15 @@ Use a scratch configuration, so your own stays untouched:
       leaves; `crew_who` from another session no longer lists it
 - [ ] `/crew:start` with the same role, in the same repository or
       another checkout of it, offers that session; picking it up checks
-      the branch first and archives the note. An unattended role offers
-      nothing
+      the branch first and archives the note
+- [ ] A watcher started fresh reads the last watcher's `session` note
+      before reconciling, without asking; its `/crew:stop` updates that
+      note rather than adding one. A reviewer the user drove asks at
+      stop whether to save
+- [ ] `/crew:stop` with a pending action creates a task with a date,
+      not a note
+- [ ] A reviewer in `focus` claims a job by id and resolves it; a job
+      whose work is already done closes with `crew_resolve` unclaimed
 - [ ] A session left quiet on channels for over an hour is still offered
       a job and woken for it
 - [ ] With hooks disabled, `/crew:start` says `~/.jay/plugins/` is

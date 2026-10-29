@@ -32,9 +32,8 @@ An unknown name is an error, listing what exists.
    `unattended` and `fallback`; its sections give the rest.
 2. **Join the crew:** `crew_join` with the purpose (the user's, else the
    profile's description) and the profile's `capabilities` and
-   `fallback`. If the result says `notifications: "poll"` and the role
-   advertises capabilities, check for work on a timer per
-   `~/.jay/plugins/crew/processes/polling.md`. If `"channel"`, wait to be woken.
+   `fallback`. On `notifications: "poll"` with capabilities, set a timer
+   per `~/.jay/plugins/crew/processes/polling.md`; on `"channel"`, wait to be woken.
 3. **Load** everything under the profile's **Load at start**. Not its
    **Load when needed** files: those are for the moment they apply.
 4. **Follow the profile's Startup section**, for an `unattended` role
@@ -48,6 +47,7 @@ An unknown name is an error, listing what exists.
   Repository:    <Owner/Repo, or none>
   Crew:          <session-id>, advertising <capabilities>
   Notifications: <channel | poll>
+  Polling:       <only with poll: timer 'poll' in <n> min | none: checks only when you write>
   <whatever the profile's startup found>
   <each of crew_join's warnings, one line>
 ```
