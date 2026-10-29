@@ -18,6 +18,9 @@ Anything in progress that another session could not reconstruct:
   `fyi_handoff` gives the session that picks it up, from any directory.
 - **Decisions not yet captured** — a note each, against the project.
   The reasoning is the expensive part to reconstruct.
+- **Pending actions** — a task each, with `next_action_at`, or an
+  attention item on the `pr` item it concerns. Never a note: a note
+  records, and nothing brings it back on a date.
 - **A review in progress** — record findings so far on the `pr` item,
   then return to the default branch.
 - **Uncommitted changes** — tell the user, do not act. Whether to commit

@@ -59,7 +59,7 @@ purpose: <the purpose the session joined with>
 <What was done, what is half done, the branch and uncommitted state.>
 
 ## Next
-<The next steps, in order.>
+<The next steps, in order. Pending actions by their task ids, not restated.>
 
 ## Open
 <Questions for the user, decisions pending, anything promised.>
