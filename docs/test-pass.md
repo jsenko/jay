@@ -105,7 +105,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] A project with `issues`: a new `coder` session checks them before
       trusting `current_state`, and says when one has closed
 - [ ] On an open PR, a review comment produces an assessment and a
-      proposed reply rather than a silent change
+      proposed reply rather than a silent change; the replies are shown
+      with the push confirmation and posted on each thread after it
 
 ## Reviewing pull requests
 
@@ -137,8 +138,16 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] The author answers "O1 here, O2 issue": `followups` recorded, an
       issue filed for O2 and linked on the PR, O1 checked on the next
       re-review
-- [ ] A push to a reviewed PR produces a re-review job, preferring the
-      same reviewer
+- [ ] A push to a reviewed PR produces a re-review job of the delta,
+      preferring the same reviewer, from a fork too, and only once
+- [ ] A Renovate PR assigned to you is tracked with no review job; one
+      still open a day later gets one from the sweep
+- [ ] On your own PR, the reviewer posts nothing to GitHub and posts the
+      findings to the coder session on it, or a note when there is none;
+      `attention` stays false while they are fixed, and `/pr:checkout`
+      offers no verdict
+- [ ] Requesting changes through `/pr:checkout` on a re-reviewed,
+      partially addressed head sets `attention` false
 - [ ] `/pr:queue` lists at most five, quick wins and oldest first, and
       says how many it left out; a `stale` item is refreshed first
 - [ ] `/pr:checkout <n>` briefs in thirty seconds and doesn't review; on

@@ -38,8 +38,10 @@ For anything actionable, present before changing code:
 A reviewer can be wrong. Say so with the reason rather than complying
 silently — the developer is the one who has to defend the change.
 
-After addressing, prepare a short reply per comment saying what changed,
-so the developer can work through the conversation quickly.
+Replies are part of addressing them: one per comment, saying what
+changed and in which commit, or why it was not taken. Show them with the
+push confirmation; on the yes, push, then post each as a reply to its
+thread (`gh api repos/<o>/<r>/pulls/<n>/comments/<id>/replies -f body=…`).
 
 ## CI
 
