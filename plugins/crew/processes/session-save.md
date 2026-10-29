@@ -9,10 +9,18 @@ the session, project or not.
 **Source:** `/crew:stop`, step 1 → this session
 **Processed by:** this session, once, after `current_state` is written
 
-Never for an `unattended` role: pickup never offers its notes.
+| Session | Then |
+|---|---|
+| Attended: its role is not `unattended`, or the user drove it at some point (it set `focus`) | Ask first, below |
+| `unattended` throughout | Write without asking, when anything would be lost |
 
-Otherwise ask first, in one line, since writing the note costs a
-summary's worth of work the user may not want:
+An `unattended` role keeps **one note per role and place**: its
+repository, or its directory when it has none. Update the note pickup
+read at startup, or the newest that matches, with `fyi_update`, rather
+than capturing a second; a new note only when none exists.
+
+Ask in one line, since writing the note costs a summary's worth of work
+the user may not want:
 
 ```
 Save this session to pick up later? <yes or no>: <why, in a few words>
@@ -29,7 +37,7 @@ in this conversation. Write the note only on a yes.
 
 | Field | Value |
 |---|---|
-| `title` | `Session: <role> in <directory name> — <purpose>` |
+| `title` | `Session: <role> in <directory name> — <purpose>`; for an `unattended` role, without the purpose |
 | `tags` | `session` and the role's name |
 | `archive_after_days` | `sessions.keep_days` in `~/.jay/config.json`, else 7 |
 | `links` | `relates-to` the project, when one is in play |

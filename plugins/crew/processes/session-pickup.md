@@ -5,11 +5,14 @@ the note `~/.jay/plugins/crew/processes/session-save.md` wrote.
 
 ## Start
 
-**Source:** `/crew:start`, after the ready report → this session
+**Source:** `/crew:start` → this session: after the ready report, or
+for an `unattended` role, before its Startup
 **Processed by:** this session, once
 
-Not for an `unattended` role: it rebuilds its state from its own sources
-at startup, and nobody is there to answer.
+| Role | Then |
+|---|---|
+| Attended | Find candidates, offer, and pick up only on a yes |
+| `unattended` | Find candidates and read the best one at once, without asking: nobody is there to answer, and its Startup depends on it. Check it against the present as in Pick up, step 2, but leave it active: stop updates it in place |
 
 ## Find candidates
 
@@ -19,7 +22,7 @@ lists the notes that have not expired. Read the header of each with
 
 | Matches | Weight |
 |---|---|
-| The same role | Required, unless the purpose names the note's project |
+| The same role | Required, unless the purpose names the note's project. Always, for an `unattended` role |
 | The same directory, or a checkout of the same repository | Strong |
 | The purpose names the note's project, or describes the same work | Strong |
 | Neither directory nor purpose | Not a candidate |
@@ -29,7 +32,7 @@ repository, still matches: the repository counts, not the path.
 
 ## Offer
 
-At most three, newest first, after the ready report:
+Attended roles only. At most three, newest first, after the ready report:
 
 ```
 Earlier sessions to pick up:

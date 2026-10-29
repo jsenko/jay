@@ -51,8 +51,10 @@ leaves the crew.
 **End a session started with `/crew:start` with `/crew:stop`.** The
 session note is what lets a later `/crew:start` offer to continue: it
 lists up to three earlier sessions matching its role and its directory,
-repository or purpose, and picks one up if you say so. Notes expire
-after 7 days. A session that just exits still leaves the crew and hands
+repository or purpose, and picks one up if you say so. An unattended
+role, such as the watcher, keeps one note per repository instead,
+updated at each stop and read at its next start without asking. Notes
+expire after 7 days. A session that just exits still leaves the crew and hands
 back its work, but saves nothing; `claude --resume` reopens its
 conversation instead.
 
@@ -204,7 +206,7 @@ In `~/.jay/config.json`:
 
 | Setting | Default | Purpose |
 |---|---|---|
-| `sessions.keep_days` | `7` | How long a session note is offered for pickup |
+| `sessions.keep_days` | `7` | How long a session note is offered for pickup, or an unattended role's note kept after its last stop |
 | `polling.min`, `.step`, `.max` | `10`, `10`, `60` | Minutes between checks without channels ([Efficiency](../../README.md#efficiency)) |
 
 ## Developing

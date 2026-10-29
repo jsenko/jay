@@ -393,8 +393,7 @@ neither reimplements the other.
 **Session notes** cover what a project doesn't: where *this session*
 stopped, project or not. `/crew:stop` asks whether to write one, since
 a summary costs tokens and a project's `current_state` often says enough
-already; unattended roles never do, as nothing offers their notes. A note
-is an fyi note tagged
+already. A note is an fyi note tagged
 `session` with a fixed header (role, directory, repositories, project,
 purpose) and a body written as a compaction summary would be. The next
 `/crew:start` lists the notes, offers at most three that match its role
@@ -408,6 +407,17 @@ They expire, after 7 days unless `sessions.keep_days` in
 on a note: a stopped session is worth resuming for days, not months, and
 a project is where longer-lived work belongs. They leave `project`
 unset, so they don't enter its decision log, and link to it instead.
+
+**Unattended roles use the same notes**, one per role and place (the
+repository, or the directory when there is none), updated in place at
+each stop and read at startup without asking, before the role's own
+startup work: the watcher reconciles knowing what the last one had
+queued. Whether to ask at stop follows the session, not the role: an
+unattended reviewer the user drove all day was attended, and is asked.
+Before this, unattended roles saved nothing, the watcher kept a note of
+its own that no process read, and the only pointer to it was the stop
+broadcast, which a session joining later never sees. So the broadcast
+carries no handoff.
 
 An earlier version left ad-hoc work with no handoff at all, as a forcing
 function towards creating a project. In practice sessions were stopped

@@ -37,7 +37,9 @@ An unknown name is an error, listing what exists.
    `~/.jay/plugins/crew/processes/polling.md`. If `"channel"`, wait to be woken.
 3. **Load** everything under the profile's **Load at start**. Not its
    **Load when needed** files: those are for the moment they apply.
-4. **Follow the profile's Startup section.**
+4. **Follow the profile's Startup section**, for an `unattended` role
+   after reading where the last one stopped, per
+   `~/.jay/plugins/crew/processes/session-pickup.md`.
 5. **Report:**
 
 ```
@@ -50,10 +52,9 @@ An unknown name is an error, listing what exists.
   <each of crew_join's warnings, one line>
 ```
 
-Keep it short. A session that opens with a wall of text has spent the
-user's attention before doing anything.
+Keep it short: a wall of text spends the user's attention first.
 
-6. **Offer an earlier session** to pick up, per
+6. **Offer an earlier session** to pick up, for an attended role, per
    `~/.jay/plugins/crew/processes/session-pickup.md`.
 
 # Behaviour for the rest of the session

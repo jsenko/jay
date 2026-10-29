@@ -34,8 +34,9 @@ else; leaving it claimed makes it wait out the lease for nothing.
 
 ## 3. Announce
 
-`crew_send` to `all`, one line on what this session was doing and
-anything another session should pick up.
+`crew_send` to `all`, one line on what this session was doing. Nothing
+here is a handoff: a session that joins later never sees it, so what the
+next one needs is already in step 1.
 
 ## 4. Leave
 
