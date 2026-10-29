@@ -1,6 +1,6 @@
 /**
- * The poll loop: repository events, workflow runs and notifications, on
- * an interval, with the cursor saved after each round.
+ * The poll loop: repository events, PR heads, workflow runs and
+ * notifications, on an interval, with the cursor saved after each round.
  */
 
 import type { Cache } from "./cache.js";
@@ -9,6 +9,7 @@ import type { EventCallback, PollContext } from "./context.js";
 import { API, githubHeaders } from "./github.js";
 import { Health, type PollerStatus } from "./health.js";
 import { pollNotifications } from "./notifications.js";
+import { pollPullHeads } from "./pull-heads.js";
 import { pollRepoEvents, processEvents } from "./repo-events.js";
 import { resolveRepos } from "./repos.js";
 import { loadState, saveState, type StateFile } from "./state.js";
@@ -213,6 +214,7 @@ export class Poller {
       this.health.success("repo_events");
     }
 
+    await pollPullHeads(this.context());
     await pollWorkflowRuns(this.context());
     await pollNotifications(this.context());
 

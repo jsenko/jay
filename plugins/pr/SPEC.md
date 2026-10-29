@@ -116,6 +116,17 @@ once, including events from while the server was down, up to
 `MAX_EVENT_AGE`. Conditional requests with ETags make an unchanged
 stream free against the rate limit.
 
+**Pushes come from heads, not the stream.** The repository event stream
+rarely carries a `synchronize` for a push to a same-repository branch,
+and never for a fork, whose pushes happen in the fork: on 26 Oct, three
+pushes to tracked PRs arrived with none, and no re-review was posted.
+So each round also reads the watched repositories' open PRs, most
+recently updated first, and reports a `synchronize`, with `before` and
+`after`, for each head that moved. Any change to a PR puts it on the
+first page, so an unchanged first page is a free 304 and the rest is
+never read. The stream's own `synchronize` events are dropped, so a push
+arrives once.
+
 **Polling starts on demand.** Every session with the plugin runs its own
 server, and before this each one polled all the watched repositories on
 its own: rate limit spent several times over, and every event pushed

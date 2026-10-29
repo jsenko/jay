@@ -121,7 +121,7 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: "get_status",
-      description: "Returns the health status of the GitHub events server: authenticated user, monitored repos, last successful poll times per source (repo_events, workflow_runs, notifications), and any recent errors. Use this to diagnose whether empty results mean 'no events' or 'polling is broken'.",
+      description: "Returns the health status of the GitHub events server: authenticated user, monitored repos, last successful poll times per source (repo_events, pull_heads, workflow_runs, notifications), and any recent errors. Use this to diagnose whether empty results mean 'no events' or 'polling is broken'.",
       inputSchema: {
         type: "object" as const,
         properties: {},

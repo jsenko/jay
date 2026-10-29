@@ -2,8 +2,8 @@
  * A fake GitHub API, enough for the poller: the authenticated user, a
  * repository's events with ETags, empty workflow runs, and notifications
  * with their latest comments. Tests add events and notifications and
- * watch what reaches a session. It also serves open pulls and a head's
- * checks, for the tools that read them.
+ * watch what reaches a session. It also serves open pulls, most recently
+ * updated first and with an ETag, and a head's checks.
  */
 
 import { createServer, type Server } from "node:http";
@@ -46,6 +46,12 @@ export interface FakeGitHub {
   notify(notification: RawNotification, comment: { body: string; login: string }): void;
   /** Adds an open pull to a repository's list; `head` is its head commit. */
   pull(repo: string, pull: Record<string, unknown> & { number: number; head?: string }): void;
+  /** Moves an open pull's head, as a push to its branch does. */
+  moveHead(repo: string, number: number, sha: string): void;
+  /** Takes a pull off the open list. */
+  closePull(repo: string, number: number): void;
+  /** How many pull list requests were answered 304, unchanged. */
+  readonly pullsNotModified: number;
   /** Sets a commit's checks. */
   checks(sha: string, checks: FakeChecks): void;
   /** Makes a repository's pull list fail. */
@@ -82,6 +88,10 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
   const pulls = new Map<string, Record<string, any>[]>();
   const checks = new Map<string, FakeChecks>();
   const broken = new Set<string>();
+  // Bumped on every change to a repository's pulls, for its list's ETag.
+  const pullVersions = new Map<string, number>();
+  const touch = (repo: string) => pullVersions.set(repo, (pullVersions.get(repo) ?? 0) + 1);
+  let pullsNotModified = 0;
   const server: Server = createServer((req, res) => {
     const [path, query] = (req.url ?? "").split("?");
     requests.push(path);
@@ -105,7 +115,14 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
         const found = list.find((p) => p.number === Number(number));
         return found ? json(200, found) : json(404, { message: "Not Found" });
       }
-      return json(200, new URLSearchParams(query).get("page") === "1" ? list : []);
+      const etag = `"${repo}-${pullVersions.get(repo) ?? 0}"`;
+      const page = new URLSearchParams(query).get("page");
+      if (page === "1" && req.headers["if-none-match"] === etag) {
+        pullsNotModified++;
+        return json(304, undefined, { etag });
+      }
+      const newestFirst = [...list].sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at));
+      return json(200, page === "1" ? newestFirst : [], { etag });
     }
     const commit = path.match(/\/commits\/([^/]+)\/(check-runs|status)$/);
     if (commit) {
@@ -138,7 +155,26 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
     },
     pull: (repo, pull) => {
       const { head, ...rest } = pull;
-      pulls.set(repo, [...(pulls.get(repo) ?? []), { html_url: `https://github.com/${repo}/pull/${pull.number}`, head: { sha: head ?? `sha-${pull.number}` }, ...rest }]);
+      const html_url = `https://github.com/${repo}/pull/${pull.number}`;
+      pulls.set(repo, [...(pulls.get(repo) ?? []), {
+        html_url, url: `x/repos/${repo}/pulls/${pull.number}`, diff_url: `${html_url}.diff`, state: "open",
+        updated_at: new Date().toISOString(), head: { sha: head ?? `sha-${pull.number}`, ref: `branch-${pull.number}` }, ...rest,
+      }]);
+      touch(repo);
+    },
+    moveHead: (repo, number, sha) => {
+      const found = pulls.get(repo)?.find((p) => p.number === number);
+      if (!found) throw new Error(`no pull ${repo}#${number}`);
+      found.head = { ...found.head, sha };
+      found.updated_at = new Date().toISOString();
+      touch(repo);
+    },
+    closePull: (repo, number) => {
+      pulls.set(repo, (pulls.get(repo) ?? []).filter((p) => p.number !== number));
+      touch(repo);
+    },
+    get pullsNotModified() {
+      return pullsNotModified;
     },
     checks: (sha, value) => checks.set(sha, value),
     breakRepo: (repo) => broken.add(repo),

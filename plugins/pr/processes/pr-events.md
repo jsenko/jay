@@ -54,8 +54,8 @@ New commits arrived, so any prior review is stale.
 
 1. `auto_review: needs-re-review`, `attention: false`
 2. Clear `review` and `re-review` attention items
-3. `crew_post` a re-review job, `prefer` the session that reviewed it
-   last. When `manual_review` is `changes-requested`, include the user's
+3. `crew_post` a re-review job of the delta `before`..`after`, `prefer`
+   the session that reviewed it last. When `manual_review` is `changes-requested`, include the user's
    comments and ask the reviewer to set `author_response`.
 4. `routable: false` → add a `re-review` attention item, per Errors
 

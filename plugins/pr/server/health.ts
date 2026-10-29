@@ -3,8 +3,8 @@
  * happened" from "polling is broken" (`get_status`).
  */
 
-/** The three things the poller polls. */
-export type PollSource = "repo_events" | "workflow_runs" | "notifications";
+/** The things the poller polls. */
+export type PollSource = "repo_events" | "pull_heads" | "workflow_runs" | "notifications";
 
 /** One failed poll. */
 export interface HealthError {
@@ -42,6 +42,7 @@ const MAX_RECENT_ERRORS = 20;
 export class Health {
   readonly sources: Record<PollSource, SourceHealth> = {
     repo_events: { lastSuccessAt: null, lastError: null },
+    pull_heads: { lastSuccessAt: null, lastError: null },
     workflow_runs: { lastSuccessAt: null, lastError: null },
     notifications: { lastSuccessAt: null, lastError: null },
   };

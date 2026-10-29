@@ -174,8 +174,9 @@ follow-up, waiting for users outside Apicurio.
 | `get_status` | The user, repositories, last success per source and recent errors, to tell "nothing happened" from "polling is broken" |
 
 It watches PRs, reviews, review comments, issues and issue comments in
-the watched repositories, completed workflow runs and runs waiting for
-approval, and notifications you take part in elsewhere. A first start
+the watched repositories, pushes to their open PRs (found by each PR's
+head moving, so a fork's count too), completed workflow runs and runs
+waiting for approval, and notifications you take part in elsewhere. A first start
 only records where each stream is; after that, each event is delivered
 once, including those from while it was down, up to the age limit.
 

@@ -45,6 +45,9 @@ export interface PullRequestEvent extends EventBase {
   deletions?: number;
   // from follow-up API call
   changed_files?: number;
+  // synchronize only: the head before and after, from comparing heads between polls
+  before?: string;
+  after?: string;
   refs: {
     // from follow-up API call; html_url and diff_url derived from api_url if unavailable
     pr: NumberedRef & { diff_url: string };

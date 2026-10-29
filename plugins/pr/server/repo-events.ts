@@ -119,6 +119,9 @@ export async function processEvents(
     }
 
     if (!WATCHED_EVENT_TYPES.has(event.type)) continue;
+    // Pushes come from pull-heads.ts, which sees every one; the stream
+    // carries only some, and a second copy would be a second re-review.
+    if (event.type === "PullRequestEvent" && event.payload?.action === "synchronize") continue;
     if (isEventTooOld(event, config.maxEventAgeHours)) continue;
     if (isFirstRun) continue;
 

@@ -19,9 +19,18 @@ export interface WorkflowRunState {
   lastPollAt: string;
 }
 
+/** One repository's open PRs and their heads, to notice pushes. */
+export interface PullHeadsState {
+  /** The first page's ETag; a 304 means no PR changed. */
+  etag: string | null;
+  /** Head SHA by PR number. */
+  heads: Record<string, string>;
+}
+
 /** Everything persisted between runs. */
 export interface StateFile {
   repos: Record<string, RepoState>;
+  pullHeads?: Record<string, PullHeadsState>;
   workflowRuns?: Record<string, WorkflowRunState>;
   lastNotificationAt?: string;
   /**

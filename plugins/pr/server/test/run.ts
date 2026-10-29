@@ -5,10 +5,11 @@ import { run as cache } from "./cache.test.js";
 import { run as events } from "./events.test.js";
 import { run as notifications } from "./notifications.test.js";
 import { run as pulls } from "./pulls.test.js";
+import { run as pushes } from "./pushes.test.js";
 
 console.log("pr tests");
 
-for (const suite of [cache, events, notifications, pulls]) {
+for (const suite of [cache, events, notifications, pulls, pushes]) {
   await suite();
 }
 

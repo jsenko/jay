@@ -20,7 +20,7 @@ export async function run(): Promise<void> {
   const idle = await connect(github.url, join(tempDir("idle"), "state.json"));
   await call(idle.client, "github_api", { url: `${github.url}/repos/acme/widgets/issues/7` });
   await settle(2500);
-  const isPolling = (path: string) => path === "/user" || path.endsWith("/events") || path.endsWith("/runs") || path === "/notifications";
+  const isPolling = (path: string) => path === "/user" || path.endsWith("/events") || path.endsWith("/runs") || path.endsWith("/pulls") || path === "/notifications";
   check("a server nobody asks for events makes no polling calls", !github.requests.some(isPolling), github.requests);
 
   const asked = await call(idle.client, "get_status");
