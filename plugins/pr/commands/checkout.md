@@ -66,6 +66,9 @@ Then set `manual_review` and `manual_reviewed_commit`, and `crew_send`
 the watcher what happened; it recalculates `attention`. The GitHub review
 event is the fallback if that message is missed. *Skip* changes nothing.
 
+**The user's own PR** has no verdict. Offer to hand the findings over,
+per `~/.jay/plugins/pr/processes/own-pr-review.md` step 3.
+
 # Notes
 
 Facts, not a data dump. Show what needs action rather than everything

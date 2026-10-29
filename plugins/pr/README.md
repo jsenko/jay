@@ -96,6 +96,13 @@ saying so.
 Approval is never automatic. Talking to a reviewer session yourself
 puts it in `focus`, so no other work is routed to it while you do.
 
+**Your own PRs** are reviewed the same way, but nothing is posted to
+them: you can't approve your own PR, and a review in your name is noise
+to the other maintainers. The findings go to a coder session working on
+the PR, as a crew job, or into a note for the next one; each push is
+re-reviewed, and once nothing is left, the PR waits for another
+maintainer.
+
 ## Notifications
 
 Launch every session the same way, with the channels flag for both

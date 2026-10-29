@@ -17,6 +17,7 @@ A review job claimed from the crew, or the user asking directly.
 | From a team member | Review once; re-review at lower priority |
 | Not theirs, already reviewed by another team member | Do not pile on. Only if asked, or if the user is mentioned |
 | The user already reviewed this head | Record anything new on the item; post nothing |
+| The user authored it | Review, then `~/.jay/plugins/pr/processes/own-pr-review.md` in place of step 7 |
 
 Update the `pr` item either way: a summary is worth having without a comment.
 
@@ -102,8 +103,6 @@ saying which.
 
 **Asked for directly** — the user is present. Show the findings before
 posting; they accept, drop, reword or add. Only post what they accept.
-Reviewing drafts changes conclusions often enough to be worth the round
-trip.
 
 Once they approve a *class* of action, that carries — no need to ask
 again for the next one of the same kind. Mechanical actions (setting a
