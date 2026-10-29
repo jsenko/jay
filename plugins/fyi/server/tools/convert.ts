@@ -5,16 +5,46 @@ import { authoredId, keyedId } from "../identity.js";
 import { deriveFromKey, findByKey, keyField } from "../keys.js";
 import { stampCompletion } from "../completion.js";
 import { checkRefs } from "../refs.js";
-import { addLink } from "../links.js";
-import { unionProperties, validate } from "../schema.js";
+import { addLink, inverseOf } from "../links.js";
+import { SCHEMAS, unionProperties, validate, type FieldSchema } from "../schema.js";
 import { get, write } from "../store.js";
 import { nowIso } from "../time.js";
-import { BODY_FIELD, ITEM_TYPES, type Item, type ItemType } from "../types.js";
+import { BODY_FIELD, ITEM_TYPES, type Item, type ItemType, type Link } from "../types.js";
 import { requireString } from "../validation.js";
 import type { Tool } from "./tool.js";
 
-/** Fields the server owns, which never carry across a conversion. */
+/** Fields the server owns, which never carry across a conversion. Links are carried separately. */
 const NOT_CARRIED = new Set(["id", "type", "created_at", "updated_at", "links", "archived"]);
+
+/**
+ * Whether a field holds something written by hand, worth keeping in the
+ * body when the target type has no place for it. Enums, dates, flags and
+ * numbers are state that means nothing under another type.
+ */
+function isProse(field: FieldSchema | undefined): boolean {
+  const scalar = field?.type === "array" ? field.items : field;
+  return scalar?.type === "string" && !scalar.enum && !scalar.format;
+}
+
+/**
+ * Moves the links other items hold to the source over to the converted
+ * item, or adds them alongside when the source stays active, so each
+ * carried link still reads from both ends.
+ */
+function carryInverses(links: Link[], sourceId: string, newId: string, keepSource: boolean, now: string): void {
+  for (const link of links) {
+    const inverse = inverseOf(link.rel);
+    const other = inverse ? get(link.id) : undefined;
+    if (!inverse || !other) continue;
+
+    const held = other.item.links ?? [];
+    const old = held.find((l) => l.id === sourceId && l.rel === inverse);
+    const kept = keepSource ? held : held.filter((l) => l !== old);
+    other.item.links = addLink(kept, { id: newId, rel: inverse, note: old?.note ?? link.note });
+    other.item.updated_at = now;
+    write(other.item, other.scope);
+  }
+}
 
 /**
  * Converts an item to another type.
@@ -61,12 +91,22 @@ function handler(args: Record<string, any>) {
 
   // Drop anything the target type has no place for, rather than failing:
   // a conversion should not require the caller to know both schemas.
+  // What was written by hand goes into the body instead, so nothing the
+  // user wrote is lost.
+  const folded = new Map<string, string>();
   for (const field of Object.keys(fields)) {
     try {
       validate(target, { [field]: fields[field] }, { partial: true });
     } catch {
+      if (!(field in SCHEMAS[target].properties) && isProse(SCHEMAS[source.type].properties[field])) {
+        const value = fields[field];
+        folded.set(field, `${field}: ${Array.isArray(value) ? value.join(", ") : value}`);
+      }
       delete fields[field];
     }
+  }
+  if (folded.size > 0) {
+    fields[targetBody] = [fields[targetBody], [...folded.values()].join("\n")].filter(Boolean).join("\n\n");
   }
 
   // Only the fields the caller added are checked: a reference carried
@@ -93,12 +133,13 @@ function handler(args: Record<string, any>) {
     title: String(fields.title ?? source.title),
     created_at: now,
     updated_at: now,
-    links: addLink(undefined, { id, rel: "from", note: `converted from ${source.type}` }),
+    links: addLink(source.links, { id, rel: "from", note: `converted from ${source.type}` }),
   } as Item;
   // A carried completed_at is the source's finish time, which still holds.
   stampCompletion(item, undefined, fields, now);
 
   write(item, stored.scope);
+  carryInverses(source.links ?? [], id, item.id, Boolean(keep_source), now);
 
   if (!keep_source) {
     source.archived = true;
@@ -116,7 +157,8 @@ function handler(args: Record<string, any>) {
     type: target,
     from: id,
     source_archived: !keep_source,
-    dropped: Object.keys(carried).filter((f) => fields[f] === undefined),
+    dropped: Object.keys(carried).filter((f) => fields[f] === undefined && !folded.has(f)),
+    folded: [...folded.keys()],
   };
 }
 
@@ -124,7 +166,7 @@ export const convertTool: Tool = {
   definition: {
     name: "fyi_convert",
     description:
-      "Turn one item into another type, carrying its content and recording where it came from: a note that turns out to need doing, a task that is really a project, a project that was only ever one task. The original is archived unless keep_source is set.",
+      "Turn one item into another type, carrying its content and links and recording where it came from: a note that turns out to need doing, a task that is really a project, a project that was only ever one task. Text the new type has no field for, such as a note's urls on a task, is added to the body. The original is archived unless keep_source is set.",
     inputSchema: {
       type: "object",
       properties: {

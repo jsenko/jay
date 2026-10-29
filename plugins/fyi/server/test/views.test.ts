@@ -131,6 +131,32 @@ export async function run(): Promise<void> {
   check("keep_source leaves the original active", keptConv.source_archived === false, keptConv);
   check("original is still searchable", (await call(c, "fyi_get", { id: kept.id })).archived === undefined);
 
+  const finding = await call(c, "fyi_capture", {
+    type: "note", title: "Merge order for the error contract",
+    content: "Record it on the epic.", urls: ["https://github.com/acme/widgets/issues/10"],
+  });
+  await call(c, "fyi_link", { from: finding.id, to: project.id, rel: "relates-to", note: "the epic" });
+  await call(c, "fyi_link", { from: finding.id, to: kept.id, rel: "blocks" });
+  const linkedConv = await call(c, "fyi_convert", { id: finding.id, to: "task", next_action_at: dayOffset(1) });
+  const linkedTask = await call(c, "fyi_get", { id: linkedConv.id });
+  check("links carry to the converted item",
+    linkedTask.links.some((l: any) => l.id === project.id && l.rel === "relates-to") &&
+    linkedTask.links.some((l: any) => l.id === kept.id && l.rel === "blocks"), linkedTask.links);
+  const projectLinks = (await call(c, "fyi_get", { id: project.id })).links;
+  check("inverse links move to the converted item",
+    projectLinks.some((l: any) => l.id === linkedConv.id && l.note === "the epic") &&
+    !projectLinks.some((l: any) => l.id === finding.id), projectLinks);
+  check("a field the new type lacks goes into the body",
+    linkedTask.description.endsWith("urls: https://github.com/acme/widgets/issues/10") &&
+    linkedConv.folded.includes("urls") && !linkedConv.dropped.includes("urls"), { linkedTask, linkedConv });
+
+  const keptLinked = await call(c, "fyi_convert", { id: linkedConv.id, to: "note", keep_source: true });
+  const blockedLinks = (await call(c, "fyi_get", { id: kept.id })).links;
+  check("keep_source keeps inverse links to both",
+    blockedLinks.some((l: any) => l.id === linkedConv.id) && blockedLinks.some((l: any) => l.id === keptLinked.id), blockedLinks);
+  check("state with no place in the new type is dropped, not folded",
+    keptLinked.dropped.includes("next_action_at") && !keptLinked.folded.includes("next_action_at"), keptLinked);
+
   const sameType = await call(c, "fyi_convert", { id: converted.id, to: "task", next_action_at: dayOffset(1) });
   check("converting to the same type is rejected", sameType.error?.includes("already a task"), sameType);
 

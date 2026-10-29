@@ -198,6 +198,11 @@ rather than the default.
 **Provenance is written, not optional.** `fyi_convert` always records
 where an item came from, so "why does this task exist?" is answerable —
 which matters most for items an automated poster created unattended.
+It also carries the source's links, moving the other ends to the new
+item, and adds text the new type has no field for to its body. A note
+turned into a task to be reminded of it is the common case, and losing
+its links or URLs on the way made that move cost more than leaving it a
+note.
 
 ## 6. What was removed, and why
 

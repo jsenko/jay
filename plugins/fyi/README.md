@@ -42,7 +42,7 @@ and `/fyi:dashboard` is `/fyi-dashboard` there.
 | `fyi_today` | What needs attention now, in one call |
 | `fyi_link` | Relate two items; the inverse link is written too |
 | `fyi_handoff` | Pick up a project where the last session stopped |
-| `fyi_convert` | Turn one item into another type, keeping where it came from |
+| `fyi_convert` | Turn one item into another type, keeping its links and where it came from |
 | `fyi_create_scope` | Create a scope |
 
 The plugin also brings a skill, `fyi-triggers`, that has sessions notice
