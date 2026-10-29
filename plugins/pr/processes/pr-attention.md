@@ -12,15 +12,19 @@ CI — are handled in `~/.jay/plugins/pr/processes/pr-events.md`, which then com
 
 ## Core table
 
+The first row that matches decides.
+
 | `manual_review` | `auto_review` | `attention` | Reason |
 |---|---|---|---|
 | `pending` | `needs-review` | `false` | Automated review has not started |
 | `pending` | `in-progress` | `false` | Review in progress |
 | `pending` | `reviewed`, no required findings | `true` | Ready for manual sign-off |
+| `pending` | `reviewed`, required findings, on the user's own PR, handed to a code session (a `respond` item, `who: automation`) | `false` | Being fixed; the push brings a re-review |
 | `pending` | `reviewed`, required findings | `true` | Required findings need the user's decision |
 | `pending` | `needs-re-review` | `false` | Waiting for the re-review |
 | `approved` | any | `false` | Already approved |
 | `changes-requested` | `needs-re-review` | `false` | Waiting for the author, then a re-review |
+| `changes-requested` | `reviewed`, and `manual_reviewed_commit` is `auto_reviewed_commit` | `false` | The user decided on this head; the author's turn |
 | `changes-requested` | `reviewed` + `author_response: addressed` | `true` | Author addressed it; the user re-checks |
 | `changes-requested` | `reviewed` + `author_response: not-addressed` | `false` | Still the author's turn |
 | `changes-requested` | `reviewed` + `author_response: partially-addressed` | `true` | Partial; the user decides the next step |
