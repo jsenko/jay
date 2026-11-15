@@ -22,3 +22,7 @@ Never push without the user confirming, each time.
   says otherwise.
 - The description has its own section on impact: what changes for users,
   operators or other code.
+- When a round of work has several GitHub side effects (a push, a body
+  edit, a comment, replies), re-fetch each afterwards and check it
+  against what was meant before calling the round done. A body drafted
+  to a file but never sent looks finished until checked on the live PR.

@@ -215,6 +215,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] Posting a job no session can take reports it at once; it waits
       rather than expiring, and the next `/crew:start` warns about it in
       one line
+- [ ] A job with several items, resolved as `done`, says which were
+      checked on GitHub and which could not be
 - [ ] A Claude Code watcher and an opencode reviewer see each other and
       pass a job
 - [ ] `/crew:retry-smaller` (`/crew-retry-smaller` in opencode), after a
