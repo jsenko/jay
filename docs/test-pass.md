@@ -71,6 +71,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] `/crew:start` with the same role, in the same repository or
       another checkout of it, offers that session; picking it up checks
       the branch first and archives the note
+- [ ] A session note saved with a scratchpad draft lists a durable copy
+      instead; deleting a listed path before pickup gets it named as gone
 - [ ] A watcher started fresh reads the last watcher's `session` note
       before reconciling, without asking; its `/crew:stop` updates that
       note rather than adding one. A reviewer the user drove asks at

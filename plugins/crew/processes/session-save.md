@@ -45,6 +45,12 @@ in this conversation. Write the note only on a yes.
 
 Leave `project` unset: notes with a project are its decision log.
 
+**Nothing only in the scratchpad.** The client's temporary directory can
+be emptied by a reboot, so the note never points at a file there as the
+only copy. Put small text in `content`; move anything else somewhere
+durable first, such as the working directory, the project's folder or a
+committed branch, and list that path.
+
 `content`, written as if for a compaction summary, for a session that
 has none of this context:
 

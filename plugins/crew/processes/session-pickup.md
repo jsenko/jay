@@ -46,6 +46,8 @@ candidates, say nothing.
 
 1. Read the note in full, and `fyi_handoff` its project if it has one.
 2. Check what it says against the present: the branch, uncommitted
-   changes, the issue's state. Where they disagree, the present wins.
+   changes, the issue's state, and each of its `paths`. Where they
+   disagree, the present wins. Name any path that is gone, so the user
+   knows what has to be rebuilt.
 3. Archive the note (`fyi_update`, `archived: true`), so it is not
    offered again, and carry on from its **Next**.
