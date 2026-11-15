@@ -10,12 +10,11 @@ ownership, area interest and load; bot PRs rotated to spread them evenly.
 So the primary rule is short:
 
 **Track what is assigned to the user.** The upstream router has already
-weighed who should look at a PR, using a richer model than this file
-could restate. Duplicating its area and contributor matching here would
-be a second copy that drifts.
+weighed who should look at a PR, with a richer model than this file
+could restate; duplicating its matching here would be a copy that drifts.
 
-Importance follows from the same source: the strongest signal is that
-someone — a person or the router — put it on the user's plate.
+A repository with no router assigns nobody, so there
+`~/.jay/plugins/pr/rules/pr-interest-unrouted.md` replaces this rule.
 
 ## Exceptions
 
@@ -31,9 +30,10 @@ them:
 | **Security or a breaking change** | Matters regardless of who holds it |
 | Assigned to **someone else**, and the user has context | Track at low importance; do not review unless asked |
 
-**Unassigned is a defect,** worth a look at the job, not an `assign` item:
-assignment happens on open and undraft. Except a maintainer's own PR: it
-only gets a suggested reviewer, so unassigned is expected there.
+**Unassigned is a defect** where there is a router, worth a look at the
+job, not an `assign` item: assignment happens on open and undraft.
+Except a maintainer's own PR: it only gets a suggested reviewer, so
+unassigned is expected there.
 
 ## Importance
 

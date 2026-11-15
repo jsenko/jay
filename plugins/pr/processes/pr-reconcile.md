@@ -23,6 +23,14 @@ Mentions and comments come only from search, for each watched entry
 gh search prs --state open --repo <owner/repo> --involves @me --json url,number,title
 ```
 
+A repository with no router (`~/.jay/plugins/pr/rules/pr-interest-unrouted.md`)
+lists its open PRs instead, assigned or not, and refreshing one there
+also checks it for staleness:
+
+```bash
+gh pr list --repo <owner/repo> --state open --json url,number,isDraft
+```
+
 The search index can lag, so an empty answer proves nothing. Prefix with
 `GH_HOST=github.com` only when `gh auth status` lists another host;
 without it, the allow rules for `gh` still match.

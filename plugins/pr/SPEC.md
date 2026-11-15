@@ -35,7 +35,7 @@ user is worth their attention, not to reach a verdict.
 
 | Stage | Who | Reads |
 |---|---|---|
-| Triage | watcher | `rules/pr-interest.md`, `rules/apicurio-prs.md` |
+| Triage | watcher | `rules/pr-interest.md` (`rules/pr-interest-unrouted.md` where nothing assigns reviewers), `rules/apicurio-prs.md` |
 | Unblock | watcher sweep, or reviewer as step one | `processes/pr-preflight.md` |
 | Review | reviewer | `processes/pr-review.md`, `pr-comment.md` |
 | Re-review | reviewer | `processes/pr-rereview.md` |

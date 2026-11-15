@@ -166,8 +166,11 @@ reviewer assignment are declared, maintainer-only labels, and the
 `get_check_status` reads as pending gates, and the bots whose PRs merge
 on green CI, which get no review job unless one is still open a day
 later. `rules/pr-interest.md` tracks
-what is assigned to you, so it assumes the project assigns reviewers
-automatically. A project without lifecycle labels needs
+what is assigned to you, where the project assigns reviewers
+automatically (`.github/pr-lifecycle.yml`). In a watched repository
+without that, `rules/pr-interest-unrouted.md` tracks every open PR
+instead, and flags one stale after 14 days with no maintainer activity.
+A project without lifecycle labels needs
 `processes/pr-events.md` changed as well. Making this configurable is a
 follow-up, waiting for users outside Apicurio.
 

@@ -156,6 +156,9 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] A re-review after one with R1–R2 and O1 numbers its new items R3
       and O2 on, never a plain list; an open design question is a `Q`
       with a `decide` item, a settled direction a `D`
+- [ ] In a watched repository with no `.github/pr-lifecycle.yml`, an
+      unassigned PR is tracked at `medium`, and one quiet for 14 days
+      gets a `stale` item
 - [ ] A push to a reviewed PR produces a re-review job of the delta,
       preferring the same reviewer, from a fork too, and only once
 - [ ] A Renovate PR assigned to you is tracked with no review job; one
