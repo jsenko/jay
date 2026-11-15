@@ -52,6 +52,38 @@ export async function fetchGitHubApi(url: string, token: string, cache: Cache): 
   }
 }
 
+/** Reads already started this poll round, by URL, so each is fetched once per round. */
+export type Round = Map<string, Promise<Record<string, any> | null>>;
+
+/**
+ * Fetches an API URL afresh, for what changes over a PR's life: its labels,
+ * state and size. The cached copy can date from when the PR opened. Within
+ * one round, every event on the same PR shares one read; a success also
+ * refreshes the cache for `github_api`, and a failure is null, leaving the
+ * cache alone.
+ */
+export function fetchGitHubApiFresh(url: string, token: string, cache: Cache, round: Round): Promise<Record<string, any> | null> {
+  const started = round.get(url);
+  if (started) return started;
+  const read = (async () => {
+    try {
+      const res = await fetch(url, { headers: githubHeaders(token) });
+      if (!res.ok) {
+        console.error(`[github-events] Failed to fetch ${url}: ${res.status}`);
+        return null;
+      }
+      const data = await res.json();
+      cache.setApiResponse(url, data);
+      return data;
+    } catch (err) {
+      console.error(`[github-events] Error fetching ${url}:`, err);
+      return null;
+    }
+  })();
+  round.set(url, read);
+  return read;
+}
+
 /** The web page for an API URL, for when the API response has no `html_url`. */
 export function htmlUrlFromApiUrl(apiUrl: string): string {
   return apiUrl

@@ -48,6 +48,8 @@ export interface FakeGitHub {
   notify(notification: RawNotification, comment: { body: string; login: string }): void;
   /** Adds an open pull to a repository's list; `head` is its head commit. */
   pull(repo: string, pull: Record<string, unknown> & { number: number; head?: string }): void;
+  /** Replaces an open pull's labels. */
+  relabel(repo: string, number: number, labels: string[]): void;
   /** Moves an open pull's head, as a push to its branch does. */
   moveHead(repo: string, number: number, sha: string): void;
   /** Takes a pull off the open list. */
@@ -169,6 +171,13 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
         html_url, url: `x/repos/${repo}/pulls/${pull.number}`, diff_url: `${html_url}.diff`, state: "open",
         updated_at: new Date().toISOString(), head: { sha: head ?? `sha-${pull.number}`, ref: `branch-${pull.number}` }, ...rest,
       }]);
+      touch(repo);
+    },
+    relabel: (repo, number, labels) => {
+      const found = pulls.get(repo)?.find((p) => p.number === number);
+      if (!found) throw new Error(`no pull ${repo}#${number}`);
+      found.labels = labels.map((name) => ({ name }));
+      found.updated_at = new Date().toISOString();
       touch(repo);
     },
     moveHead: (repo, number, sha) => {

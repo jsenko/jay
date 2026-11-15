@@ -124,6 +124,14 @@ again once a fresh page arrives, which a watcher acts on twice. So the
 cursor never moves back, and the server also remembers the last thousand
 events it pushed, by id and time, so no source can push one again.
 
+**A PR event reads the PR as it is now.** The stream's payload carries
+little, so each PR event reads the PR for its title, labels, state and
+size. That read is made afresh, once per poll round however many events
+the PR has in it, because a cached copy from when the PR opened would
+give a label event its first labels and a merge its open state. A PR
+that can't be read is marked `unread`, so empty labels never pass for
+real ones.
+
 **Pushes come from heads, not the stream.** The repository event stream
 rarely carries a `synchronize` for a push to a same-repository branch,
 and never for a fork, whose pushes happen in the fork: on 26 Oct, three

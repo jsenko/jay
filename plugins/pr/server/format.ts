@@ -9,7 +9,7 @@ import type {
   IssuesEvent,
   IssueCommentEvent,
 } from "./event-types.js";
-import { fetchGitHubApi, htmlUrlFromApiUrl, type RawGitHubEvent } from "./github.js";
+import { fetchGitHubApi, fetchGitHubApiFresh, htmlUrlFromApiUrl, type RawGitHubEvent, type Round } from "./github.js";
 
 /** A body on one line, so pushes and summaries stay compact. */
 export function collapseWhitespace(text: string | undefined | null): string {
@@ -23,14 +23,17 @@ function truncate(text: string, maxLen: number): string {
   return text.slice(0, maxLen - 3) + "...";
 }
 
-/** A PR opened, closed, merged, labelled…; fetches the PR for its title, body and size. */
-async function formatPullRequestEvent(event: RawGitHubEvent, token: string, cache: Cache): Promise<PullRequestEvent | null> {
+/**
+ * A PR opened, closed, merged, labelled…; reads the PR as it is now for its
+ * title, labels, state and size, since a cached copy can be from its opening.
+ */
+async function formatPullRequestEvent(event: RawGitHubEvent, token: string, cache: Cache, round: Round): Promise<PullRequestEvent | null> {
   const { payload } = event;
   const action = payload.action;
   const pr = payload.pull_request;
   if (!pr) return null;
 
-  const full = await fetchGitHubApi(pr.url, token, cache);
+  const full = await fetchGitHubApiFresh(pr.url, token, cache, round);
 
   const title = full?.title ?? `${pr.head?.ref ?? "unknown"}`;
   const merged = action === "closed" && (full?.merged ?? false);
@@ -52,6 +55,7 @@ async function formatPullRequestEvent(event: RawGitHubEvent, token: string, cach
     additions: full?.additions,
     deletions: full?.deletions,
     changed_files: full?.changed_files,
+    ...(full ? {} : { unread: true as const }),
     refs: {
       pr: {
         number: pr.number,
@@ -195,7 +199,7 @@ async function formatIssueCommentEvent(event: RawGitHubEvent, token: string, cac
 }
 
 /** Turns one raw event into what a session sees, or null to drop it. */
-type Formatter = (event: RawGitHubEvent, token: string, cache: Cache) => Promise<Event | null>;
+type Formatter = (event: RawGitHubEvent, token: string, cache: Cache, round: Round) => Promise<Event | null>;
 
 /** The formatter for each watched event type. */
 const formatters: Record<string, Formatter> = {
@@ -206,11 +210,14 @@ const formatters: Record<string, Formatter> = {
   IssueCommentEvent: formatIssueCommentEvent,
 };
 
-/** Formats an event of a watched type and caches it for `get_event`. */
-export async function formatEvent(event: RawGitHubEvent, token: string, cache: Cache): Promise<Event | null> {
+/**
+ * Formats an event of a watched type and caches it for `get_event`. `round`
+ * holds the reads already made this poll round.
+ */
+export async function formatEvent(event: RawGitHubEvent, token: string, cache: Cache, round: Round = new Map()): Promise<Event | null> {
   const formatter = formatters[event.type];
   if (!formatter) return null;
-  const formatted = await formatter(event, token, cache);
+  const formatted = await formatter(event, token, cache, round);
   if (formatted) {
     cache.setEvent(event.id, formatted);
   }

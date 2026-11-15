@@ -5,7 +5,7 @@ import type { PollerConfig } from "./config.js";
 import type { Event } from "./event-types.js";
 import { applyFilters } from "./filters.js";
 import { formatEvent } from "./format.js";
-import { API, githubHeaders, type RawGitHubEvent } from "./github.js";
+import { API, githubHeaders, type RawGitHubEvent, type Round } from "./github.js";
 import type { RepoState } from "./state.js";
 
 /** The repository event types a session hears about. */
@@ -92,6 +92,7 @@ export async function processEvents(
 
   let latestEventId: string | null = null;
   const newEvents: { id: string; event: Event }[] = [];
+  const round: Round = new Map();
 
   const lastSeenId = repoState?.lastEventId;
   const lastPollAt = repoState?.lastPollAt ? new Date(repoState.lastPollAt).getTime() : 0;
@@ -125,7 +126,7 @@ export async function processEvents(
     if (isEventTooOld(event, config.maxEventAgeHours)) continue;
     if (isFirstRun) continue;
 
-    const formatted = await formatEvent(event, config.githubToken, cache);
+    const formatted = await formatEvent(event, config.githubToken, cache, round);
     if (formatted) {
       const filterResult = applyFilters(formatted, authenticatedUser);
       if (filterResult) {

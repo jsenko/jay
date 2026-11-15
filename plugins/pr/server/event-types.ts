@@ -45,6 +45,8 @@ export interface PullRequestEvent extends EventBase {
   deletions?: number;
   // from follow-up API call
   changed_files?: number;
+  // set when the PR couldn't be read: labels, state and size are then unknown, not empty
+  unread?: true;
   // synchronize only: the head before and after, from comparing heads between polls
   before?: string;
   after?: string;
