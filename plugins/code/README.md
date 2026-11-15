@@ -70,7 +70,7 @@ and ordered items ending in a written convention.
 | [`supply-chain.md`](rules/supply-chain.md) | SC | Signs of a malicious change | Dependency, build and CI changes; newcomers' contributions |
 | [`apicurio.md`](rules/apicurio.md) | A | Apicurio and Apitomy conventions | Their repositories |
 | [`preferences.md`](rules/preferences.md) | P | The author's opinions | Code written in your sessions only |
-| [`git.md`](rules/git.md) | — | Commits, branches, PRs | Your sessions |
+| [`git.md`](rules/git.md) | — | Commits, branches, PRs, public text | Your sessions |
 
 An ID is never renumbered or reused, so "Q7" in a review comment means
 the same thing a year later. A retired rule keeps its row, marked

@@ -110,6 +110,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] On an open PR, a review comment produces an assessment and a
       proposed reply rather than a silent change; the replies are shown
       with the push confirmation and posted on each thread after it
+- [ ] After a job handed over from an unposted review, nothing the
+      session posts names the job, a session, or the review's finding ids
 
 ## Reviewing pull requests
 

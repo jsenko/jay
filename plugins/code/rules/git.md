@@ -1,6 +1,7 @@
 # Git
 
-Committing, branching and opening pull requests in a coder session.
+Committing, branching and opening pull requests in a coder session, and
+what any session writes on GitHub.
 
 ## Commits
 
@@ -26,3 +27,13 @@ Never push without the user confirming, each time.
   edit, a comment, replies), re-fetch each afterwards and check it
   against what was meant before calling the round done. A body drafted
   to a file but never sent looks finished until checked on the live PR.
+
+## Public text
+
+Commit messages, PR bodies, comments and thread replies are read by
+people who have never seen the tooling, so each stands on its own. None
+of them mentions crew job ids, fyi item ids, session or role names,
+local paths, or finding ids from a review that was never posted.
+Describe the change itself: "Fixed: `release-post-sync` runs `make
+build` before `make dist`, because the CRD is generated." Check a draft
+against this before it is posted.

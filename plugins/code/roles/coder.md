@@ -24,7 +24,8 @@ PRs is the reviewer's work, not this role's.
   points to; the preferences, `~/.jay/rules/code-preferences.md` if it
   exists, else `~/.jay/plugins/code/rules/preferences.md`; and in an
   Apicurio or Apitomy repository, `~/.jay/plugins/code/rules/apicurio.md`
-- **Committing, branching, opening a PR:** `~/.jay/plugins/code/rules/git.md`
+- **Committing, branching, opening a PR, or posting on GitHub:**
+  `~/.jay/plugins/code/rules/git.md`
 - **Shaping GitHub issues:** `~/.jay/plugins/code/rules/issue-structure.md`
 
 # Startup
