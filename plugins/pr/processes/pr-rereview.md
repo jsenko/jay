@@ -33,6 +33,9 @@ set `author_response`:
 | `partially-addressed` | Some outstanding — say which in the Decision |
 | `not-addressed` | Nothing acted on |
 
+On the user's own PR, also check that each review thread addressed since,
+bots' included, has a reply, and name the ones that don't on the item.
+
 ## Say what changed, not everything
 
 The comment leads with what was addressed, then lists what remains and

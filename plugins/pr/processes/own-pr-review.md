@@ -16,12 +16,13 @@ author is the user (`github.user` in `~/.jay/config.json`) → this reviewer
    verification and finding ids.
 2. **Post nothing to the PR**: no review, comment or verdict, whatever
    `~/.jay/plugins/pr/processes/pr-comment.md` would allow. The draft
-   goes in `draft_review`.
+   goes in `draft_review`. This holds the verdict back; the author's
+   replies to other reviewers' threads are theirs, posted from the fix.
 3. **Hand the findings over**:
 
 | Situation | Do |
 |---|---|
-| A code session works on the PR: `crew_who` shows its purpose, directory or repository | `crew_post` with `to` it, `needs: ["code"]` and `ref: pr:<Owner/Repo>#<n>`: each finding's id, what was verified and how, files and lines, and how the PR's pushes go (remote, sign-off). Add a `respond` attention item, `who: automation`, naming the job |
+| A code session works on the PR: `crew_who` shows its purpose, directory or repository | `crew_post` with `to` it, `needs: ["code"]` and `ref: pr:<Owner/Repo>#<n>`: each finding's id, what was verified and how, files and lines; the PR's unresolved review threads, bots' included, with their comment ids, to answer per `~/.jay/plugins/code/processes/pr-feedback-loop.md`; and how the PR's pushes go (remote, sign-off). Add a `respond` attention item, `who: automation`, naming the job |
 | No such session | Capture a note with the findings, linked `relates-to` the `pr` item, and add a `respond` item, `who: user`, pointing at it, for a coder session to pick up |
 | Nothing worth changing | Go to 5 |
 

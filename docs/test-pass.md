@@ -110,6 +110,9 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] On an open PR, a review comment produces an assessment and a
       proposed reply rather than a silent change; the replies are shown
       with the push confirmation and posted on each thread after it
+- [ ] A Copilot comment on the user's PR gets an assessment and a reply
+      with the push; its thread is resolved once the suggestion is taken,
+      including when the work came as a job from an own-PR review
 - [ ] After a job handed over from an unposted review, nothing the
       session posts names the job, a session, or the review's finding ids
 

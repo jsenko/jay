@@ -47,7 +47,9 @@ the command is `/code-implement` and the skill `code-style` there.
 description. It picks the weight, sets up a branch, and works in a loop:
 build, read its own diff against the rules, and ask before committing.
 It never pushes without asking. Once a PR is open it watches review
-comments and CI, and prepares fixes and replies for you to send.
+comments and CI, Copilot's and other bots' included, and prepares fixes
+and a reply to each comment, posted with the push you confirm. A bot's
+thread is resolved once its suggestion is taken.
 
 **Tracking.** Work above a quick fix gets a project in fyi, with its
 files (`DESIGN.md`, `TASKS.md`, and for phased work `PLAN.md` and
