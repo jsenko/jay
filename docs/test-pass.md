@@ -46,8 +46,9 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] `/crew:start` with no argument starts `general`, names the other
       roles in one line, and asks what you're working on
 - [ ] `/crew:start nonsense` errors and lists the real roles
-- [ ] The ready report shows directory, repository, crew id, and
-      `Notifications: channel` or `poll`
+- [ ] The ready report opens with `Session: <id>` on its own line, for
+      every role, then directory, repository, and `Notifications:
+      channel` or `poll`
 - [ ] Launched with the channels flag, a session reports `channel`;
       without it, `poll`
 - [ ] In `poll` mode a role with capabilities checks at the interval

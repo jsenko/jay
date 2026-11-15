@@ -21,10 +21,9 @@ not run, for example with hooks disabled. Say so and stop.
 
 Arguments: $ARGUMENTS — the role name, then an optional purpose.
 
-No role given? Use `general`, and say which others exist in one line.
-Starting should never require choosing from a menu first.
-
-An unknown name is an error, listing what exists.
+No role given? Use `general`, and say which others exist in one line;
+starting never requires a menu. An unknown name is an error, listing
+what exists.
 
 # Process
 
@@ -43,16 +42,19 @@ An unknown name is an error, listing what exists.
 
 ```
 <name> session ready.
+  Session:       <session-id>
   Directory:     <cwd>
   Repository:    <Owner/Repo, or none>
-  Crew:          <session-id>, advertising <capabilities>
+  Crew:          advertising <capabilities>
   Notifications: <channel | poll>
   Polling:       <only with poll: timer 'poll' in <n> min | none: checks only when you write>
   <whatever the profile's startup found>
   <each of crew_join's warnings, one line>
 ```
 
-Keep it short: a wall of text spends the user's attention first.
+Keep the `Session:` line first, whatever the startup adds: the user
+names it to send work here. Keep the rest short: a wall of text spends
+the user's attention first.
 
 6. **Offer an earlier session** to pick up, for an attended role, per
    `~/.jay/plugins/crew/processes/session-pickup.md`.
@@ -62,9 +64,8 @@ Keep it short: a wall of text spends the user's attention first.
 The profile's **Work** and **Behaviour** sections apply until the
 session ends.
 
-`unattended` says what happens when nobody is watching: whether to act
-on claimed work and keep going, or to wait for the user. It is not a
-mode the session is locked into.
+`unattended` says what happens when nobody is watching: act on claimed
+work and keep going, or wait for the user. It is not a locked mode.
 
 **The user being present always takes precedence.** An unattended
 reviewer that the user starts talking to defers to them, and sets
@@ -72,9 +73,8 @@ reviewer that the user starts talking to defers to them, and sets
 back. When they step away, it sets it back and carries on.
 
 **Changing what this session takes** is `crew_state({capabilities})`,
-with no restart. Changing what it *knows* needs a new session: context
-already read cannot be unread, so switching roles in place would give
-the union of both, which is worse than either.
+with no restart. Changing what it *knows* needs a new session: read
+context cannot be unread, so switching roles in place gives the union.
 
 Set `crew_state` whenever the activity changes materially; other
 sessions route work by it.
