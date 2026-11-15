@@ -13,7 +13,7 @@ import { Cache } from "./cache.js";
 import { checkStatus } from "./check-status.js";
 import { loadConfig, validateConfig } from "./config.js";
 import { truncateEvent } from "./format.js";
-import { API, fetchGitHubApi } from "./github.js";
+import { API, fetchGitHubApiCurrent } from "./github.js";
 import { greetOnce } from "./hello.js";
 import { involvedPrs } from "./involved-prs.js";
 import { Poller } from "./poller.js";
@@ -83,13 +83,17 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: "github_api",
-      description: "Fetch a GitHub API URL. Uses cached responses when available to reduce API calls. Returns the raw JSON response.",
+      description: "Fetch a GitHub API URL. Returns the raw JSON response, then a line saying when GitHub last confirmed it. A cached response is served for up to a minute, then checked again; pass fresh:true to check it now, before acting on something that may have just changed.",
       inputSchema: {
         type: "object" as const,
         properties: {
           url: {
             type: "string",
             description: "The GitHub API URL to fetch (e.g. https://api.github.com/repos/owner/repo/pulls/42)",
+          },
+          fresh: {
+            type: "boolean",
+            description: "Check with GitHub whatever the cached response's age.",
           },
         },
         required: ["url"],
@@ -177,15 +181,16 @@ mcp.setRequestHandler(CallToolRequestSchema, async (req) => {
           isError: true,
         };
       }
-      const data = await fetchGitHubApi(url, config.githubToken, cache);
+      const { data, fetchedAt } = await fetchGitHubApiCurrent(url, config.githubToken, cache, args.fresh === true);
+      const age = `fetched_at: ${new Date(fetchedAt).toISOString()} (${Math.round((Date.now() - fetchedAt) / 1000)}s ago)`;
       if (data === null) {
         return {
-          content: [{ type: "text", text: `Failed to fetch ${url}` }],
+          content: [{ type: "text", text: `Failed to fetch ${url}` }, { type: "text", text: age }],
           isError: true,
         };
       }
       return {
-        content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+        content: [{ type: "text", text: JSON.stringify(data, null, 2) }, { type: "text", text: age }],
       };
     }
 

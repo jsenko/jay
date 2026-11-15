@@ -182,7 +182,7 @@ follow-up, waiting for users outside Apicurio.
 | `get_involved_prs` | Open PRs the user authored, is assigned or is asked to review, read live from each watched repository |
 | `get_check_status` | A PR's `check_status`, from the latest run of each check and the runs held for approval |
 | `get_event` | One event in full |
-| `github_api` | Any GitHub API URL, cached |
+| `github_api` | Any GitHub API URL, cached for up to a minute (`fresh: true` checks now), with when GitHub last confirmed it |
 | `get_status` | The user, repositories, last success per source and recent errors, to tell "nothing happened" from "polling is broken" |
 
 It watches PRs, reviews, review comments, issues and issue comments in

@@ -132,6 +132,15 @@ give a label event its first labels and a merge its open state. A PR
 that can't be read is marked `unread`, so empty labels never pass for
 real ones.
 
+**What `github_api` serves is at most a minute old.** Sessions read a
+PR through it before acting on it, and a copy cached when the PR opened
+gave them labels, a head or a state long gone. So a cached response is
+served for a minute, then revalidated with its ETag, which GitHub
+answers with a 304 that doesn't count against the rate limit; `fresh`
+revalidates at once. Each response says when GitHub last confirmed it,
+and a failure is retried after the same minute rather than cached until
+evicted.
+
 **Pushes come from heads, not the stream.** The repository event stream
 rarely carries a `synchronize` for a push to a same-repository branch,
 and never for a fork, whose pushes happen in the fork: on 26 Oct, three

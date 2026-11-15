@@ -43,13 +43,58 @@ export async function fetchGitHubApi(url: string, token: string, cache: Cache): 
       return null;
     }
     const data = await res.json();
-    cache.setApiResponse(url, data);
+    cache.setApiResponse(url, data, res.headers.get("etag") ?? undefined);
     return data;
   } catch (err) {
     console.error(`[github-events] Error fetching ${url}:`, err);
     cache.setApiResponse(url, null);
     return null;
   }
+}
+
+/**
+ * How long `github_api` serves a cached response before checking it
+ * again. Short, because a session reads through it to act on the PR as
+ * it is, and cheap, because a 304 doesn't count against the rate limit.
+ */
+const MAX_AGE_MS = (Number(process.env.GITHUB_API_MAX_AGE_SECONDS) || 60) * 1000;
+
+/** What `github_api` serves: the body, or null for a failure, and when GitHub last confirmed it. */
+export interface CurrentResponse {
+  data: Record<string, any> | null;
+  fetchedAt: number;
+}
+
+/**
+ * Fetches an API URL for `github_api`: from the cache while younger than
+ * the maximum age, unless `fresh`, and otherwise revalidated with its
+ * ETag, so a session never acts on a PR as it was hours ago. A failure
+ * is cached for the same age, so a broken link isn't retried on every
+ * call but isn't broken forever.
+ */
+export async function fetchGitHubApiCurrent(url: string, token: string, cache: Cache, fresh = false): Promise<CurrentResponse> {
+  const entry = cache.getApiEntry(url);
+  if (entry && !fresh && Date.now() - entry.fetchedAt < MAX_AGE_MS) return entry;
+
+  const headers = githubHeaders(token);
+  if (entry?.data && entry.etag) headers["If-None-Match"] = entry.etag;
+  try {
+    const res = await fetch(url, { headers });
+    if (res.status === 304 && entry?.data) {
+      cache.touchApiResponse(url);
+      return cache.getApiEntry(url)!;
+    }
+    if (!res.ok) {
+      console.error(`[github-events] Failed to fetch ${url}: ${res.status}`);
+      cache.setApiResponse(url, null);
+    } else {
+      cache.setApiResponse(url, await res.json(), res.headers.get("etag") ?? undefined);
+    }
+  } catch (err) {
+    console.error(`[github-events] Error fetching ${url}:`, err);
+    cache.setApiResponse(url, null);
+  }
+  return cache.getApiEntry(url)!;
 }
 
 /** Reads already started this poll round, by URL, so each is fetched once per round. */
@@ -73,7 +118,7 @@ export function fetchGitHubApiFresh(url: string, token: string, cache: Cache, ro
         return null;
       }
       const data = await res.json();
-      cache.setApiResponse(url, data);
+      cache.setApiResponse(url, data, res.headers.get("etag") ?? undefined);
       return data;
     } catch (err) {
       console.error(`[github-events] Error fetching ${url}:`, err);

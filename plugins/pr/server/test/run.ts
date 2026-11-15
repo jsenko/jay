@@ -1,6 +1,7 @@
 /** Runs every pr test suite and reports the combined result. */
 
 import { failures } from "./harness.js";
+import { run as api } from "./api.test.js";
 import { run as cache } from "./cache.test.js";
 import { run as events } from "./events.test.js";
 import { run as labels } from "./labels.test.js";
@@ -10,7 +11,7 @@ import { run as pushes } from "./pushes.test.js";
 
 console.log("pr tests");
 
-for (const suite of [cache, events, labels, notifications, pulls, pushes]) {
+for (const suite of [api, cache, events, labels, notifications, pulls, pushes]) {
   await suite();
 }
 

@@ -56,6 +56,10 @@ export interface FakeGitHub {
   closePull(repo: string, number: number): void;
   /** How many pull list requests were answered 304, unchanged. */
   readonly pullsNotModified: number;
+  /** How many single pull requests were answered 304, unchanged. */
+  readonly pullNotModified: number;
+  /** Makes a repository's pulls readable again. */
+  fixRepo(repo: string): void;
   /** Sets a commit's checks. */
   checks(sha: string, checks: FakeChecks): void;
   /** Makes a repository's pull list fail. */
@@ -97,6 +101,7 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
   const pullVersions = new Map<string, number>();
   const touch = (repo: string) => pullVersions.set(repo, (pullVersions.get(repo) ?? 0) + 1);
   let pullsNotModified = 0;
+  let pullNotModified = 0;
   const server: Server = createServer((req, res) => {
     const [path, query] = (req.url ?? "").split("?");
     requests.push(path);
@@ -123,7 +128,13 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
       const list = pulls.get(repo) ?? [];
       if (number) {
         const found = list.find((p) => p.number === Number(number));
-        return found ? json(200, found) : json(404, { message: "Not Found" });
+        if (!found) return json(404, { message: "Not Found" });
+        const etag = `"pr-${number}-${found.updated_at}"`;
+        if (req.headers["if-none-match"] === etag) {
+          pullNotModified++;
+          return json(304, undefined, { etag });
+        }
+        return json(200, found, { etag });
       }
       const etag = `"${repo}-${pullVersions.get(repo) ?? 0}"`;
       const page = new URLSearchParams(query).get("page");
@@ -194,6 +205,10 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
     get pullsNotModified() {
       return pullsNotModified;
     },
+    get pullNotModified() {
+      return pullNotModified;
+    },
+    fixRepo: (repo) => broken.delete(repo),
     checks: (sha, value) => checks.set(sha, value),
     breakRepo: (repo) => broken.add(repo),
     close: () => new Promise((r) => server.close(() => r())),

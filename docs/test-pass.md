@@ -159,6 +159,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] In a watched repository with no `.github/pr-lifecycle.yml`, an
       unassigned PR is tracked at `medium`, and one quiet for 14 days
       gets a `stale` item
+- [ ] `github_api` on a PR whose labels changed a minute ago shows the
+      new labels, and its last line says when it was fetched
 - [ ] A push to a reviewed PR produces a re-review job of the delta,
       preferring the same reviewer, from a fork too, and only once
 - [ ] A Renovate PR assigned to you is tracked with no review job; one

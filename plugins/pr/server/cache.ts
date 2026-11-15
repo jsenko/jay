@@ -13,6 +13,17 @@ function evictOldest<K, V>(map: Map<K, V>): void {
   }
 }
 
+/**
+ * An API response: the body, or null for a failure, with when it was
+ * fetched and its ETag, so `github_api` can tell how old it is and
+ * revalidate it cheaply.
+ */
+export interface CachedResponse {
+  data: Record<string, any> | null;
+  fetchedAt: number;
+  etag?: string;
+}
+
 /** An event, and whether `get_new_events` has handed it out yet. */
 interface CachedEvent {
   event: Event;
@@ -24,11 +35,16 @@ interface CachedEvent {
  * reuses. Bounded, because the server runs for weeks.
  */
 export class Cache {
-  private apiResponses = new Map<string, Record<string, any> | null>();
+  private apiResponses = new Map<string, CachedResponse>();
   private events = new Map<string, CachedEvent>();
 
   /** A cached response: data, null for a cached failure, undefined if never fetched. */
   getApiResponse(url: string): Record<string, any> | null | undefined {
+    return this.apiResponses.get(url)?.data;
+  }
+
+  /** A cached response with its age and ETag, or undefined if never fetched. */
+  getApiEntry(url: string): CachedResponse | undefined {
     return this.apiResponses.get(url);
   }
 
@@ -37,10 +53,17 @@ export class Cache {
     return this.apiResponses.has(url);
   }
 
-  /** Caches a response, or null for a failure. */
-  setApiResponse(url: string, data: Record<string, any> | null): void {
-    this.apiResponses.set(url, data);
+  /** Caches a response, or null for a failure, as fetched now. */
+  setApiResponse(url: string, data: Record<string, any> | null, etag?: string): void {
+    this.apiResponses.delete(url);
+    this.apiResponses.set(url, { data, fetchedAt: Date.now(), etag });
     evictOldest(this.apiResponses);
+  }
+
+  /** Marks a cached response as confirmed current now, after a 304. */
+  touchApiResponse(url: string): void {
+    const entry = this.apiResponses.get(url);
+    if (entry) entry.fetchedAt = Date.now();
   }
 
   /** The full event, for `get_event`. */
