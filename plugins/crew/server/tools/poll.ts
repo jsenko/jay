@@ -2,6 +2,7 @@
 
 import {
   boardJobs,
+  eligibleSessions,
   jobSummary,
   jobsHeldBy,
   jobsNeedingPoster,
@@ -11,6 +12,7 @@ import {
 import { markRead, pruneMessages, unreadFor } from "../messages.js";
 import { focusLapsed, minutesSinceUser } from "../focus.js";
 import { Backoff } from "../polling/backoff.js";
+import { heldByFocus, whyWaiting } from "../waiting.js";
 import { requireOwnSession } from "../sessions.js";
 import { mutate } from "../store.js";
 import type { Tool } from "./tool.js";
@@ -42,7 +44,7 @@ async function handler(args: Record<string, any>) {
     markRead(state, session, state.seq);
     pruneMessages(state);
 
-    const held = jobsHeldBy(state, session.id);
+    const mine = jobsHeldBy(state, session.id);
     const needsPoster = jobsNeedingPoster(state, session.id);
     const claimable = nextJobFor(state, session, now);
 
@@ -58,15 +60,22 @@ async function handler(args: Record<string, any>) {
     if (claimable) {
       result.claimable = jobSummary(claimable, state, now);
     }
+    if (mine.length > 0) {
+      result.jobs_mine = mine.map((job) => jobSummary(job, state, now));
+    }
+    const held = heldByFocus(state, session, now);
     if (held.length > 0) {
-      result.jobs_mine = held.map((job) => jobSummary(job, state, now));
+      result.held_by_focus = held.map((job) => jobSummary(job, state, now));
     }
     if (needsPoster.length > 0) {
       result.jobs_needing_attention = needsPoster.map((job) => jobSummary(job, state, now));
     }
 
     if (args.board) {
-      result.board = boardJobs(state).map((job) => jobSummary(job, state, now));
+      result.board = boardJobs(state).map((job) => ({
+        ...jobSummary(job, state, now),
+        ...(job.state === "open" && eligibleSessions(state, job, now).length === 0 && { waiting_on: whyWaiting(state, job, now) }),
+      }));
       result.sessions = Object.values(state.sessions)
         .filter((s) => s.status !== "offline")
         .map((s) => ({ id: s.id, status: s.status, capabilities: s.capabilities }));
@@ -80,7 +89,7 @@ export const pollTool: Tool = {
   definition: {
     name: "crew_poll",
     description:
-      "Check for messages and work waiting for this session. Returns only next_poll_minutes when there is nothing. Call after a crew wake notification, or on a timer when notifications are unavailable, waiting next_poll_minutes before the next call: it grows while nothing happens. Pass board:true to see everything outstanding across all sessions, including work nothing can currently take.",
+      "Check for messages and work waiting for this session. Returns only next_poll_minutes when there is nothing. Call after a crew wake notification, or on a timer when notifications are unavailable, waiting next_poll_minutes before the next call: it grows while nothing happens. In focus, 'held_by_focus' lists jobs this session could take that focus keeps from it, hand-offs addressed to it first: tell the user what is waiting and from whom, and claim one by id once they agree. Pass board:true to see everything outstanding across all sessions, including work nothing can currently take and why.",
     inputSchema: {
       type: "object",
       properties: {

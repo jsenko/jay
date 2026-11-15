@@ -47,6 +47,7 @@ job asks for (same `ref`), claim the job by id first, or resolve it
 | `crew_join` reports `notifications: "poll"` | With capabilities, poll per `~/.jay/plugins/crew/processes/polling.md` |
 | A crew push `{"crew":"hello"}` arrives | Pushes reach this session: stop polling crew. Nothing to read |
 | A crew push `{"crew":"wake"}` arrives | Something is waiting: `crew_poll` |
+| `crew_poll` lists `held_by_focus` | Tell the user what is waiting and from whom; claim it by id once they agree |
 
 ## Resolving
 
@@ -56,5 +57,4 @@ or a draft, and say in the result what was verified and what could not be.
 
 ## Leaving
 
-Call `crew_leave` when the session ends, so held work returns to the pool
-instead of waiting out its lease.
+Call `crew_leave` when the session ends, so held work goes back to the pool.

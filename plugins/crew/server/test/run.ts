@@ -12,10 +12,11 @@ import { run as retention } from "./retention.test.js";
 import { run as waiting } from "./waiting.test.js";
 import { run as polling } from "./polling.test.js";
 import { run as focus } from "./focus.test.js";
+import { run as handoff } from "./handoff.test.js";
 
 console.log("crew tests");
 
-for (const suite of [registry, messaging, queue, locking, version, liveness, retention, waiting, polling, focus]) {
+for (const suite of [registry, messaging, queue, locking, version, liveness, retention, waiting, polling, focus, handoff]) {
   await suite();
 }
 

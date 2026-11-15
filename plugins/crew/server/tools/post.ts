@@ -7,6 +7,7 @@ import { mutate } from "../store.js";
 import { nowIso } from "../time.js";
 import type { Job, Priority } from "../types.js";
 import { requireString, validateCapabilities } from "../validation.js";
+import { whyWaiting } from "../waiting.js";
 import { CAPABILITY_SCHEMA, type Tool } from "./tool.js";
 
 const PRIORITIES: Priority[] = ["critical", "high", "normal", "low"];
@@ -69,6 +70,7 @@ async function handler(args: Record<string, any>) {
       job_id: job.id,
       routable: eligible.length > 0,
       eligible_sessions: eligible,
+      ...(eligible.length === 0 && { waiting_on: whyWaiting(state, job, now) }),
       expires_at: job.expires_at,
     };
   });
@@ -78,7 +80,7 @@ export const postTool: Tool = {
   definition: {
     name: "crew_post",
     description:
-      "Post work for another session to do. Omit 'to' to offer it to whoever matches — the first session to claim it wins. Check 'routable' in the result: false means nobody can take it right now, and the job waits until a session can, up to three days. Post it once: re-posting a waiting job only duplicates it.",
+      "Post work for another session to do. Omit 'to' to offer it to whoever matches — the first session to claim it wins. Check 'routable' in the result: false means nobody can take it right now, 'waiting_on' says why, and the job waits until a session can, up to three days. A job sent 'to' a session the user is working in reaches it, and waits for the user's go-ahead. Post it once: re-posting a waiting job only duplicates it.",
     inputSchema: {
       type: "object",
       properties: {

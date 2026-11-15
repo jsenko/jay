@@ -66,7 +66,7 @@ function reservationAllows(job: Job, session: Session, now: number): boolean {
 }
 
 /** Whether everything but status and capabilities lets this session take the job. */
-function placementAllows(job: Job, session: Session, now: number): boolean {
+export function placementAllows(job: Job, session: Session, now: number): boolean {
   return (
     !isStale(session, now) &&
     repoAllows(job, session) &&
@@ -76,7 +76,7 @@ function placementAllows(job: Job, session: Session, now: number): boolean {
 }
 
 /** Whether the session advertises everything the job needs. */
-function hasCapabilities(job: Job, session: Session): boolean {
+export function hasCapabilities(job: Job, session: Session): boolean {
   return job.needs.every((need) => session.capabilities.includes(need));
 }
 

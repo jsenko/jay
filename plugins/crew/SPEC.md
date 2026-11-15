@@ -159,7 +159,7 @@ three, and the full-board view is a flag rather than an eleventh tool.
 | `crew_state` | `{status?, activity?, directories?}` | `{ok}` |
 | `crew_who` | `{}` | `{sessions[]}` — id, purpose, repos, status, capabilities, last-seen |
 | `crew_send` | `{to, body}` | `{seq, warning?}` |
-| `crew_post` | `{body, to?, needs?, repo?, repo_required?, priority?, prefer?, expires_in?, ref?}` | `{job_id, routable, eligible_sessions[]}` |
+| `crew_post` | `{body, to?, needs?, repo?, repo_required?, priority?, prefer?, expires_in?, ref?}` | `{job_id, routable, eligible_sessions[], waiting_on?}` |
 | `crew_poll` | `{board?}` | `{next_poll_minutes}` when idle — see below |
 | `crew_claim` | `{job_id?}` | The job, or `{claimed: null}` |
 | `crew_resolve` | `{job_id, outcome, detail?}` | `{ok}` — outcome `done` \| `failed` \| `released` |
@@ -177,7 +177,8 @@ cares.
 **`crew_post` reports routability synchronously.** `routable: false` with
 an empty `eligible_sessions` means nothing can take this job *right now*
 — the poster learns immediately instead of discovering it four hours
-later. See §4.
+later — and `waiting_on` says why, so the watcher can say "the reviewer
+is in focus" rather than "no reviewer". See §4.
 
 **`crew_claim({})` with no argument is the normal path** — it picks the
 best-matching open job and returns its content in one call, instead of
@@ -239,6 +240,15 @@ keep the router from pushing work at a session behind the user's back;
 a claim by id is the opposite, the user having that session do the
 work. Without it, a reviewer the user drove through a re-review could
 not close the job for it, and the next free reviewer did it again.
+
+**A hand-off reaches a focused session.** Routing still skips a session
+whose focus holds, but a job posted `to` it wakes it, and its poll
+lists that job, and pooled ones it could take, as `held_by_focus`. A
+direct hand-off is deliberate: on 9 November the user's own hand-off of
+two jobs to the coder they had been working in waited in silence behind
+its focus. The session tells the user and claims by id on their word,
+so focus still keeps work from starting behind their back. Pooled jobs
+don't wake it: another session may take them.
 
 **An open job closes without a claim** when its poster withdraws it, or
 when a session able to take it did the work outside the job. Both are

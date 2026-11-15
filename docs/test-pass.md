@@ -82,6 +82,9 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] A reviewer left in `focus` for 30 minutes with no prompt takes the
       next review job; when you write in it again, `crew_who` shows its
       focus holding, and new jobs wait
+- [ ] A job the watcher sends `to` a coder you are working in is
+      announced in that session, and claimed only when you agree; the
+      watcher's activity says the coder is in focus
 - [ ] A reviewer in `focus` claims a job by id and resolves it; a job
       whose work is already done closes with `crew_resolve` unclaimed
 - [ ] A session left quiet on channels for over an hour is still offered

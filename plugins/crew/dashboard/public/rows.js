@@ -31,7 +31,7 @@ export function sessions(state, selected) {
 /** Why a job is flagged, in the words a row has room for. */
 function trouble(j) {
   if (j.state === "stuck" || j.state === "expired") return chip(j.state, "bad");
-  if (j.unroutable) return chip("no session can take it", "bad");
+  if (j.unroutable) return chip(j.waiting_on ?? "no session can take it", "bad");
   if (j.slow) return chip("lease ran out", "warn");
   return chip(j.state);
 }

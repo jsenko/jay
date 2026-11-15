@@ -135,7 +135,10 @@ crew_resolve({ job_id: "job-1", outcome: "done", detail: "2 must-fix" })
 ```
 
 `routable: false` means no session can take the job now, so the poster
-knows at once. The job then waits for one, for example while the only
+knows at once, and `waiting_on` says why: which sessions are in focus,
+or that none advertises what it needs. A job sent `to` a session the user
+is working in still reaches it: the session is woken, tells the user, and
+claims it once they agree. The job then waits for one, for example while the only
 reviewer is in `focus`, rather than expiring: expiry (4 hours by
 default) counts only time when some session could have claimed it, and
 a job waits at most three days. A job that expires, or is handed back or

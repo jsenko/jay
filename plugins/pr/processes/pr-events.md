@@ -109,8 +109,8 @@ Set `lifecycle` to `merged` or `closed`, clear attention items and
 
 A failed write is logged and skipped, not retried into a loop. A job
 posted with `routable: false` waits for a reviewer: never re-post it, and
-begin `activity` with "review queue stalled" until one is claimed. On
-GitHub API failures, act on what is known and say it is uncertain.
+begin `activity` with "review queue stalled:" and its `waiting_on` until
+one is claimed. On GitHub API failures, act on what is known, and say it is uncertain.
 
 ## Notes
 

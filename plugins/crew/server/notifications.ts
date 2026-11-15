@@ -12,6 +12,7 @@ import { basename, dirname } from "node:path";
 
 import { getSessionId } from "./context.js";
 import { nextJobFor } from "./jobs.js";
+import { heldByFocus } from "./waiting.js";
 import { unreadFor } from "./messages.js";
 import { ensureDir, paths, read } from "./store.js";
 
@@ -36,7 +37,7 @@ let push: (kind: Push) => void = () => {};
 /** Highest sequence already signalled, so one arrival wakes the session once. */
 let signalledUpto = 0;
 
-/** Job last signalled as claimable, so a standing offer wakes once. */
+/** Job last signalled as claimable or handed over, so a standing offer wakes once. */
 let signalledJob: string | null = null;
 
 /**
@@ -81,7 +82,9 @@ function check(): void {
 
     const unread = unreadFor(state, session);
     const highest = unread.reduce((max, m) => Math.max(max, m.seq), 0);
-    const claimable = nextJobFor(state, session)?.id ?? null;
+    // A job handed to this session wakes it even in focus: the hand-off was deliberate.
+    const handedOver = heldByFocus(state, session).find((job) => job.to === session.id);
+    const claimable = nextJobFor(state, session)?.id ?? handedOver?.id ?? null;
 
     if (highest > signalledUpto || (claimable !== null && claimable !== signalledJob)) {
       signalledUpto = Math.max(signalledUpto, highest);
