@@ -100,6 +100,42 @@
         ]
       }
     },
+    "rounds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "commit": {
+            "type": "string",
+            "description": "Short SHA the round reviewed."
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "findings": {
+            "type": "string",
+            "description": "required/optional counts this round, as in findings."
+          },
+          "posted": {
+            "type": "boolean",
+            "description": "Whether the review was posted to GitHub. False on the user's own PRs, where this is the only record."
+          },
+          "outcomes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "One line per finding, earlier rounds' included: what became of it, such as \"R1 fixed in abc1234\", \"O2 declined: the author keeps the name\" or \"R3 open\"."
+          }
+        },
+        "required": [
+          "commit",
+          "at"
+        ]
+      },
+      "description": "Each review round, oldest first, appended with add: the PR's review history, of which findings, summary and draft_review keep only the latest."
+    },
     "complexity": {
       "type": "string",
       "enum": [

@@ -46,5 +46,15 @@ export async function run(): Promise<void> {
   const badLink = await call(c, "fyi_update", { id: pr.id, add: { links: [{ id: "task-nope", rel: "relates-to" }] } });
   check("added links must resolve", badLink.error?.includes("no item with id"), badLink);
 
+  const first = { commit: "abc1234", at: "2026-11-10T09:00:00Z", findings: "1/1", posted: false, outcomes: ["R1 open", "O1 open"] };
+  const second = { commit: "def5678", at: "2026-11-12T09:00:00Z", findings: "0/0", posted: false, outcomes: ["R1 fixed in def5678", "O1 declined: the author keeps the name"] };
+  await call(c, "fyi_update", { id: pr.id, add: { rounds: [first] } });
+  await call(c, "fyi_update", { id: pr.id, add: { rounds: [second] } });
+  const rounds = (await call(c, "fyi_get", { id: pr.id })).rounds;
+  check("review rounds accumulate, outcomes and all", JSON.stringify(rounds) === JSON.stringify([first, second]), rounds);
+
+  const noCommit = await call(c, "fyi_update", { id: pr.id, add: { rounds: [{ at: "2026-11-12T09:00:00Z" }] } });
+  check("a round names the commit it reviewed", noCommit.error?.includes("commit is required"), noCommit);
+
   await c.close();
 }

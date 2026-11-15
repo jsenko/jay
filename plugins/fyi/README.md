@@ -72,7 +72,9 @@ its script in a terminal:
 
 Click an item for its details; ✕ or Esc closes them. A pull request
 shows what its review found, your review, the author's response, CI,
-and its attention items by whose move they are, yours first. Tasks can
+and its attention items by whose move they are, yours first. Its review
+rounds are listed newest first, each with what became of every finding,
+which on your own PRs is the only record kept. Tasks can
 be marked done or snoozed by a day or a week; everything else is
 read-only. The page refreshes every 30 seconds.
 

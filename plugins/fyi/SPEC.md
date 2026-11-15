@@ -147,6 +147,13 @@ that has not changed, without touching `updated_at`.
 That is also what lets a review happen while the watcher is down:
 refresh the one PR, no full sync.
 
+**A pr keeps its review rounds.** `findings`, `summary` and
+`draft_review` describe the latest review only, and on the user's own
+PRs, which post nothing, a re-review overwrote the only record of what
+the last one found. So `rounds` is a list, appended with `add` like the
+attention items: each round's commit, counts, whether it was posted,
+and one line per finding saying what became of it.
+
 ## 5. Rules the server enforces
 
 **Every task has a next action date.** `next_action_at` is required. A

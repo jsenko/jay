@@ -17,6 +17,24 @@ function attention(items) {
     .join("")}`;
 }
 
+/**
+ * The review rounds, newest first: what each found, and what became of
+ * every finding. On the user's own PRs nothing is posted, so this is
+ * the only record.
+ */
+function rounds(list) {
+  if (!list?.length) return "";
+  return `<h4>Review rounds</h4>${[...list]
+    .reverse()
+    .map((r) => {
+      const f = findings(r.findings);
+      const head = [`at ${esc(String(r.commit).slice(0, 8))}`, esc(String(r.at ?? "").slice(0, 10)), f ? `${f.required} required, ${f.optional} optional` : "", r.posted === false ? "not posted" : ""];
+      const outcomes = (r.outcomes ?? []).map((o) => `<div>${esc(o)}</div>`).join("");
+      return `<div class="att"><div class="who">${head.filter(Boolean).join(" · ")}</div>${outcomes}</div>`;
+    })
+    .join("")}`;
+}
+
 /** A pull request. */
 function pr(p) {
   const f = findings(p.findings);
@@ -27,6 +45,7 @@ function pr(p) {
     ${attention(p.attention_items)}
     ${p.summary ? `<h4>Summary</h4><div class="prose">${esc(p.summary)}</div>` : ""}
     ${p.draft_review ? `<h4>Draft review</h4><details><summary>Not posted — open to read</summary><div class="prose">${esc(p.draft_review)}</div></details>` : ""}
+    ${rounds(p.rounds)}
     ${p.followups?.length ? `<h4>Optional findings, author's choice</h4>${fields(p.followups.map((x) => [x.id, `${esc(x.choice)}${x.issue ? ` · ${link(x.issue, "issue")}` : ""}`]))}` : ""}
     ${p.ci_failures?.length ? `<h4>CI failures</h4>${p.ci_failures.map((c) => `<div class="att"><div class="who">${esc(c.workflow)}${c.failed_at ? ` · ${esc(c.failed_at)}` : ""}</div>${esc(c.cause ?? "")} ${c.run_url ? link(c.run_url, "run") : ""}</div>`).join("")}` : ""}
     <h4>Details</h4>

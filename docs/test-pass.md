@@ -146,6 +146,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] The author answers "O1 here, O2 issue": `followups` recorded, an
       issue filed for O2 and linked on the PR, O1 checked on the next
       re-review
+- [ ] The dashboard shows a PR's review rounds, newest first, each
+      with its commit and what became of every finding
 - [ ] A review that verifies a finding with a fix leaves it committed on
       a `review/<n>-…` branch, and an unposted review's `draft_review`
       holds the whole comment, not a path
