@@ -38,6 +38,8 @@ export interface StateFile {
    * `since` includes that instant, so they come back on the next poll.
    */
   notificationsAtCursor?: string[];
+  /** The latest events pushed, as `<event id>@<timestamp>`, oldest first. */
+  delivered?: string[];
 }
 
 /** The saved state, or a fresh one when there is none or it is unreadable. */

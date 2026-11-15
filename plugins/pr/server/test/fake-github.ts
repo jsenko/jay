@@ -42,6 +42,8 @@ export interface FakeGitHub {
   requests: string[];
   /** Adds an event, as the newest. */
   add(event: RawEvent): void;
+  /** Serves the next events request without its newest `count`, as a lagging replica can. */
+  stale(count: number): void;
   /** Adds a notification, or updates the one with its id, and the comment it points to. */
   notify(notification: RawNotification, comment: { body: string; login: string }): void;
   /** Adds an open pull to a repository's list; `head` is its head commit. */
@@ -82,6 +84,7 @@ export function comment(actor: string, body: string, hoursAgo = 0): RawEvent {
 /** Starts the fake on a free local port. */
 export async function startFake(user = "tester"): Promise<FakeGitHub> {
   const events: RawEvent[] = [];
+  let staleBy = 0;
   const notifications = new Map<string, RawNotification>();
   const comments = new Map<string, unknown>();
   const requests: string[] = [];
@@ -102,6 +105,11 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
 
     if (path === "/user") return json(200, { login: user });
     if (path === "/repos/acme/widgets/events") {
+      if (staleBy > 0) {
+        const page = events.slice(staleBy);
+        staleBy = 0;
+        return json(200, page, { etag: `"stale-${page.length}"` });
+      }
       const etag = `"${events.length}-${events[0]?.id ?? "none"}"`;
       if (req.headers["if-none-match"] === etag) return json(304, undefined, { etag });
       return json(200, events, { etag });
@@ -148,6 +156,7 @@ export async function startFake(user = "tester"): Promise<FakeGitHub> {
     url: `http://127.0.0.1:${port}`,
     requests,
     add: (event) => events.unshift(event),
+    stale: (count) => { staleBy = count; },
     notify: (notification, comment) => {
       notifications.set(notification.id, notification);
       const url = notification.subject.latest_comment_url;

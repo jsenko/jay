@@ -136,7 +136,17 @@ export async function processEvents(
     }
   }
 
-  return { newEvents: collapseLabelEvents(newEvents), latestEventId };
+  return { newEvents: collapseLabelEvents(newEvents), latestEventId: notBefore(latestEventId, lastSeenId) };
+}
+
+/**
+ * The cursor, never moved back. GitHub can serve a stale page missing its
+ * newest events; taking that page's newest as the cursor would deliver the
+ * missing ones again once a fresh page arrives. Event ids increase.
+ */
+function notBefore(latest: string | null, lastSeen: string | undefined): string | null {
+  if (!latest || !lastSeen || !/^\d+$/.test(latest) || !/^\d+$/.test(lastSeen)) return latest;
+  return BigInt(latest) < BigInt(lastSeen) ? lastSeen : latest;
 }
 
 /**

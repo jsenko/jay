@@ -86,6 +86,16 @@ export async function run(): Promise<void> {
   await until(() => second.pushes.length > 1);
   check("then carries on with what is new", second.pushes.map((p) => p.event_id).join() === `${whileDown.id},${after.id}`, second.pushes);
 
+  // --- a stale page from GitHub delivers nothing twice -------------------
+  github.stale(1);
+  await settle(3500);
+  check("a stale page missing the newest event, then a fresh one, pushes nothing again",
+    second.pushes.map((p) => p.event_id).join() === `${whileDown.id},${after.id}`, second.pushes.map((p) => p.event_id));
+  const later = comment("erin", "after the stale page");
+  github.add(later);
+  await until(() => second.pushes.length > 2);
+  check("and what is new after it still arrives", second.pushes.at(-1)?.event_id === later.id, second.pushes.map((p) => p.event_id));
+
   const status = await call(second.client, "get_status");
   check("status reports the user and repositories", status.authenticatedUser === "tester"
     && status.monitoredRepos.join() === "acme/widgets", status);

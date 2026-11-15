@@ -6,6 +6,7 @@
 import type { Cache } from "./cache.js";
 import type { PollerConfig } from "./config.js";
 import type { EventCallback, PollContext } from "./context.js";
+import { Delivered } from "./delivered.js";
 import { API, githubHeaders } from "./github.js";
 import { Health, type PollerStatus } from "./health.js";
 import { pollNotifications } from "./notifications.js";
@@ -24,6 +25,7 @@ export class Poller {
   private cache: Cache;
   private state: StateFile;
   private onEvent: EventCallback;
+  private delivered: Delivered;
   private running = false;
   private resolvedRepos: string[] = [];
   private lastRepoRefresh = 0;
@@ -37,8 +39,14 @@ export class Poller {
     this.config = config;
     this.cache = cache;
     this.state = loadState(config.stateFilePath);
+    this.delivered = new Delivered(this.state.delivered);
     this.onEvent = onEvent;
   }
+
+  /** Passes an event on, unless it has been pushed before. */
+  private emit: EventCallback = (eventId, event) => {
+    if (this.delivered.first(eventId, event.timestamp)) this.onEvent(eventId, event);
+  };
 
   /** Who the user is and what is watched, for scans beyond the event stream. */
   watched(): { user: string; repos: string[] } {
@@ -69,7 +77,7 @@ export class Poller {
       cache: this.cache,
       state: this.state,
       health: this.health,
-      onEvent: this.onEvent,
+      onEvent: this.emit,
       repos: this.resolvedRepos,
       user: this.authenticatedUser,
     };
@@ -198,7 +206,7 @@ export class Poller {
       );
 
       for (const { id, event: newEvent } of newEvents) {
-        this.onEvent(id, newEvent);
+        this.emit(id, newEvent);
       }
 
       if (latestEventId) {
@@ -218,6 +226,7 @@ export class Poller {
     await pollWorkflowRuns(this.context());
     await pollNotifications(this.context());
 
+    this.state.delivered = this.delivered.saved();
     saveState(this.config.stateFilePath, this.state);
     return maxPollInterval;
   }

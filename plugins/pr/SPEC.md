@@ -118,6 +118,12 @@ once, including events from while the server was down, up to
 `MAX_EVENT_AGE`. Conditional requests with ETags make an unchanged
 stream free against the rate limit.
 
+**Nothing is pushed twice.** GitHub sometimes serves a stale page that
+lacks its newest events, and a cursor taken from it would deliver them
+again once a fresh page arrives, which a watcher acts on twice. So the
+cursor never moves back, and the server also remembers the last thousand
+events it pushed, by id and time, so no source can push one again.
+
 **Pushes come from heads, not the stream.** The repository event stream
 rarely carries a `synchronize` for a push to a same-repository branch,
 and never for a fork, whose pushes happen in the fork: on 26 Oct, three
