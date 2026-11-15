@@ -58,11 +58,12 @@ and what it points to (Q, J, SC), and `apicurio.md` there (A) in Apicurio
 and Apitomy repositories. Never `preferences.md`: one person's taste is
 no standard for someone else's code.
 
-Two severities, because the author's decision is binary:
+Two severities, because the author's decision is binary. A cited rule's
+Tier says which; otherwise:
 
 | | |
 |---|---|
-| **Required** | Blocks merge: correctness, security, data loss, and test assertions weakened without justification |
+| **Required** | Blocks merge: correctness, security, data loss, documentation that contradicts the code, and test assertions weakened without justification |
 | **Optional** | Everything else, however strongly recommended |
 
 Be sparing with required. A relaxed test assertion — `assertEquals`
@@ -104,10 +105,9 @@ saying which.
 **Asked for directly** — the user is present. Show the findings before
 posting; they accept, drop, reword or add. Only post what they accept.
 
-Once they approve a *class* of action, that carries — no need to ask
-again for the next one of the same kind. Mechanical actions (setting a
-milestone, a one-line pointer comment, an assignment) need no approval at
-all.
+Once they approve a *class* of action, it carries to the next of its
+kind. Mechanical actions (a milestone, a one-line pointer comment, an
+assignment) need no approval at all.
 
 ## Priorities
 

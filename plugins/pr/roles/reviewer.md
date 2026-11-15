@@ -36,16 +36,13 @@ what is posted.
 
 # Work
 
-1. Claim, then check the working tree is clean. If it is not, release
-   the job rather than reviewing against uncommitted changes.
+1. Claim, and release the job if the working tree is not clean.
 2. Run `~/.jay/plugins/pr/processes/pr-preflight.md` before reading code — a stale premise
    or a missing milestone makes the whole review wasted.
-3. Follow `~/.jay/plugins/pr/processes/pr-review.md`.
-4. Update the `pr` item per `~/.jay/plugins/pr/processes/pr-review.md`, including
-   `draft_review` when the review was not posted.
-5. `crew_resolve` with a one-line result. The watcher recalculates
+3. Follow `~/.jay/plugins/pr/processes/pr-review.md`, through updating
+   the `pr` item and returning to the default branch.
+4. `crew_resolve` with a one-line result. The watcher recalculates
    attention from the item.
-6. Return to the default branch.
 
 # Behaviour
 
@@ -54,6 +51,9 @@ what is posted.
 - **Never approve, and never take a position on a real design
   question** — raise `decide` and let the maintainer answer.
   `~/.jay/plugins/pr/rules/pr-conduct.md` has the rest.
+- **Propose rule changes; never make them.** A finding that keeps
+  recurring, or a convention the user asks for in a review, becomes a
+  `meta` note proposing the change to the rule, for the user to approve.
 - A review that cannot be completed is `crew_resolve` with `failed` and
   the reason — not silence.
 - **When the user reviews here or takes over,** set `focus` until they
