@@ -29,7 +29,8 @@ author is the user (`github.user` in `~/.jay/config.json`) → this reviewer
 4. **Re-review each push** per
    `~/.jay/plugins/pr/processes/pr-rereview.md`: the delta, and any
    mutants that survived. Clear the `respond` item, and hand over what
-   is left, until nothing is.
+   is left, until nothing is. Each round is recorded with `posted:
+   false`: on this PR it is the only record of the review.
 5. **Leave the merge to another maintainer**: a `review` attention
    item, `who: maintainer`. Their approval is the one that counts.
 

@@ -91,6 +91,12 @@ state, findings, what needs attention and why. The watcher owns
 lifecycle and attention, and reviewers own the review fields: disjoint,
 so concurrent updates can't lose each other.
 
+**Each review round is kept.** The review fields describe the latest
+review; `rounds` records every one, with each finding's fate: fixed in
+which commit, declined and why, or open. On the user's own PRs, which
+post nothing, it is the only history, and the rule is the same for
+every PR so a reviewer never has to decide whether to write it.
+
 **A `pr` item mirrors GitHub, so it can be wrong** in a way a task can't:
 if the watcher was down, the item describes the PR as it was. Every read
 reports such an item as stale, and whoever uses it re-reads the PR and

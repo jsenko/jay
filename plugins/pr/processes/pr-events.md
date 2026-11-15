@@ -115,6 +115,6 @@ GitHub API failures, act on what is known and say it is uncertain.
 ## Notes
 
 The watcher owns `lifecycle` and the `attention` flag. Reviewers own
-`auto_review`, `findings`, `complexity`, `author_response`, `summary` and
-`draft_review`; `/pr:checkout` owns `manual_review`. Any of them may
+`auto_review`, `findings`, `complexity`, `author_response`, `summary`,
+`draft_review` and `rounds`; `/pr:checkout` owns `manual_review`. Any of them may
 add or clear attention items about its own work.

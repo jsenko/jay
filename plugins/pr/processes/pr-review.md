@@ -66,14 +66,11 @@ Tier says which; otherwise:
 | **Required** | Blocks merge: correctness, security, data loss, documentation that contradicts the code, and test assertions weakened without justification |
 | **Optional** | Everything else, however strongly recommended |
 
-Be sparing with required. A relaxed test assertion — `assertEquals`
-becoming `contains`, an assertion removed, matching made lenient — is
-required until the author names the field that changed and why the
-difference is safe; relaxations hide serialisation and equality
-regressions.
-
-In a module with a history of the same bug class, an edge case is
-required: the history is evidence that "cannot happen" does.
+Be sparing with required. A relaxed test assertion (`assertEquals`
+becoming `contains`, an assertion removed, matching made lenient) is
+required until the author names what changed and why that is safe:
+relaxations hide serialisation and equality regressions. So is an edge
+case of a bug class the module has had before: "cannot happen" did.
 
 **Verify rather than reason**, per `~/.jay/plugins/pr/rules/pr-conduct.md`. Running the
 PR's own tests takes two minutes and makes the review concrete. A fix
@@ -95,7 +92,11 @@ restate their findings; note what is already covered.
 `reviewed_at`, `findings` as `required/optional`, `complexity`, a
 `summary` of what the user must decide (other maintainers' reviews go
 here: `manual_review` is the user's own), and `draft_review` if not
-posted: the full comment, never a path to it, which a reboot can lose. Clear the `review` item; the watcher sets `attention` on resolve.
+posted: the full comment, never a path, which a reboot can lose. Add
+the round to `rounds`: commit, `at`, `findings`, `posted`, and
+`outcomes`, a line per finding so far (`R3 open`, `R1 fixed in <sha>`,
+`O2 declined: <reason>`). Clear the `review` item; the watcher sets
+`attention` on resolve.
 
 ## Modes
 

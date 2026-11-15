@@ -101,7 +101,8 @@ them: you can't approve your own PR, and a review in your name is noise
 to the other maintainers. The findings go to a coder session working on
 the PR, as a crew job, or into a note for the next one; each push is
 re-reviewed, and once nothing is left, the PR waits for another
-maintainer.
+maintainer. Every review round, on any PR, is kept on the item with
+what became of each finding, and the fyi dashboard shows them.
 
 ## Notifications
 

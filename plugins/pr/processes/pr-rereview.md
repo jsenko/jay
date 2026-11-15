@@ -33,6 +33,9 @@ set `author_response`:
 | `partially-addressed` | Some outstanding — say which in the Decision |
 | `not-addressed` | Nothing acted on |
 
+Each prior finding's outcome, with the commit that fixed it or the
+reason it was declined, goes in the round pr-review's step 8 appends.
+
 On the user's own PR, also check that each review thread addressed since,
 bots' included, has a reply, and name the ones that don't on the item.
 
