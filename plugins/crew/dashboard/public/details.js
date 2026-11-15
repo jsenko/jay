@@ -12,6 +12,7 @@ function session(s) {
     ${fields([
       ["Status", esc(s.status)],
       ["Purpose", esc(s.purpose)],
+      ["Role", esc(s.role)],
       ["Takes", s.capabilities.map((c) => chip(c)).join(" ") || "nothing routed"],
       ["Fallback", s.fallback ? "yes" : ""],
       ["Directory", esc(s.directory)],
@@ -31,6 +32,8 @@ function job(j) {
       ["For", esc(j.to)],
       ["Held by", esc(j.claimed_by)],
       ["Lease until", esc(j.lease_expires_at)],
+      ["Waiting on", esc(j.waiting_on)],
+      ["Role", esc(j.role)],
       ["Needs", j.needs.map((c) => chip(c)).join(" ")],
       ["Repository", esc(j.repo)],
       ["Priority", esc(j.priority)],

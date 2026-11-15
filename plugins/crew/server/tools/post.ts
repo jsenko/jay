@@ -7,6 +7,7 @@ import { mutate } from "../store.js";
 import { nowIso } from "../time.js";
 import type { Job, Priority } from "../types.js";
 import { requireString, validateCapabilities } from "../validation.js";
+import { validateRole } from "../roles.js";
 import { whyWaiting } from "../waiting.js";
 import { CAPABILITY_SCHEMA, type Tool } from "./tool.js";
 
@@ -25,6 +26,7 @@ const DEFAULT_PREFER_MIN = 10;
 async function handler(args: Record<string, any>) {
   const body = requireString(args.body, "body");
   const needs = validateCapabilities(args.needs);
+  const role = validateRole(args.role);
 
   if (args.priority !== undefined && !PRIORITIES.includes(args.priority)) {
     throw new ToolError(`priority must be one of: ${PRIORITIES.join(", ")}`);
@@ -50,6 +52,7 @@ async function handler(args: Record<string, any>) {
       body,
       to: args.to,
       needs,
+      role,
       repo: args.repo,
       repo_required: Boolean(args.repo_required),
       priority: (args.priority as Priority) ?? "normal",
@@ -86,7 +89,11 @@ export const postTool: Tool = {
       properties: {
         body: { type: "string", description: "What needs doing, with enough context to act on." },
         to: { type: "string", description: "Direct this at one session. Omit to offer it to the pool." },
-        needs: CAPABILITY_SCHEMA,
+        role: {
+          type: "string",
+          description: "The role that should do it, such as reviewer or coder: only a session started as that role takes it. Prefer this to needs.",
+        },
+        needs: { ...CAPABILITY_SCHEMA, description: "Capabilities a session must advertise to take it. Older than role, and kept for jobs no role fits." },
         repo: { type: "string", description: "Repository this concerns, as Owner/Repo." },
         repo_required: {
           type: "boolean",

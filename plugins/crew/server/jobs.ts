@@ -75,16 +75,19 @@ export function placementAllows(job: Job, session: Session, now: number): boolea
   );
 }
 
-/** Whether the session advertises everything the job needs. */
-export function hasCapabilities(job: Job, session: Session): boolean {
-  return job.needs.every((need) => session.capabilities.includes(need));
+/**
+ * Whether the session is the kind the job asks for: in its role, if it
+ * names one, and advertising everything it needs.
+ */
+export function suits(job: Job, session: Session): boolean {
+  return (job.role === undefined || job.role === session.role) && job.needs.every((need) => session.capabilities.includes(need));
 }
 
 /**
  * Sessions that could claim this job right now.
  *
  * Fallback sessions are a second tier: they are offered the job only
- * when nothing matches it on capability, which is what makes `fallback`
+ * when nothing matches it on role and capabilities, which is what makes `fallback`
  * a safety net rather than a magnet for all work.
  */
 export function eligibleSessions(state: State, job: Job, now = Date.now()): Session[] {
@@ -94,8 +97,8 @@ export function eligibleSessions(state: State, job: Job, now = Date.now()): Sess
     (s) => isAvailable(s, now) && placementAllows(job, s, now)
   );
 
-  const byCapability = candidates.filter((s) => hasCapabilities(job, s));
-  if (byCapability.length > 0) return byCapability;
+  const suited = candidates.filter((s) => suits(job, s));
+  if (suited.length > 0) return suited;
 
   return candidates.filter((s) => s.fallback);
 }
@@ -113,7 +116,7 @@ export function isEligible(state: State, job: Job, session: Session, now = Date.
  */
 export function mayClaimById(state: State, job: Job, session: Session, now = Date.now()): boolean {
   if (session.status !== "focus") return isEligible(state, job, session, now);
-  return job.state === "open" && placementAllows(job, session, now) && hasCapabilities(job, session);
+  return job.state === "open" && placementAllows(job, session, now) && suits(job, session);
 }
 
 /**
@@ -124,7 +127,7 @@ export function mayClaimById(state: State, job: Job, session: Session, now = Dat
 export function mayCloseUnclaimed(job: Job, session: Session): boolean {
   if (job.state !== "open") return false;
   if (job.from === session.id) return true;
-  return hasCapabilities(job, session) && (job.to === undefined || job.to === session.id);
+  return suits(job, session) && (job.to === undefined || job.to === session.id);
 }
 
 /**
@@ -274,6 +277,7 @@ export function jobSummary(job: Job, state: State, now = Date.now()) {
     from: job.from,
     body: job.body,
     needs: job.needs,
+    role: job.role,
     repo: job.repo,
     priority: job.priority,
     state: job.state,

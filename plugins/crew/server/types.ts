@@ -31,6 +31,8 @@ export interface Session {
   /** Owner/Repo derived from directory + directories. */
   repos: string[];
   capabilities: Capability[];
+  /** The role the session started as, which jobs can name (SPEC.md §4). */
+  role?: string;
   /** Receives work that matches nothing else. See SPEC.md §4. */
   fallback: boolean;
   status: SessionStatus;
@@ -69,6 +71,8 @@ export interface Job {
   /** Set for a directed job; unset means the pool. */
   to?: string;
   needs: Capability[];
+  /** The role that should do it; with `needs`, a session must meet both. */
+  role?: string;
   repo?: string;
   repo_required: boolean;
   priority: Priority;

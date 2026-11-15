@@ -85,6 +85,9 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] A job the watcher sends `to` a coder you are working in is
       announced in that session, and claimed only when you agree; the
       watcher's activity says the coder is in focus
+- [ ] `crew_who` shows each session's role; a job posted with
+      `role: "coder"` is offered to the coders, and an unknown role is
+      refused with the list of roles
 - [ ] A reviewer in `focus` claims a job by id and resolves it; a job
       whose work is already done closes with `crew_resolve` unclaimed
 - [ ] A session left quiet on channels for over an hour is still offered

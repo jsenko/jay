@@ -78,7 +78,7 @@ async function handler(args: Record<string, any>) {
       }));
       result.sessions = Object.values(state.sessions)
         .filter((s) => s.status !== "offline")
-        .map((s) => ({ id: s.id, status: s.status, capabilities: s.capabilities }));
+        .map((s) => ({ id: s.id, status: s.status, role: s.role, capabilities: s.capabilities }));
     }
 
     return result;

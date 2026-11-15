@@ -111,8 +111,9 @@ none describes.
 | `crew_resolve` | Report the outcome: `done`, `failed` or `released`. Also closes an open job: its poster withdrawing it, or work done outside it |
 | `crew_extend` | Extend the lease on long-running work |
 
-Work goes to a pool, not to a session: any session advertising the
-capabilities a job needs can claim it, and the first claim wins. A
+Work goes to a pool, not to a session: any session in the role a job
+names, and advertising the capabilities it needs, can claim it, and the
+first claim wins. A
 session the user is driving sets `focus`, and gets no work routed to it,
 though it can still claim a job by id when the user has it do that work.
 Focus lapses 30 minutes after the user last wrote in the session, which
@@ -120,13 +121,17 @@ a prompt hook records, so a session the user has left takes work again;
 it holds again as soon as they write. `crew_who` shows how long each
 session has been in focus and when the user was last there. Set
 `crew.focus_lapse_minutes` in `~/.jay/config.json` to change the 30.
-Capabilities are a fixed set (`review`, `code`, `watch`, `triage`, `ci`,
-`docs`, `release`, `research`), so a typo fails at the call instead of
-silently never matching.
+A role is checked against the role files installed, and capabilities are
+a fixed set (`review`, `code`, `watch`, `triage`, `ci`, `docs`,
+`release`, `research`), so a typo fails at the call instead of silently
+never matching. Roles are the newer of the two: a job for a coder names
+`role: "coder"` rather than guessing which capability a coder
+advertises. jay's own jobs name both while sessions on crew before 1.6,
+which ignores `role`, may still be running.
 
 ```jsonc
 // A watcher hands a review to whoever can take it
-crew_post({ body: "Review PR 42", needs: ["review"], repo: "example/widgets" })
+crew_post({ body: "Review PR 42", role: "reviewer", needs: ["review"], repo: "example/widgets" })
 // → { job_id: "job-1", routable: true, eligible_sessions: ["review-widgets"] }
 
 // A reviewer takes it, and reports back

@@ -4,17 +4,10 @@ Conventions around the `crew` tools, whose semantics are in their descriptions.
 
 ## Joining
 
-Call `crew_join` once at session start, with capabilities matching what
-the session is for:
-
-| Session kind | Capabilities |
-|---|---|
-| Coding | `code` |
-| PR review | `review` |
-| GitHub watcher | `watch`, `triage` |
-| Release work | `release`, `ci` |
-
-Advertise only what it acts on: work claimed and left is worse than unrouted.
+Call `crew_join` once at session start, with the role it started as and
+the role's capabilities; `/crew:start` does. A session started without a
+role advertises only what it acts on: work claimed and left is worse
+than unrouted.
 
 Set `fallback: true` on at most one session — the one the user watches.
 
@@ -28,7 +21,9 @@ define, such as the watcher's reviews, were approved by starting it.
 when it was posted.
 
 Post rather than send whenever something needs doing: a message to a busy
-session is read and forgotten, a job waits until someone takes it.
+session is read and forgotten, a job waits until someone takes it. Name
+the `role` that should do it, with that role's capabilities as `needs`,
+which crews before 1.6 route by.
 
 ## Status
 

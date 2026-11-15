@@ -7,7 +7,7 @@
  */
 
 import { focusHolds } from "./focus.js";
-import { hasCapabilities, isEligible, mayClaimById, placementAllows } from "./jobs.js";
+import { isEligible, mayClaimById, placementAllows, suits } from "./jobs.js";
 import { isStale, type Job, type Session, type State } from "./types.js";
 
 /**
@@ -30,18 +30,18 @@ function present(session: Session, now: number): boolean {
 /** Why no session can take an open job now, in one line for its poster. */
 export function whyWaiting(state: State, job: Job, now = Date.now()): string {
   const sessions = Object.values(state.sessions).filter((s) => present(s, now));
-  const needs = job.needs.length > 0 ? job.needs.join(", ") : undefined;
+  const wanted = [job.role && `started as ${job.role}`, job.needs.length > 0 && `advertising ${job.needs.join(", ")}`].filter(Boolean).join(" and ");
 
   if (job.to !== undefined) {
     const target = sessions.find((s) => s.id === job.to);
     if (!target) return `${job.to} is offline`;
-    if (!hasCapabilities(job, target)) return `${job.to} doesn't advertise ${needs}`;
+    if (!suits(job, target)) return `${job.to} isn't a session ${wanted}`;
     if (focusHolds(target, now)) return `${job.to} is in focus with the user, and has been told the job is there`;
     return `${job.to} can't take it yet`;
   }
 
-  const capable = sessions.filter((s) => hasCapabilities(job, s));
-  if (capable.length === 0) return needs ? `no session advertises ${needs}` : "no session is there";
+  const capable = sessions.filter((s) => suits(job, s));
+  if (capable.length === 0) return wanted ? `no session ${wanted}` : "no session is there";
   const placed = capable.filter((s) => placementAllows(job, s, now));
   if (placed.length === 0) {
     return job.repo_required ? `no session that can take it works in ${job.repo}` : `reserved for ${job.prefer}`;

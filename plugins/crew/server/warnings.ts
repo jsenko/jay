@@ -13,7 +13,7 @@ export function setupWarnings(state: State, now = Date.now()): string[] {
   );
   if (stranded.length === 0) return [];
 
-  const needs = [...new Set(stranded.flatMap((job) => job.needs))].sort();
+  const needs = [...new Set(stranded.flatMap((job) => [...(job.role ? [`the ${job.role} role`] : []), ...job.needs]))].sort();
   const fallback = Object.values(state.sessions).some((s) => s.fallback && isLive(s, now));
   return [
     `${stranded.length} job(s) wait for a session that can take them` +

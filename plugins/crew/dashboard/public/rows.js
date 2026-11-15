@@ -20,7 +20,7 @@ export function sessions(state, selected) {
       row(
         `session:${s.id}`,
         `<div class="line"><span class="title">${esc(s.id)}</span></div>
-         <div class="chips">${chip(s.status, STATUS_TONE[s.status] ?? "")}${s.capabilities.map((c) => chip(c)).join("")}${s.fallback ? chip("fallback", "info") : ""}</div>
+         <div class="chips">${chip(s.status, STATUS_TONE[s.status] ?? "")}${s.role ? chip(s.role, "info") : ""}${s.capabilities.map((c) => chip(c)).join("")}${s.fallback ? chip("fallback", "info") : ""}</div>
          ${s.activity ? `<div class="why"><div>${esc(s.activity)}</div></div>` : ""}`,
         { selected, tone: s.status === "stale" ? "late" : "" }
       )
@@ -43,7 +43,7 @@ export function jobs(state, selected) {
     row(
       `job:${j.id}`,
       `<div class="line"><span class="title">${esc(j.body)}</span></div>
-       <div class="chips">${trouble(j)}${j.claimed_by ? chip(`held by ${j.claimed_by}`) : ""}${j.needs.map((c) => chip(c)).join("")}</div>`,
+       <div class="chips">${trouble(j)}${j.claimed_by ? chip(`held by ${j.claimed_by}`) : ""}${j.role ? chip(j.role, "info") : ""}${j.needs.map((c) => chip(c)).join("")}</div>`,
       { selected, tone: j.flagged ? "attention" : "" }
     );
   const flagged = state.jobs.filter((j) => j.flagged);

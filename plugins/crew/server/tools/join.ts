@@ -8,6 +8,7 @@ import { reapSessions, rosterEntry } from "../sessions.js";
 import { mutate } from "../store.js";
 import { nowIso } from "../time.js";
 import { isLive, type Session } from "../types.js";
+import { validateRole } from "../roles.js";
 import { validateCapabilities, requireString } from "../validation.js";
 import { setupWarnings } from "../warnings.js";
 import { CAPABILITY_SCHEMA, type Tool } from "./tool.js";
@@ -23,6 +24,7 @@ import { CAPABILITY_SCHEMA, type Tool } from "./tool.js";
 async function handler(args: Record<string, any>) {
   const purpose = requireString(args.purpose, "purpose");
   const capabilities = validateCapabilities(args.capabilities);
+  const role = validateRole(args.role);
   const extraDirs: string[] = Array.isArray(args.directories) ? args.directories : [];
   const directories = [...new Set(extraDirs.filter((d) => d !== HOME_DIR))];
   const repos = detectRepos([HOME_DIR, ...directories]);
@@ -58,6 +60,7 @@ async function handler(args: Record<string, any>) {
       directories,
       repos,
       capabilities,
+      role,
       fallback: Boolean(args.fallback),
       status: "idle",
       activity: purpose,
@@ -86,6 +89,7 @@ async function handler(args: Record<string, any>) {
     notifications: getNotificationMode(),
     directory: HOME_DIR,
     repos: result.session.repos,
+    role: result.session.role,
     capabilities: result.session.capabilities,
     others,
     ...(warnings.length > 0 && { warnings }),
@@ -102,6 +106,7 @@ export const joinTool: Tool = {
       properties: {
         purpose: { type: "string", description: "One line on what this session is for." },
         capabilities: CAPABILITY_SCHEMA,
+        role: { type: "string", description: "The role this session started as, from /crew:start: jobs can name it." },
         directories: {
           type: "array",
           items: { type: "string" },

@@ -52,6 +52,7 @@ export function rosterEntry(session: Session) {
     purpose: session.purpose,
     repos: session.repos,
     directory: session.directory,
+    role: session.role,
     capabilities: session.capabilities,
     fallback: session.fallback,
     status: isStale(session) ? "stale" : session.status,

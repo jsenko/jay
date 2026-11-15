@@ -4,7 +4,8 @@ How the watcher turns GitHub activity into `pr` item state and crew jobs.
 Field names come from the `fyi` tool descriptions; attention rules from
 `~/.jay/plugins/pr/processes/pr-attention.md`; what is worth tracking from
 `~/.jay/plugins/pr/rules/pr-interest.md`. Run `~/.jay/plugins/pr/processes/pr-preflight.md` as a sweep over
-tracked PRs — most blocked ones are never queued for review.
+tracked PRs — most blocked ones are never queued for review. Every job
+here is posted with `role: "reviewer"` and `needs: ["review"]`.
 
 ## Start
 
@@ -29,8 +30,7 @@ PR-related means `PullRequestEvent`, `PullRequestReviewEvent`,
 `is_pull_request`, or `WorkflowRunEvent` with `refs.pr`. The MCP server
 collapses rapid label churn into one event carrying the final labels.
 
-Find the item with `fyi_search({type: ["pr"], where: {repo, number}})`;
-none means untracked.
+Find the item with `fyi_search({type: ["pr"], where: {repo, number}})`; none means untracked.
 
 ## Triage
 
@@ -108,13 +108,13 @@ Set `lifecycle` to `merged` or `closed`, clear attention items and
 ## Errors
 
 A failed write is logged and skipped, not retried into a loop. A job
-posted with `routable: false` waits for a reviewer: never re-post it, and
-begin `activity` with "review queue stalled:" and its `waiting_on` until
-one is claimed. On GitHub API failures, act on what is known, and say it is uncertain.
+posted with `routable: false` waits for a reviewer: never re-post it,
+and begin `activity` with "review queue stalled:" and its `waiting_on`
+until claimed. On GitHub API failures, act on what is known, and say it is uncertain.
 
 ## Notes
 
 The watcher owns `lifecycle` and the `attention` flag. Reviewers own
 `auto_review`, `findings`, `complexity`, `author_response`, `summary`,
-`draft_review` and `rounds`; `/pr:checkout` owns `manual_review`. Any of them may
-add or clear attention items about its own work.
+`draft_review` and `rounds`; `/pr:checkout` owns `manual_review`. Each
+adds or clears attention items about its own work.

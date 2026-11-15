@@ -30,8 +30,8 @@ what exists.
 1. **Read the profile.** Its frontmatter gives `capabilities`,
    `unattended` and `fallback`; its sections give the rest.
 2. **Join the crew:** `crew_join` with the purpose (the user's, else the
-   profile's description) and the profile's `capabilities` and
-   `fallback`. On `notifications: "poll"` with capabilities, set a timer
+   profile's description), the role's name as `role`, and the profile's
+   `capabilities` and `fallback`. On `notifications: "poll"` with capabilities, set a timer
    per `~/.jay/plugins/crew/processes/polling.md`; on `"channel"`, wait to be woken.
 3. **Load** everything under the profile's **Load at start**. Not its
    **Load when needed** files: those are for the moment they apply.
@@ -45,7 +45,7 @@ what exists.
   Session:       <session-id>
   Directory:     <cwd>
   Repository:    <Owner/Repo, or none>
-  Crew:          advertising <capabilities>
+  Crew:          <role>, advertising <capabilities>
   Notifications: <channel | poll>
   Polling:       <only with poll: timer 'poll' in <n> min | none: checks only when you write>
   <whatever the profile's startup found>

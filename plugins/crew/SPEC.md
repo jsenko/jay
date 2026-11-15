@@ -79,6 +79,7 @@ settings, so polling is the default.
 | `directories` | Additional directories this session works in |
 | `repos` | `Owner/Repo` list, derived from the above plus explicit additions: where it works, for affinity, not what it covers |
 | `capabilities` | From the fixed enum below |
+| `role` | The role it started as, from `/crew:start`; unset for a session joined without one |
 | `fallback` | If true, receives work nothing else matches — see §4 |
 | `status` | `idle` \| `busy` \| `focus` \| `offline` |
 | `focus_since` | ISO 8601, when `focus` was last set |
@@ -121,6 +122,22 @@ ci          docs        release     research
 Unknown capability in `crew_join` or `crew_post` is an error naming the
 valid set — a typo must fail loudly at the call, not silently at routing.
 
+### Roles
+
+Capabilities are a vocabulary beside the roles: a job needing `docs`
+matched no session though a coder would have done it, and a session
+told to claim a job had to advertise a capability first. A job can name
+a `role` instead, and goes to sessions started as it. Roles are free
+names, so they are checked against the role files on disk
+(`~/.jay/plugins/*/roles/`, `~/.jay/roles/`) at the call, for the same
+reason the capabilities are an enum.
+
+A job may name both, and a session must then meet both. That is how
+jay's own jobs are posted for now: a crew before 1.6 ignores `role`, and
+would treat a role-only job as needing nothing and offer it to every
+session. Removing capabilities in favour of roles is a 2.0, recorded in
+the backlog (#1, CR6).
+
 ### Message
 
 Directed, informational, no state machine. `seq`, `from`, `to`
@@ -135,6 +152,7 @@ Work that someone must do. Directed when `to` is set, pooled otherwise.
 | `id`, `from`, `body` | |
 | `to` | Session id, or unset for the pool |
 | `needs` | Capabilities required |
+| `role` | The role a session must have started as |
 | `repo`, `repo_required` | Affinity; preference by default, hard filter if required |
 | `priority` | `critical` \| `high` \| `normal` \| `low` |
 | `prefer`, `prefer_until` | Soft reservation — see §4 |
@@ -154,12 +172,12 @@ three, and the full-board view is a flag rather than an eleventh tool.
 
 | Tool | Input | Returns |
 |---|---|---|
-| `crew_join` | `{purpose, capabilities?, directories?, fallback?, id?, force_new?}` | `{session_id, notifications, others[]}` |
+| `crew_join` | `{purpose, role?, capabilities?, directories?, fallback?, id?, force_new?}` | `{session_id, notifications, others[]}` |
 | `crew_leave` | `{}` | `{released_jobs[]}` |
 | `crew_state` | `{status?, activity?, directories?}` | `{ok}` |
-| `crew_who` | `{}` | `{sessions[]}` — id, purpose, repos, status, capabilities, last-seen |
+| `crew_who` | `{}` | `{sessions[]}` — id, purpose, repos, role, status, capabilities, last-seen, and for focus how long and whether it holds |
 | `crew_send` | `{to, body}` | `{seq, warning?}` |
-| `crew_post` | `{body, to?, needs?, repo?, repo_required?, priority?, prefer?, expires_in?, ref?}` | `{job_id, routable, eligible_sessions[], waiting_on?}` |
+| `crew_post` | `{body, to?, role?, needs?, repo?, repo_required?, priority?, prefer?, expires_in?, ref?}` | `{job_id, routable, eligible_sessions[], waiting_on?}` |
 | `crew_poll` | `{board?}` | `{next_poll_minutes}` when idle — see below |
 | `crew_claim` | `{job_id?}` | The job, or `{claimed: null}` |
 | `crew_resolve` | `{job_id, outcome, detail?}` | `{ok}` — outcome `done` \| `failed` \| `released` |
@@ -226,6 +244,7 @@ A job is **eligible** for a session when all hold:
 
 - `state == open`
 - `to` unset, or `to == me`
+- job `role` unset, or my `role` is it
 - my `capabilities` ⊇ job `needs`
 - `repo_required` false, or job `repo` ∈ my `repos`
 - my status is `idle` or `busy`, or `focus` that has lapsed (§2) — never stale

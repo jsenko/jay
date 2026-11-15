@@ -53,7 +53,7 @@ export async function run(): Promise<void> {
   check("whose poll still lists it", (await call(reviewer, "crew_poll")).held_by_focus?.[0]?.id === pooled.job_id);
 
   const docs = await call(watcher, "crew_post", { body: "Document the new flag", needs: ["docs"] });
-  check("a job nobody advertises the capabilities for says so", docs.waiting_on === "no session advertises docs", docs);
+  check("a job nobody advertises the capabilities for says so", docs.waiting_on === "no session advertising docs", docs);
   const board = (await call(watcher, "crew_poll", { board: true })).board;
   check("the board says why each waiting job waits", board.every((j: any) => typeof j.waiting_on === "string"), board);
 
