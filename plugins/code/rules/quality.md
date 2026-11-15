@@ -11,7 +11,7 @@ is what a violation is in a review: a required or an optional finding.
 | Q3 | **Errors:** no catch-all handler except to rethrow or at the top level. Never swallow an error; log it with its trace. | Required |
 | Q4 | **Test names** describe the scenario, not the method under test: `retriesOnTimeout`, not `testProcess`. | Optional |
 | Q5 | **Dead code** goes. "Might be useful later" is maintenance and a misleading API. | Optional |
-| Q6 | **Values with meaning** (versions, URLs, paths, identifiers) get a dedicated type, converted once at the boundary, not passed around as strings. | Optional |
+| Q6 | **Values with meaning** (versions, URLs, paths, identifiers) that travel across a significant part of the code, such as a return type used elsewhere, get a dedicated type, converted once at the boundary, not passed around as strings. A short-lived local doesn't need one. | Optional |
 | Q7 | **Versions** are never compared as strings: `3.3.1` prefixes `3.3.10`, and pre-release suffixes sort wrong. Parse them and compare the parsed values. | Required |
 | Q8 | **Skipping tests:** one mechanism per test class. An early `return` in a test reports a pass, so where the intent was to skip, it is a bug. | Required |
 | Q9 | **Order:** code relying on an external API's ordering checks it and fails loudly. Map iteration order means nothing. Selecting by a criterion ("older than") compares parsed values, never iteration or string order. | Required |

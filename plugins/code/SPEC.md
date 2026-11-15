@@ -22,7 +22,7 @@ they apply to:
   violation raised as required in one review and optional in the next
   teaches authors that the tier is the reviewer's mood.
 - **Preferences** (P): opinions about how code is written here: `var`,
-  records over Lombok, how tests are written. Only code written in a
+  when a record and when Lombok, how tests are written. Only code written in a
   coder session follows them.
 
 jay ships its author's preferences, because a plugin with no opinions

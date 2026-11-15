@@ -24,11 +24,11 @@ this file.
 
 | ID | Preference |
 |---|---|
-| P8 | **`var`**, unless leaving the type out makes the code harder to read. |
+| P8 | **`var`** when the type can be read from the right-hand side (a constructor, a factory or builder chain), when the variable is short-lived or incidental, or when its name says enough. A significant variable whose type shows in neither keeps it explicit. |
 | P9 | **Modern language features** the project's Java version supports: switch expressions, text blocks, `instanceof` patterns. |
 | P10 | **Streams** where they read at least as well as a loop. |
 | P11 | **Multi-line strings** as text blocks, with `formatted()` for values, not concatenated literals. |
 | P12 | **Static imports** where the name stays clear. |
-| P13 | **Records** for simple data with a few methods. Lombok instead when the constructor must be less visible than the class, needs logic, or there are several; for a builder; or when `equals`/`hashCode` must leave fields out or be absent. |
+| P13 | **Records** only when nothing is added beyond the components; a compact constructor that only validates or normalises still counts. Lombok instead for any method, static factory or extra field; when the constructor must be less visible than the class, or there are several; for a builder; or when `equals`/`hashCode` must leave fields out or be absent. A value type (Q6) is shaped the same way. |
 | P14 | **Stateful utilities** are singletons (private constructor, `getInstance()`), not classes of static fields. Static-only is for pure functions. A test singleton may use a synchronized lazy `getInstance()`. |
 | P15 | **Accessors** of a data class are a chain from one source method, not repeated field access. Repeated formulas become small helpers. |
