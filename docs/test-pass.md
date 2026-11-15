@@ -181,7 +181,8 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] A note with `archive_after_days: 1` is archived the day after its
       last change, and `fyi_get` still finds it
 - [ ] `/status:brief` summarises what it found, asks once about what's
-      missing, and gives a few bullets with no headings
+      missing, and gives Completed, Planned and Blockers, each present,
+      `None` when empty, within 100 words per working day
 - [ ] Something private or not yet public is asked about before it is
       included
 - [ ] `/status:weekly` writes prose and saves a `report` note

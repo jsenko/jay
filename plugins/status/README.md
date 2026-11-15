@@ -3,8 +3,9 @@
 Status reports written from what you actually did: your GitHub activity
 and what you recorded in [fyi](../fyi/README.md).
 
-- **`/status:brief`** gives a few bullets for your team, covering the days
-  since your last brief, ready to paste into a channel.
+- **`/status:brief`** gives your team three short lists, Completed,
+  Planned and Blockers, covering the days since your last brief, ready to
+  paste into a channel.
 - **`/status:weekly`** writes a prose report of your week for the wider
   organisation: what finished and why it mattered, decisions, and what
   comes next.

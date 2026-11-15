@@ -89,8 +89,8 @@ Talk to a session as usual; the plugins give it tools and habits.
   sessions see what it is doing, and work it can take is routed to it.
   `/crew:stop` saves where it stopped before it leaves, and the next
   `/crew:start` offers to pick it up.
-- **`/status:brief`** writes a few bullets on what you did since your
-  last brief, ready to paste into your team's channel, and asks first
+- **`/status:brief`** writes what you completed, what's planned and
+  what's blocked since your last brief, ready to paste into your team's channel, and asks first
   about anything personal or not yet public. **`/status:weekly`** writes
   the week as prose for a wider audience, and saves it to fyi.
 - **`/code:implement make the retry back off exponentially`** works on

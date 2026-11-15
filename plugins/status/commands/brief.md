@@ -5,9 +5,9 @@ argument-hint: [period, default: since the last brief]
 
 # Overview
 
-A few bullets for teammates on what the user has been doing, posted
-every couple of days to cover what meetings miss. Not
-`/status:weekly`: a quick check-in, then bullets, no prose.
+A short status for teammates, posted every couple of days to cover
+what meetings miss: what was completed, what is planned, and what is
+blocked. Not `/status:weekly`: a quick check-in, then bullets, no prose.
 
 # Period
 
@@ -29,15 +29,36 @@ through its check-in.
 
 # Write
 
-- Bullets, under 150 words, with no headings, bold or nesting.
+Three sections, in this order, each a plain label on its own line with
+bullets under it:
+
+```
+Completed:
+- …
+
+Planned:
+- …
+
+Blockers:
+- None.
+```
+
+- **All three always appear.** A section with nothing in it is
+  `- None.`, so a reader finds each in the same place every time.
+- **Each item goes in the section it fits best.** There is no fourth
+  section: what was learned goes with the work it came from, and an
+  item that fits none of them is left out.
+- **Completed:** what was done and why it mattered, including what came
+  of conversations with others.
+- **Planned:** what is next in the coming days, and time off.
+- **Blockers:** what is stuck, and what it waits on.
+- **Length:** at most 100 words per working day of the period, and 300
+  in all.
 - Each bullet is one line, not hard-wrapped, so it reflows when pasted.
-- What was done and why it mattered, including what came of
-  conversations with others.
-- Something learned, from `learned` notes, when there is one.
-- Blockers, with what they wait on, when there are any.
+  No other headings, bold or nesting.
 - A PR or issue number only when it is the point.
 
-A period with nothing worth sharing gets one line saying so, not padding.
+A period with nothing done still has all three sections, not padding.
 
 # Save
 

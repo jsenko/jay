@@ -15,7 +15,7 @@ audiences need different things from the same activity:
 | Next | What is due in the next few days | Each project's direction |
 | Blockers | Blocked tasks | Those that matter beyond the team |
 | Learnings | Notes tagged `learned` | Decisions, with their reasoning |
-| Form | Bullets, pasted into a channel | Prose |
+| Form | Completed, Planned and Blockers, pasted into a channel | Prose |
 
 So the gathering is one process, `processes/gather.md`, and each command
 is about its audience and form. GitHub alone shows what changed. fyi adds
@@ -61,7 +61,23 @@ Standing answers are kept as fyi notes tagged `decision` and `status`
 rather than in configuration: they are decisions the user made, they are
 read the same way as everything else, and they need no settings file.
 
-## 4. Reports are fyi notes
+## 4. The brief has a fixed shape
+
+Teammates read briefs in a channel, one after another, looking for the
+same three things: what got done, what is next, and what is in the way.
+So the brief always has Completed, Planned and Blockers, in that order,
+with `None` for an empty one. A missing section would leave the reader
+wondering whether it was forgotten.
+
+There is no fourth section. An "Other" list collects what was not worth
+placing, and readers learn to skip it; an item that fits none of the
+three is not news for the team.
+
+The length grows with the period, at 100 words per working day up to
+300: a brief after a long gap covers more, but still has to be read in
+the channel, not opened.
+
+## 5. Reports are fyi notes
 
 Reports are saved as notes, not files in a folder.
 
@@ -75,7 +91,7 @@ Briefs expire after 14 days (`archive_after_days`), since only the latest
 matters for the next period. Weekly reports stay until the user archives
 them; they are the record a year-end review is written from.
 
-## 5. Periods are inferred
+## 6. Periods are inferred
 
 The period comes from the last report of the same kind, so there is no
 setting for when a week starts. Reports are asked for on the period's
@@ -83,7 +99,7 @@ last day or the working day after, so anything else (a period ending in
 the future, or a missed week) is put to the user rather than guessed.
 The weekly report confirms its period; the brief states it.
 
-## 6. What fyi provides
+## 7. What fyi provides
 
 status relies on two things fyi added for it:
 
@@ -93,7 +109,7 @@ status relies on two things fyi added for it:
 - Well-known tags (`decision`, `finding`, `learned`, `report`), listed in
   fyi's schema so every session uses the same words.
 
-## 7. Not done
+## 8. Not done
 
 - **Posting to Slack.** The brief is copied and pasted. Slack data is
   often restricted, so posting is more likely a write-only webhook than
