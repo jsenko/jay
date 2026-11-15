@@ -34,6 +34,8 @@ export interface Session {
   /** Receives work that matches nothing else. See SPEC.md §4. */
   fallback: boolean;
   status: SessionStatus;
+  /** When focus was last set: a sign the user was there, like a prompt (focus.ts). */
+  focus_since?: string;
   activity: string;
   joined_at: string;
   last_seen: string;

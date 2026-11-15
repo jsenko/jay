@@ -115,6 +115,11 @@ Work goes to a pool, not to a session: any session advertising the
 capabilities a job needs can claim it, and the first claim wins. A
 session the user is driving sets `focus`, and gets no work routed to it,
 though it can still claim a job by id when the user has it do that work.
+Focus lapses 30 minutes after the user last wrote in the session, which
+a prompt hook records, so a session the user has left takes work again;
+it holds again as soon as they write. `crew_who` shows how long each
+session has been in focus and when the user was last there. Set
+`crew.focus_lapse_minutes` in `~/.jay/config.json` to change the 30.
 Capabilities are a fixed set (`review`, `code`, `watch`, `triage`, `ci`,
 `docs`, `release`, `research`), so a typo fails at the call instead of
 silently never matching.

@@ -6,6 +6,7 @@
   "author": {
     "name": "Jakub Senko"
   },
+  "hooks": "./activity/hooks.json",
   "dependencies": [
     {
       "name": "fyi",

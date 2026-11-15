@@ -2,6 +2,7 @@
 
 import { getSessionId } from "./context.js";
 import { ToolError } from "./errors.js";
+import { focusHolds, lastUserSign } from "./focus.js";
 import { nowIso, relTime } from "./time.js";
 import { isStale, type Session, type State } from "./types.js";
 
@@ -56,6 +57,20 @@ export function rosterEntry(session: Session) {
     status: isStale(session) ? "stale" : session.status,
     activity: session.activity,
     last_seen: relTime(session.last_seen),
+    ...(session.status === "focus" && { focus: focusEntry(session) }),
+  };
+}
+
+/**
+ * How long a session has been in focus, when the user last showed they
+ * were there, and whether it still holds work back, so the board says
+ * why a queue isn't moving.
+ */
+function focusEntry(session: Session) {
+  return {
+    since: session.focus_since ? relTime(session.focus_since) : "unknown",
+    user_last_seen: relTime(new Date(lastUserSign(session)).toISOString()),
+    holds_work: focusHolds(session),
   };
 }
 

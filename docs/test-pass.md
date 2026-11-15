@@ -79,6 +79,9 @@ Use a scratch configuration, so your own stays untouched:
       stop whether to save
 - [ ] `/crew:stop` with a pending action creates a task with a date,
       not a note
+- [ ] A reviewer left in `focus` for 30 minutes with no prompt takes the
+      next review job; when you write in it again, `crew_who` shows its
+      focus holding, and new jobs wait
 - [ ] A reviewer in `focus` claims a job by id and resolves it; a job
       whose work is already done closes with `crew_resolve` unclaimed
 - [ ] A session left quiet on channels for over an hour is still offered

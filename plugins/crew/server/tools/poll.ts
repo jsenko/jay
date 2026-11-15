@@ -9,6 +9,7 @@ import {
   sweep,
 } from "../jobs.js";
 import { markRead, pruneMessages, unreadFor } from "../messages.js";
+import { focusLapsed, minutesSinceUser } from "../focus.js";
 import { Backoff } from "../polling/backoff.js";
 import { requireOwnSession } from "../sessions.js";
 import { mutate } from "../store.js";
@@ -48,6 +49,9 @@ async function handler(args: Record<string, any>) {
     const result: Record<string, unknown> = {
       next_poll_minutes: backoff.next(unread.length > 0 || claimable !== undefined || needsPoster.length > 0),
     };
+    if (focusLapsed(session, now)) {
+      result.focus_lapsed = `Nothing from the user for ${minutesSinceUser(session, now)} minutes: focus no longer holds work back. Act as when unattended until they write again.`;
+    }
     if (unread.length > 0) {
       result.messages = unread.map((m) => ({ seq: m.seq, from: m.from, body: m.body, at: m.at }));
     }

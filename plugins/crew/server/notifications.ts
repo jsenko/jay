@@ -18,6 +18,12 @@ import { ensureDir, paths, read } from "./store.js";
 /** Collapses the burst of writes a single mutation can produce. */
 const DEBOUNCE_MS = 150;
 
+/**
+ * How often to look again with nothing written: focus lapses with time
+ * alone, and a job it held back should then wake the session.
+ */
+const RECHECK_MS = 60_000;
+
 /** Lets the join's answer reach the session before the hello does. */
 const GREET_DELAY_MS = 200;
 
@@ -51,6 +57,7 @@ export function startNotifier(send: (kind: Push) => void): void {
     clearTimeout(timer);
     timer = setTimeout(check, DEBOUNCE_MS);
   }).unref();
+  setInterval(check, Number(process.env.CREW_RECHECK_MS) || RECHECK_MS).unref();
 }
 
 /**

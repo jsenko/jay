@@ -81,12 +81,27 @@ settings, so polling is the default.
 | `capabilities` | From the fixed enum below |
 | `fallback` | If true, receives work nothing else matches — see §4 |
 | `status` | `idle` \| `busy` \| `focus` \| `offline` |
+| `focus_since` | ISO 8601, when `focus` was last set |
 | `activity` | 1–2 sentences, current work |
 | `joined_at`, `last_seen` | ISO 8601 |
 | `cursor` | Highest message `seq` consumed |
 
 `focus` means the user is actively driving this session — the router
 never assigns to it. It may still claim a job by id (§4).
+
+**Focus lapses.** A session has no signal that the user left, so focus
+set once stayed for hours: on 2 November eight review jobs waited
+overnight behind a reviewer the user had left. So focus holds only
+within 30 minutes (`crew.focus_lapse_minutes` in `~/.jay/config.json`)
+of the user's last sign: a prompt, stamped per directory by a
+`UserPromptSubmit` hook (opencode: the adapter's `chat.message`) in
+`~/.jay/crew/activity/`, or setting `focus`. The hook can't take the
+state lock or know the session id, so it writes a file every server can
+read; two sessions in one directory share it, which errs towards
+holding. The status is never rewritten: the router treats lapsed focus
+as `busy`, a poll tells the session `focus_lapsed`, and the next prompt
+makes focus hold again. Each server re-checks its own session every
+minute, since a lapse writes nothing that would wake it.
 
 A session has one home `directory` but may work across several; repo
 affinity (§4) matches against the whole `repos` set. Several sessions may
@@ -212,7 +227,7 @@ A job is **eligible** for a session when all hold:
 - `to` unset, or `to == me`
 - my `capabilities` ⊇ job `needs`
 - `repo_required` false, or job `repo` ∈ my `repos`
-- my status is `idle` or `busy` — never `focus` or stale
+- my status is `idle` or `busy`, or `focus` that has lapsed (§2) — never stale
 - `prefer` unset, or `prefer == me`, or `now > prefer_until`
 
 Ordering among eligible jobs: **priority desc → repo match → oldest

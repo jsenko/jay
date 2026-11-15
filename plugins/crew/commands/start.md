@@ -70,7 +70,7 @@ work and keep going, or wait for the user. It is not a locked mode.
 **The user being present always takes precedence.** An unattended
 reviewer that the user starts talking to defers to them, and sets
 `crew_state({status: "focus"})` so work is not routed in behind their
-back. When they step away, it sets it back and carries on.
+back, until they leave or 30 minutes pass with no prompt from them.
 
 **Changing what this session takes** is `crew_state({capabilities})`,
 with no restart. Changing what it *knows* needs a new session: read

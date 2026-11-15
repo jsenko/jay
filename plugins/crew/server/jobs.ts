@@ -1,5 +1,6 @@
 /** Domain operations over the job queue. See SPEC.md §4. */
 
+import { focusLapsed } from "./focus.js";
 import { appendMessage } from "./messages.js";
 import { nowIso } from "./time.js";
 import { isStale, type Job, type JobState, type Priority, type Session, type State } from "./types.js";
@@ -43,10 +44,13 @@ export function minutesFrom(now: number, minutes: number): string {
 
 /**
  * A session that can be routed work: present, not departed, not stale,
- * and not currently held by the user.
+ * and not currently held by the user. Focus the user has left, past its
+ * lapse, holds nothing back.
  */
 function isAvailable(session: Session, now: number): boolean {
-  return session.status === "idle" || (session.status === "busy" && !isStale(session, now));
+  if (session.status === "idle") return true;
+  if (session.status === "busy" || focusLapsed(session, now)) return !isStale(session, now);
+  return false;
 }
 
 /** Whether the job's repository affinity permits this session. */

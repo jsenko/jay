@@ -14,8 +14,7 @@ the session is for:
 | GitHub watcher | `watch`, `triage` |
 | Release work | `release`, `ci` |
 
-Advertise only what the session will act on: a capability it ignores
-leaves work claimed and unstarted, worse than not routed at all.
+Advertise only what it acts on: work claimed and left is worse than unrouted.
 
 Set `fallback: true` on at most one session — the one the user watches.
 
@@ -34,11 +33,12 @@ session is read and forgotten, a job waits until someone takes it.
 ## Status
 
 Keep `crew_state` current: other sessions route work by it. Set `focus`
-while the user is actively working here, and back to `idle` or `busy`
-when they move on. Focus removes the session from routing, so leaving it
-set strands work. When the user has it do work an open job asks for
-(same `ref`), claim that job by id first; when the work is already done,
-`crew_resolve` the open job as `done`.
+while the user works here, `idle` or `busy` when they move on. Focus
+holds work back until the user has written nothing for 30 minutes; a
+poll with `focus_lapsed` means they've gone: act as the role does
+unattended until they write. For work the user has it do that an open
+job asks for (same `ref`), claim the job by id first, or resolve it
+`done` if the work is already done.
 
 ## Receiving
 

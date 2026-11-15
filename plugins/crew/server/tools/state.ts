@@ -3,6 +3,7 @@
 import { detectRepos } from "../identity.js";
 import { requireOwnSession } from "../sessions.js";
 import { mutate } from "../store.js";
+import { nowIso } from "../time.js";
 import { validateCapabilities, validateStatus } from "../validation.js";
 import { CAPABILITY_SCHEMA, type Tool } from "./tool.js";
 
@@ -19,6 +20,8 @@ async function handler(args: Record<string, any>) {
     const session = requireOwnSession(state);
 
     if (status) session.status = status;
+    if (status === "focus") session.focus_since = nowIso();
+    else if (status) delete session.focus_since;
     if (typeof args.activity === "string") session.activity = args.activity;
     if (capabilities) session.capabilities = capabilities;
     if (Array.isArray(args.directories)) {
@@ -41,7 +44,7 @@ export const stateTool: Tool = {
   definition: {
     name: "crew_state",
     description:
-      "Update this session's status or activity. Set 'focus' while the user is actively driving this session, 'busy' while working, 'idle' when free.",
+      "Update this session's status or activity. Set 'focus' while the user is actively driving this session, 'busy' while working, 'idle' when free. Focus holds work back only until the user has written nothing for a while (30 minutes by default); setting it again counts as the user being there.",
     inputSchema: {
       type: "object",
       properties: {
