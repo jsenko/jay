@@ -146,6 +146,9 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] The author answers "O1 here, O2 issue": `followups` recorded, an
       issue filed for O2 and linked on the PR, O1 checked on the next
       re-review
+- [ ] A review that verifies a finding with a fix leaves it committed on
+      a `review/<n>-…` branch, and an unposted review's `draft_review`
+      holds the whole comment, not a path
 - [ ] A Javadoc that contradicts the code is a required finding; a
       `Thread.sleep` with no comment is required, citing J5's tier
 - [ ] A finding the reviewer has raised before produces a `meta` note

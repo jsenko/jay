@@ -73,11 +73,12 @@ difference is safe; relaxations hide serialisation and equality
 regressions.
 
 In a module with a history of the same bug class, an edge case is
-required rather than optional. The history is evidence that "cannot
-happen" does.
+required: the history is evidence that "cannot happen" does.
 
 **Verify rather than reason**, per `~/.jay/plugins/pr/rules/pr-conduct.md`. Running the
-PR's own tests takes two minutes and makes the review concrete.
+PR's own tests takes two minutes and makes the review concrete. A fix
+or demo written to verify a finding is committed to a local branch, such
+as `review/<n>-<topic>`: a scratch worktree can be emptied by a reboot.
 
 ## 6. Consolidate
 
@@ -94,13 +95,12 @@ restate their findings; note what is already covered.
 `reviewed_at`, `findings` as `required/optional`, `complexity`, a
 `summary` of what the user must decide (other maintainers' reviews go
 here: `manual_review` is the user's own), and `draft_review` if not
-posted. Clear the `review` item; the watcher sets `attention` on resolve.
+posted: the full comment, never a path to it, which a reboot can lose. Clear the `review` item; the watcher sets `attention` on resolve.
 
 ## Modes
 
-**Claimed from the crew** — do not ask; the user approved it when it was
-posted. Post or draft per `~/.jay/plugins/pr/processes/pr-comment.md`, then `crew_resolve`
-saying which.
+**Claimed from the crew**: do not ask, since the user approved it when
+it was posted. Post or draft, then `crew_resolve` saying which.
 
 **Asked for directly** — the user is present. Show the findings before
 posting; they accept, drop, reword or add. Only post what they accept.
