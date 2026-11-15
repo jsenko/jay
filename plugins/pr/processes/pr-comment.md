@@ -35,6 +35,16 @@ With the user present, show the review first in every case. Unattended,
 the table is the user's standing approval: a preference for seeing
 reviews first, in memory or elsewhere, covers attended sessions only.
 
+## Ids
+
+Every Direction and change item has one, never a plain list number:
+`R<n>` required, `O<n>` optional, `Q<n>` an open question, `D<n>` a
+decided direction, so the author can answer in a line ("O1 here").
+
+**Assigned once per PR, never reused or renumbered**: before assigning,
+read the PR's earlier reviews and the item's `findings` and `followups`,
+and continue each letter from its highest. An answered `Q` keeps its id.
+
 ## 1. Decision
 
 Lead with it. Short, and the first sentence matches the verdict — never
@@ -47,35 +57,27 @@ On a re-review, say what was addressed here: the author's first question.
 Three parts, in order:
 
 1. **What the thing is.** Define the tool, mechanism or concept the
-   review refers to, and what it measures or does — including the
-   intended end state if the feature is not switched on yet. *Err toward
-   more detail.* Numbers in a review are unreadable without the mechanism
-   behind them.
+   review refers to, and what it measures or does, including the intended
+   end state if it is not switched on yet. *Err toward more detail*:
+   numbers in a review are unreadable without the mechanism behind them.
 2. **The problem the PR solves.**
 3. **What the PR does about it**, in a sentence or two.
 
 ## 3. Direction
 
-Before the changes sections, deliberately: if the approach is wrong, the
-implementation detail does not matter, and it tells the author what to
-read first.
+Before the changes, deliberately: if the approach is wrong, the details
+do not matter, and it tells the author what to read first.
 
-**A genuine open design question is not posted as an opinion.** Say a
-question exists and that the maintainer will weigh in, raise a `decide`
-attention item, and stop. Arguing a position pre-empts the decision.
+A direction the review settles is a `D` item. **A genuine open design
+question is not posted as an opinion**: it is a `Q` item saying the
+question exists and the maintainer will weigh in, with a `decide`
+attention item. Arguing a position pre-empts the decision.
 
 ## 4 and 5. Changes
 
-Two sections, not three. The author's decision is binary: must this
-happen before merge, or is it their call. A finding not worth blocking on
-is optional — say "strongly recommended" inside Optional rather than
-inventing a middle category that hides whether it blocks.
-
-Every item gets an id: `R1`, `R2` for required, `O1`, `O2` for optional.
-
-**Ids are assigned once per PR and never reused or renumbered.** A
-re-review continues the sequence. Renumbering makes "R1 from my earlier
-review" quietly mean something else.
+Two sections, not three: must this happen before merge, or is it the
+author's call. A finding not worth blocking on is optional; say "strongly
+recommended" inside Optional rather than a middle category that hides it.
 
 ```
 ### R2 — Version comparison uses startsWith
@@ -87,11 +89,10 @@ Use `Semver.coerce()` and compare components.
 Name the file and line. Say what to change and why. Group findings that
 share a root cause.
 
-**Optional only: ask the author to choose.** End the section with:
+**Optional: ask the author to choose.** Always end the section with:
 *None of these block merge. For each, let us know whether you would like
 to address it here, prefer a follow-up issue, or would rather skip it —
-e.g. "O1 here, O2 issue".* The ids are what make a one-line answer
-possible.
+e.g. "O1 here, O2 issue".*
 
 **Inline comments are pointers, not copies:** `**R2** — <one line>`
 where a line anchor helps, the full item in the summary, which is the
@@ -110,9 +111,8 @@ to trust the review.
 
 ## Tone
 
-**Do not apologise for latency or capacity.** No "sorry for the delay",
-no "this is on us". It frames the project badly when the cause is simply
-volume. Thank them for their patience instead.
+**Do not apologise for latency or capacity** ("sorry for the delay"): it
+frames the project badly when the cause is volume. Thank them for waiting.
 
 Reserve ownership language for a specific, identifiable failure — a bug
 that cost the contributor two days is worth owning by name.

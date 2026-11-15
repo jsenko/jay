@@ -103,9 +103,11 @@ Six sections, in order, any of which may be empty: **Decision**,
 changes`, `## Checked`.
 
 Two change sections, because the author's decision is binary: does this
-block merge, or is it their call. Items carry IDs (`R1`, `O2`) assigned
-once per PR and never renumbered, so a later review's reference still
-means what it meant. The format is in `processes/pr-comment.md`.
+block merge, or is it their call. Items carry IDs by kind, `R1`
+required, `O2` optional, and in Direction `Q1` for a question left to
+the maintainer and `D1` for a direction already decided, since only one
+of those asks the author to act. IDs are assigned once per PR and never
+renumbered, so a later review's reference still means what it meant. The format is in `processes/pr-comment.md`.
 
 ## 6. The server
 

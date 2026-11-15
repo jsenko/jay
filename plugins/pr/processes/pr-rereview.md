@@ -17,8 +17,9 @@ New commits only. Do not re-raise findings already posted, and do not
 re-raise ones dropped on purpose — the author will read it as the
 review going backwards.
 
-Ids continue the existing sequence. A finding raised now is the next
-free `R` or `O`; earlier ids keep meaning what they meant.
+Ids continue each existing sequence, as Ids in
+`~/.jay/plugins/pr/processes/pr-comment.md` says: a new item is the next
+free `R`, `O`, `Q` or `D`, and earlier ids keep meaning what they meant.
 
 ## Did they address the last round?
 

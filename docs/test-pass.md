@@ -143,6 +143,9 @@ Use a scratch configuration, so your own stays untouched:
 - [ ] The author answers "O1 here, O2 issue": `followups` recorded, an
       issue filed for O2 and linked on the PR, O1 checked on the next
       re-review
+- [ ] A re-review after one with R1–R2 and O1 numbers its new items R3
+      and O2 on, never a plain list; an open design question is a `Q`
+      with a `decide` item, a settled direction a `D`
 - [ ] A push to a reviewed PR produces a re-review job of the delta,
       preferring the same reviewer, from a fork too, and only once
 - [ ] A Renovate PR assigned to you is tracked with no review job; one
