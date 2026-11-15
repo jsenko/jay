@@ -76,6 +76,10 @@ An ID is never renumbered or reused, so "Q7" in a review comment means
 the same thing a year later. A retired rule keeps its row, marked
 retired.
 
+Each quality rule also has a **tier**: whether a review raises a
+violation as a required or an optional finding, so reviewers don't
+decide it case by case.
+
 **jay is opinionated.** The preferences are its author's, and they apply
 only to code your own sessions write, never to reviews of other people's
 code. To use your own, write `~/.jay/rules/code-preferences.md` in the

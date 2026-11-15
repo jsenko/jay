@@ -18,6 +18,9 @@ they apply to:
 
 - **Quality** (Q, J, SC, A): what a reviewer would raise on anyone's
   code. Both the coder and the reviewer use them.
+  Each carries its tier, required or optional, because the same
+  violation raised as required in one review and optional in the next
+  teaches authors that the tier is the reviewer's mood.
 - **Preferences** (P): opinions about how code is written here: `var`,
   records over Lombok, how tests are written. Only code written in a
   coder session follows them.

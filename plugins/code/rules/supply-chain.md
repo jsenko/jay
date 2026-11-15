@@ -3,6 +3,8 @@
 Patterns that may mean a malicious or compromised change. Read when
 reviewing a contribution from someone new, or any change to dependencies,
 the build or CI; and when making such a change. Cite a rule by its ID.
+These are leads to investigate, not findings: one that is confirmed is
+a required finding.
 
 ## Text and encoding
 
