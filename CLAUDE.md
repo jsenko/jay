@@ -179,6 +179,10 @@ first released.
 Follow semver. A dependent's range, such as `^1.2`, admits every later
 minor and patch, so a change it can't rely on is a new major.
 `tools/check` fails when a range doesn't admit the version it depends on,
-so a major release goes in two steps: first raise the dependents' ranges
+so a dependent can't raise its range before the dependency's release
+exists. The workflow's `raise` input does it in the release commit:
+`pr:crew` raises pr's range on crew to the minor being released, such as
+`^1.6`, and needs pr released in the same run. A major release goes in
+two steps: first raise the dependents' ranges
 to admit both majors (`^1.2 || ^2`), then release. `claude plugin validate`
 accepts such a range; no install has resolved one yet.

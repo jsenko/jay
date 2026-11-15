@@ -25,6 +25,9 @@ on:
       timer:
         description: "timer: version to release (empty: not released)"
         required: false
+      raise:
+        description: "Ranges to raise to the released minor, as dependent:dependency, such as pr:crew pr:fyi (empty: none)"
+        required: false
 
 # One release at a time: each pushes to main.
 concurrency: release
@@ -65,7 +68,8 @@ jobs:
           CODE: ${{ inputs.code }}
           PR: ${{ inputs.pr }}
           TIMER: ${{ inputs.timer }}
+          RAISE: ${{ inputs.raise }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          tools/release/release.sh "fyi=$FYI" "crew=$CREW" "status=$STATUS" "code=$CODE" "pr=$PR" "timer=$TIMER"
+          tools/release/release.sh "--raise=$RAISE" "fyi=$FYI" "crew=$CREW" "status=$STATUS" "code=$CODE" "pr=$PR" "timer=$TIMER"

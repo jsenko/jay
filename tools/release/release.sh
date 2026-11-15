@@ -4,6 +4,8 @@
 #
 #   tools/release/release.sh fyi=1.3.0 pr=1.0.1            release, and push
 #   tools/release/release.sh --dry-run fyi=1.3.0 pr=1.0.1  bump, check and show, then undo
+#   tools/release/release.sh --raise=pr:fyi fyi=1.3.0 pr=1.0.1
+#                                      also raise pr's range on fyi to ^1.3
 #
 # Each version is raised in the plugin's manifests, the tree is checked and
 # tested, and the bump is committed. Only then is anything pushed: the commit
@@ -15,16 +17,25 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DRY_RUN=false
 RELEASES=()
+RAISES=()
 
 die() { echo "release: $*" >&2; exit 1; }
 
 # Each argument is plugin=version, for a plugin here and a version above its
 # current one: releases only move forward. The current version itself is
 # accepted while it has no tag, which is how a plugin is first released.
+# --raise=dependent:dependency,... names ranges to raise, each on a plugin
+# this run releases.
 parse_args() {
-    local arg name version current
+    local arg name version current pairs
     for arg in "$@"; do
         [[ "$arg" == --dry-run ]] && { DRY_RUN=true; continue; }
+        if [[ "$arg" == --raise=* ]]; then
+            # Comma- or space-separated, as the workflow's one input gives them.
+            IFS=', ' read -r -a pairs <<<"${arg#--raise=}"
+            RAISES+=("${pairs[@]}")
+            continue
+        fi
         [[ "$arg" == *=* ]] || die "expected plugin=version, got '$arg'"
         name="${arg%%=*}" version="${arg#*=}"
         [[ -n "$version" ]] || continue
@@ -40,6 +51,25 @@ parse_args() {
         RELEASES+=("$name=$version")
     done
     (( ${#RELEASES[@]} )) || die "no plugin given a version"
+    local pair
+    for pair in "${RAISES[@]}"; do
+        [[ "$pair" =~ ^[a-z]+:[a-z]+$ ]] || die "expected dependent:dependency to raise, got '$pair'"
+        releasing "${pair%%:*}" || die "${pair%%:*} isn't released in this run, so its range on ${pair#*:} can't be raised"
+    done
+}
+
+# Whether this run releases the plugin.
+releasing() {
+    local entry
+    for entry in "${RELEASES[@]}"; do [[ "${entry%%=*}" == "$1" ]] && return 0; done
+    return 1
+}
+
+# Raises a dependent's range on a dependency to the dependency's version as it
+# now is, as ^major.minor: the release that starts relying on a new minor says
+# so, which tools/check can't let a commit do before that minor exists.
+raise() {
+    node "$REPO/tools/release/raise.mjs" "$REPO/plugins/$1/.claude-plugin/plugin.json" "$2" "$(manifest_version "$2")" || exit 1
 }
 
 # A plugin's version, from plugin.json.
@@ -88,6 +118,9 @@ summary=()
 for entry in "${RELEASES[@]}"; do
     bump "${entry%%=*}" "${entry#*=}"
     summary+=("${entry%%=*} ${entry#*=}")
+done
+for pair in "${RAISES[@]}"; do
+    raise "${pair%%:*}" "${pair#*:}"
 done
 "$REPO/tools/check/check.sh" --quiet
 # The tests' output, including the errors they provoke on purpose, only on failure.
