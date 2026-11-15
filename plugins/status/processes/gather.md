@@ -14,6 +14,8 @@ a start and an end date, both inclusive.
 Before anything else, read the user's standing choices: `fyi_search`
 for notes with `where: {tags: {all: ["decision", "status"]}}`. They say
 what to always include or leave out, and how the user's periods run.
+Apply each to what it names and no further: a choice to leave out a
+kind of note does not drop finished tasks, which are work done.
 
 ## GitHub
 
