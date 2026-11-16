@@ -1,6 +1,6 @@
 {
   "name": "crew",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "license": "Apache-2.0",
   "description": "Start sessions as roles, and coordinate them: who is working on what, jobs routed by role, messages, and a dashboard",
   "author": {
