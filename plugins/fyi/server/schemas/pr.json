@@ -149,7 +149,7 @@
     },
     "draft_review": {
       "type": "string",
-      "description": "A review written but not posted: the full markdown comment. The user posts it with their verdict via /j:pr-checkout; cleared once posted."
+      "description": "A review written but not posted: the full markdown comment. The user posts it with their verdict via /pr:checkout; cleared once posted."
     },
     "author_response": {
       "type": "string",
